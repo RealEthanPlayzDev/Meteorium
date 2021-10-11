@@ -1,10 +1,10 @@
 const { Client, Intents } = require("discord.js");
-const { token, prefix, clientId, targetGuildIds } = require("../config.json");
+const { token, prefix, applicationId, targetGuildIds } = require("../config.json");
 const MeteoriumCommandHandler = require("./util/CommandHandler");
 const MeteoriumEventHandler = require("./util/EventHandler");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-const CommandHandler = new MeteoriumCommandHandler(client, prefix, clientId, token);
+const CommandHandler = new MeteoriumCommandHandler(client, prefix, applicationId, token);
 const EventHandler = new MeteoriumEventHandler(client);
 
 EventHandler.RegisterEvents();
@@ -18,4 +18,4 @@ client.on("interactionCreate", async interaction => {
     CommandHandler.HandleCommandInteraction(interaction);
 });
 
-//client.login(token);
+client.login(token);

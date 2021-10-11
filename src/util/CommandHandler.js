@@ -10,10 +10,10 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
 class MeteoriumCommandHandler {
-    constructor(client, prefix, clientId, token) {
+    constructor(client, prefix, applicationId, token) {
         this.client = client;
         this.prefix = prefix;
-        this.clientId = clientId;
+        this.applicationId = applicationId;
         this.REST = new REST({ version: '9' }).setToken(token);
         this.parsedCommands = new Collection();
         this.interactionDeployCommands = [];
@@ -41,7 +41,7 @@ class MeteoriumCommandHandler {
         (async() => {
             try {
                 console.log(`MeteoriumCommandHandler: Deploying interaction for guildId ${GuildId}`);
-                await this.REST.put(Routes.applicationGuildCommands, { body: this.interactionDeployCommands });
+                await this.REST.put(Routes.applicationGuildCommands(this.applicationId, GuildId), { body: this.interactionDeployCommands });
                 console.log(`MeteoriumCommandHandler: Interaction deployed for guildId ${GuildId}`);
             } catch (err) {
                 console.error(`MeteoriumCommandHandler: Error occured when deploying command interaction, \n${err}`);
