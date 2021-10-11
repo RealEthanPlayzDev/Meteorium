@@ -1,0 +1,22 @@
+{
+  "name": "brokenlexer",
+  "version": "1.0.0",
+  "description": "private discord bot using discordjs made by RadiatedExodus",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RealEthanPlayzDev/brokenlexer.git"
+  },
+  "author": "RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RealEthanPlayzDev/brokenlexer/issues"
+  },
+  "homepage": "https://github.com/RealEthanPlayzDev/brokenlexer#readme",
+  "dependencies": {
+    "discord.js": "^13.2.0"
+  }
+}
