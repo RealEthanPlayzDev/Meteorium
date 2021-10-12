@@ -10,6 +10,7 @@ The ``config.json`` is normally under .gitignore and is required for the bot to 
     "applicationId": "application id here",
     "targetGuildIds": [
         "put guild ids where you want to register interaction commands into (or leave empty)"
-    ]
+    ],
+    holodexApiKey: "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started"
 }
 ```

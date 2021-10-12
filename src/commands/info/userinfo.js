@@ -44,7 +44,8 @@ module.exports = new MeteoriumCommand("userinfo", "Returns information about the
                     { name: "Joined this server at", value: `<t:${Math.round(parseddata.joinedTimestamp / 1000)}:f>\n(<t:${Math.round(parseddata.joinedTimestamp / 1000)}:R>)` },
                     { name: "Server Nitro Booster", value: `${parseddata.premiumSince ? `Booster since <t:${Math.round(parseddata.premiumSinceTimestamp / 1000)}:f> (<t:${Math.round(parseddata.premiumSinceTimestamp / 1000)}:R>)` : "Not a booster"}`},
                     { name: `Roles (${parseddata.roles.cache.filter(role => role.name !== "@everyone").size} in total without @everyone)`, value: parseddata.roles.cache.filter(role => role.name !== '@everyone').size ? (() => parseddata.roles.cache.filter(role => role.name !== '@everyone').sort((role1, role2) => role2.rawPosition - role1.rawPosition).map(role => role).join(', '))() : '———' },
-                );
+                )
+                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)");
         } else if (parseddata instanceof User) {
             embed.setDescription(String(parseddata))
                 .setAuthor(parseddata.tag, null, `https://discordapp.com/users/${parseddata.id}`)
@@ -54,6 +55,7 @@ module.exports = new MeteoriumCommand("userinfo", "Returns information about the
                     { name: "Joined Discord at", value: `<t:${Math.round(parseddata.createdTimestamp / 1000)}:f>\n${parseddata.createdAt}\n(<t:${Math.round(parseddata.createdTimestamp / 1000)}:R>)` }
                 )
                 .setColor("0099ff")
+                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)");
         }
         embeds.push(embed)
     }
