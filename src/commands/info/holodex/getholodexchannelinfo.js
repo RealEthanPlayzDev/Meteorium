@@ -10,7 +10,6 @@ const holodexClient = new HolodexApiClient({
 module.exports = new MeteoriumCommand("getholodexchannelinfo", "Get a channel info from holodex", async (interaction, client) => {
     await interaction.deferReply()
     const channel = (await holodexClient.getChannel(interaction.options.getString("channelid"))).toRaw();
-    console.log(channel)
     await interaction.editReply({ embeds: [
         new MessageEmbed()
             .setAuthor(channel.name, null, `https://www.youtube.com/channel/${channel.channelId}`)
