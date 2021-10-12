@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js");
-const MeteoriumCommand = require("../util/Command");
+const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("embedtest", "Embed test command.", async (interaction, client) => {
     await interaction.reply({ embeds: [new MessageEmbed()
