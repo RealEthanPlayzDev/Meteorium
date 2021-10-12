@@ -1,8 +1,14 @@
 module.exports = {
     name: "ready",
-    once: true,
+    once: false,
     async execute(client) {
-        client.user.setPresence("idle");
-        client.user.setActivity("no", { type: "playing" });
+        client.user.setPresence({
+            status: "idle",
+            activity: {
+                name: "no",
+                type: "PLAYING"
+            }
+        })
+        console.log("Successfully set the activity");
     }
 }

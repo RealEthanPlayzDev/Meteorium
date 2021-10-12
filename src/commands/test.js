@@ -1,16 +1,5 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const MeteoriumCommand = require("../util/Command");
 
-var command = {
-    name: "test",
-    description: "Test command",
-    interactionData: null,
-    async execute(interaction, client) {
-        await interaction.reply("The command ran successfully.");
-    }
-}
-
-command.interactionData = new SlashCommandBuilder()
-    .setName(command.name)
-    .setDescription(command.description);
-
-module.exports = command;
+module.exports = new MeteoriumCommand("test", "Test command.", async (interaction, client) => {
+    await interaction.reply("The command ran successfully.");
+});
