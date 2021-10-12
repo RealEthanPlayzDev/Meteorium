@@ -68,7 +68,11 @@ class MeteoriumCommandHandler {
                 .setTimestamp()
                 .setColor("FF0000");
                 
-            await interaction.reply({ embeds: [errEmbed]});
+            if (interaction.deferred) {
+                await interaction.editReply({ embeds: [errEmbed] });
+            } else {
+                await interaction.reply({ embeds: [errEmbed] });
+            }
         }
     }
 }
