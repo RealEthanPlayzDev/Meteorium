@@ -8,7 +8,7 @@ const holodexClient = new HolodexApiClient({
 });
 
 module.exports = new MeteoriumCommand("getholodexchannelinfo", "Get a channel info from holodex", async (interaction, client) => {
-    await interaction.deferReply()
+    await interaction.deferReply();
     const channel = (await holodexClient.getChannel(interaction.options.getString("channelid"))).toRaw();
     await interaction.editReply({ embeds: [
         new MessageEmbed()
@@ -25,7 +25,7 @@ module.exports = new MeteoriumCommand("getholodexchannelinfo", "Get a channel in
                 { name: "Inactive", value: channel.inactive ? "Yes" : "No" },
             )
             .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-    ] })
+    ] });
 }, new SlashCommandBuilder()
     .setName("getholodexchannelinfo")
     .setDescription("Get a channel info from holodex (https://holodex.net)")
