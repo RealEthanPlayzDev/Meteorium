@@ -10,11 +10,7 @@ class MeteoriumCommand {
         this.name = name;
         this.description = description;
         this.execute = execute;
-        if (!interactionData) {
-            this.interactionData = new SlashCommandBuilder()
-                .setName(name)
-                .setDescription(description);
-        }
+        this.interactionData = interactionData ?? new SlashCommandBuilder().setName(name).setDescription(description);
     }
 
     SetName(newName) {
@@ -28,7 +24,6 @@ class MeteoriumCommand {
     }
 
     SetInteractionData(newInteraction) {
-        this.interactionData = newInteraction;
         this.interactionData = newInteraction;
     }
 
