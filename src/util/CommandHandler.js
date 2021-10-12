@@ -24,7 +24,6 @@ class MeteoriumCommandHandler {
         for (const file of files) {
             const fInfo = fs.lstatSync(path.join(__dirname, targetDir, file));
             if (fInfo.isDirectory()) {
-                console.log(path.join(targetDir, file))
                 this.ParseCommands(path.join(targetDir, file));
             } else {
                 try {
