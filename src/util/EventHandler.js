@@ -23,7 +23,6 @@ class MeteoriumEventHandler {
                     } else {
                         this.client.on(event.name, event.execute);
                     }
-                    console.log(file);
                 } catch(err) {
                     console.warn(`MeteoriumEventHandler: An error occured when attempting to parse event file: ${file}\n${err}`);
                 }

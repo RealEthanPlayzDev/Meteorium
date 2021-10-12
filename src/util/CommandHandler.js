@@ -67,7 +67,6 @@ class MeteoriumCommandHandler {
                 .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
                 .setTimestamp()
                 .setColor("FF0000");
-                
             if (interaction.deferred) {
                 await interaction.editReply({ embeds: [errEmbed] });
             } else {
