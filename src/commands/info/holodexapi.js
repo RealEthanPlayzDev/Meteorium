@@ -46,6 +46,7 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
         }
         if (songs === "") { songs = "No songs" }
 
+        console.log(video);
         await interaction.editReply({ embeds: [
             new MessageEmbed()
                 .setAuthor(video.title, null, `https://www.youtube.com/watch?v=${video.id}`)
@@ -53,23 +54,26 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                 .setDescription((video.description === "" && "(No description available)" || video.description))
                 .addFields(
                     // Video metadata
+                    { name: `Video link`, value: `https://www.youtube.com/watch?v=${video.id}` },
                     { name: `Songs (${(video.songs === undefined && "0" || video.songs.length)} total)`, value: (songs === "" && "Unable to parse song/No songs available" || songs) },
                     { name: "Video type", value: (video.type === "" && "Unknown" || video.type) },
-                    { name: "Video topic id", value: (video.topic_id === "" && "None" || video.topic_id) },
+                    { name: "Status", value: (video.status === "" && "Unknown" || video.status) },
+                    { name: "Video topic id", value: (video.topic_id === undefined && "None" || video.topic_id) },
                     { name: "Video duration", value: (video.duration === 0 && "0" || String(video.duration)) },
 
                     // Anything related to time/date
                     { name: "Published at", value: (video.published_at === "" && "Unknown date" || video.published_at) },
                     { name: "Available at", value: (video.available_at === "" && "Unknown date" || video.available_at) },
-                    { name: "Scheduled premiere start time", value: (video.start_scheduled === "" && "Unknown date (Possibly not a premiere)" || video.start_scheduled) },
-                    { name: "Premiere started at", value: (video.start_actual === "" && "Unknown date (Possibly not a premiere)" || video.start_actual) },
-                    { name: "Premiere ended at", value: (video.end_actual === "" && "Unknown date (Possibly not a premiere)" || video.end_actual) },
+                    { name: "Scheduled premiere start time", value: (video.start_scheduled === undefined && "Unknown date (Possibly not a premiere)" || video.start_scheduled) },
+                    { name: "Premiere started at", value: (video.start_actual === undefined && "Unknown date (Possibly not a premiere)" || video.start_actual) },
+                    { name: "Premiere ended at", value: (video.end_actual === undefined && "Unknown date (Possibly not a premiere)" || video.end_actual) },
 
                     // Channel info
                     { name: "Channel name", value: video.channel.name },
                     { name: "Channel English name", value: video.channel.english_name },
                     { name: "Channel organization", value: (video.channel.org === "" && "Independent" || video.channel.org) },
                     { name: "Channel suborganization", value: (video.channel.suborg === "" || video.channel.suborg === undefined && "Independent" || video.channel.suborg) },
+                    { name: "Channel link", value: `https://www.youtube.com/channel/${video.channel.id}` },
                     { name: "For more information about the channel", value: "Do the command ``/holodexapi getchannelinfo channelid:"+video.channel.id+"``" },
                 )
                 .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
