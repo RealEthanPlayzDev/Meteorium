@@ -3,7 +3,7 @@ const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
-    if (interaction.member.permissions.has("MANAGE_MESSAGES"), true) {
+    if (interaction.member.permissions.has("MANAGE_GUILD"), true) {
         const msg = interaction.options.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
             await interaction.reply({ embeds: [
