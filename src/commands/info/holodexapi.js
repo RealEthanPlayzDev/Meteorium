@@ -26,6 +26,8 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                     { name: "Inactive", value: channel.inactive ? "Yes" : "No" },
                 )
                 .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                .setColor("0099ff")
+                .setTimestamp()
         ]});
     } else if (interaction.options.getSubcommand() === "getvideoinfo") {
         const video = (await holodexClient.getVideo(interaction.options.getString("videoid"), false)).toRaw();
@@ -68,6 +70,9 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                     { name: "Channel suborganization", value: (video.channel.suborg === "" || video.channel.suborg === undefined && "Independent" || video.channel.suborg) },
                     { name: "For more information about the channel", value: "Do the command ``/holodexapi getchannelinfo channelid:"+video.channel.id+"``" },
                 )
+                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                .setColor("0099ff")
+                .setTimestamp()
         ]});
     }
 }, new SlashCommandBuilder()
