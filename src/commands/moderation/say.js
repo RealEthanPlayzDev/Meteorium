@@ -1,10 +1,12 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
+const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
-    if (interaction.member.permissions.has("MANAGE_GUILD", true)) {
-        const msg = interaction.options.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
+    if (interaction.member.permissions.has("MANAGE_MESSAGES", true)) {
+        const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(interaction.guildId) }).exec();
+        const msg = (guildSchema.EnforceSayinExecutor && interaction.options.getString("message")+`\n\n(Sayin command executed by ${interaction.member})` || interaction.options.getString("message")), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
             await interaction.reply({ embeds: [
                 new MessageEmbed()
@@ -22,7 +24,7 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
         await interaction.reply({embeds: [
             new MessageEmbed()
                 .setTitle("Cannot do sayin")
-                .setDescription("You do not have permission to use this command! (Missing permission MANAGE_GUILD)")
+                .setDescription("You do not have permission to use this command! (Missing permission MANAGE_MESSAGES)")
                 .setColor("FF0000")
                 .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
                 .setTimestamp()
