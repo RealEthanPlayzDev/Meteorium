@@ -11,6 +11,9 @@ The ``config.json`` is normally under .gitignore and is required for the bot to 
     "targetGuildIds": [
         "put guild ids where you want to register interaction commands into (or leave empty)"
     ],
-    holodexApiKey: "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started"
+    "holodexApiKey": "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started"
 }
 ```
+
+## Running the bot
+The bot is using discord.js v13, which requires node.js v16, make sure you have node.js v16 before attempting to run the bot (otherwise it will crash)
