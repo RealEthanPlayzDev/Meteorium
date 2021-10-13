@@ -46,7 +46,6 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
         }
         if (songs === "") { songs = "No songs" }
 
-        console.log(video);
         await interaction.editReply({ embeds: [
             new MessageEmbed()
                 .setAuthor(video.title, null, `https://www.youtube.com/watch?v=${video.id}`)
