@@ -3,7 +3,7 @@ const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
-    if (interaction.member.permissions.has("MANAGE_GUILD"), true) {
+    if (interaction.member.permissions.has("MANAGE_GUILD", true)) {
         const msg = interaction.options.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
             await interaction.reply({ embeds: [
@@ -22,7 +22,7 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
         await interaction.reply({embeds: [
             new MessageEmbed()
                 .setTitle("Cannot do sayin")
-                .setDescription("You do not have permission to use this command! (Missing permission MANAGE_MESSAGES)")
+                .setDescription("You do not have permission to use this command! (Missing permission MANAGE_GUILD)")
                 .setColor("FF0000")
                 .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
                 .setTimestamp()
