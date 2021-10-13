@@ -4,9 +4,9 @@ const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
     if (interaction.member.permissions.has("MANAGE_MESSAGES"), true) {
-        const msg = interaction.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
+        const msg = interaction.options.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
-            await interaction.options.reply({ embeds: [
+            await interaction.reply({ embeds: [
                 new MessageEmbed()
                     .setTitle("Cannot do sayin")
                     .setDescription("Specified channel is not a text channel.")
