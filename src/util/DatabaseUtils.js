@@ -1,5 +1,6 @@
 // MongoDB Database wrapper for Meteorium
 // Written by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev)
+// NOTE: As of October 13 2021 (the same day this was written), this won't be used for the time being.
 
 const mongoose = require("mongoose")
 

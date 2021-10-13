@@ -24,7 +24,7 @@ class MeteoriumEventHandler {
                         this.client.on(event.name, event.execute);
                     }
                 } catch(err) {
-                    console.warn(`MeteoriumEventHandler: An error occured when attempting to parse event file: ${file}\n${err}`);
+                    console.warn(`MeteoriumEventHandler: An error occured when attempting to parse event file: ${file}\n${err.stack}`);
                 }
             }
         }

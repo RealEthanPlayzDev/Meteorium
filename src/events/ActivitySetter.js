@@ -1,6 +1,6 @@
 module.exports = {
     name: "ready",
-    once: false,
+    once: true,
     async execute(client) {
         client.user.setPresence({
             status: "idle",
