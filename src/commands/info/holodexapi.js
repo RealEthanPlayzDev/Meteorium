@@ -34,12 +34,14 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
 
         // Song parsing
         var songs = "";
-        for (const song of video.songs) {
-            var str = `Name: ${song.name}\nOriginal artist: ${song.original_artist}\niTunes id: ${song.itunesid ? song.itunesid : "Unknown/None"}\nSong duration: ${song.end}`;
-            if (songs === "") {
-                songs = str
-            } else {
-                songs += "\n" + str
+        if (video.songs) {
+            for (const song of video.songs) {
+                var str = `Name: ${song.name}\nOriginal artist: ${song.original_artist}\niTunes id: ${song.itunesid ? song.itunesid : "Unknown/None"}\nSong duration: ${song.end}`;
+                if (songs === "") {
+                    songs = str
+                } else {
+                    songs += "\n" + str
+                }
             }
         }
         if (songs === "") { songs = "No songs" }
@@ -51,7 +53,7 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                 .setDescription((video.description === "" && "(No description available)" || video.description))
                 .addFields(
                     // Video metadata
-                    { name: `Songs (${video.songs.length} total)`, value: (songs === "" && "Unable to parse song/No songs available" || songs) },
+                    { name: `Songs (${(video.songs === undefined && "0" || video.songs.length)} total)`, value: (songs === "" && "Unable to parse song/No songs available" || songs) },
                     { name: "Video type", value: (video.type === "" && "Unknown" || video.type) },
                     { name: "Video topic id", value: (video.topic_id === "" && "None" || video.topic_id) },
                     { name: "Video duration", value: (video.duration === 0 && "0" || String(video.duration)) },

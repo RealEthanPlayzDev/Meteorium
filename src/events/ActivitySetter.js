@@ -8,7 +8,7 @@ module.exports = {
                 name: "no",
                 type: "PLAYING"
             }]
-        })
+        });
         console.log("Successfully set the activity");
     }
 }

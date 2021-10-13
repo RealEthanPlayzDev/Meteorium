@@ -6,12 +6,14 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
     if (interaction.member.permissions.has("MANAGE_MESSAGES"), true) {
         const msg = interaction.options.getString("message"), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
-            new MessageEmbed()
-                .setTitle("Cannot do sayin")
-                .setDescription("Specified channel is not a text channel.")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
+            await interaction.options.reply({ embeds: [
+                new MessageEmbed()
+                    .setTitle("Cannot do sayin")
+                    .setDescription("Specified channel is not a text channel.")
+                    .setColor("FF0000")
+                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                    .setTimestamp()
+            ]})
             return;
         }
         await channel.send(msg);

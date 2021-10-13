@@ -31,7 +31,7 @@ class MeteoriumCommandHandler {
                     this.parsedCommands.set(command.name, command);
                     this.interactionDeployCommands.push(command.interactionData.toJSON());
                 } catch(err) {
-                    console.error(`MeteoriumCommandHandler: error occured while parsing command file: ${path.join(__dirname, targetDir, file)}\n${err}\n${err.stack}`);
+                    console.error(`MeteoriumCommandHandler: error occured while parsing command file: ${path.join(__dirname, targetDir, file)}\n${err.stack}`);
                 }
             }
         }
@@ -57,7 +57,7 @@ class MeteoriumCommandHandler {
         try {
             await targetCommand.execute(interaction, this.client);
         } catch(err) {
-            console.error(`MeteoriumCommandHandler: error occured when handling command:\n${err}\n${err.stack}`);
+            console.error(`MeteoriumCommandHandler: error occured when handling command:\n${err.stack}`);
             const errEmbed = new MessageEmbed()
                 .setTitle("An error occured when running the command!")
                 .setDescription(String(err))
