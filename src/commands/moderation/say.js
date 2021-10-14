@@ -6,7 +6,8 @@ const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
     if (interaction.member.permissions.has("MANAGE_MESSAGES", true)) {
         const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(interaction.guildId) }).exec();
-        const msg = (guildSchema.EnforceSayinExecutor && interaction.options.getString("message")+`\n\n(Sayin command executed by ${interaction.member})` || interaction.options.getString("message")), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
+        const showExecutorName = (guildSchema.EnforceSayinExecutor && !interaction.member.permissions.has("ADMINISTRATOR", true) && true || interaction.options.getBoolean("showexecutorname"))
+        const msg = (showExecutorName && interaction.options.getString("message")+`\n\n(Sayin command executed by ${interaction.member})` || interaction.options.getString("message")), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!channel.isText()) {
             await interaction.reply({ embeds: [
                 new MessageEmbed()
@@ -34,4 +35,5 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
     .setName("sayin")
     .setDescription("Says message in a channel in this server")
     .addStringOption(option => option.setName("message").setDescription("The message to be sent").setRequired(true))
-    .addChannelOption(option => option.setName("channel").setDescription("Optional channel where message will be sent (if not specified it will be sent to the current channel")));
+    .addChannelOption(option => option.setName("channel").setDescription("Optional channel where message will be sent (if not specified it will be sent to the current channel"))
+    .addBooleanOption(option => option.setName("showexecutorname").setDescription("Show the executor name or not (can be overriden by EnforceSayinExecutor, doesn't include admins)")));
