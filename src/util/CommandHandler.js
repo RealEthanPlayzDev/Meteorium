@@ -8,6 +8,7 @@ const path = require("path");
 const { Collection, MessageEmbed } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+const GuildSettingSchema = require("../schemas/GuildSettingSchema");
 
 class MeteoriumCommandHandler {
     constructor(client, prefix, applicationId, token) {
@@ -17,6 +18,8 @@ class MeteoriumCommandHandler {
         this.REST = new REST({ version: '9' }).setToken(token);
         this.parsedCommands = new Collection();
         this.interactionDeployCommands = [];
+        this.disabledCommandCache = {};
+        this.disabledCommandCategoryCache = {};
     }
 
     ParseCommands(targetDir = "../commands") {
@@ -53,6 +56,17 @@ class MeteoriumCommandHandler {
         if (!interaction.isCommand()) return;
         const targetCommand = this.parsedCommands.get(interaction.commandName);
         if (!targetCommand) return;
+        if (this.disabledCommandCache[interaction.guildId][interaction.commandName]) {
+            await interaction.reply({ embeds: [
+                new MessageEmbed()
+                    .setTitle("Cannot run command")
+                    .setDescription("This command has been disabled by a administrator for this server!")
+                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                    .setTimestamp()
+                    .setColor("FF0000")
+            ]});
+            return;
+        }
 
         try {
             await targetCommand.execute(interaction, this.client);
@@ -74,6 +88,21 @@ class MeteoriumCommandHandler {
                 await interaction.reply({ embeds: [errEmbed] });
             }
         }
+    }
+
+    async UpdateDisabledCommandCache(guildId) {
+        if (!guildId) { throw new Error("MeteoriumCommandHandler: no guildId specified for UpdateDisabledCommandCache") }
+        const guildExists = this.client.guilds.cache.has(String(guildId));
+        if (guildExists) {
+            const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) })
+            try {
+                this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
+                this.disabledCommandCategoryCache[String(guildId)] = guildSchema.DisabledCommandCategories;
+            } catch(err) {
+
+            }
+        }
+        //console.log(this.disabledCommandCache);
     }
 }
 

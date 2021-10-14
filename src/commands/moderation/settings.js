@@ -24,16 +24,71 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
          }
     } else if (interaction.options.getSubcommandGroup() === "disabledcommands") {
         if (interaction.member.permissions.has("ADMINISTRATOR", true)) {
-            switch(interaction.options.getSubcommand()) {
-                case("add"): {
-                    
+            const guildSchema = await GuildSettingSchema.findOne({ GuildId: interaction.guildId });
+            if (interaction.options.getSubcommand() === "add") {
+                const targetCommands = ([]).concat(interaction.options.getString("commands").split(",")), updatedDisabledCommands = guildSchema.DisabledCommands;
+                var parseSuccess = true, failParseCommandName = "";
+
+                for (const targetCommand of targetCommands) {
+                    if (client.CommandHandler.parsedCommands.get(targetCommand)) {
+                        console.log(targetCommand)
+                        updatedDisabledCommands[client.CommandHandler.parsedCommands.get(targetCommand).name] = client.CommandHandler.parsedCommands.get(targetCommand).description
+                    } else {
+                        failParseCommandName = targetCommand;
+                        parseSuccess = false;
+                        break;
+                    }
                 }
-                case("remove"): {
-                    
+
+                if (!parseSuccess) {
+                    await interaction.editReply({ embeds: [
+                        new MessageEmbed()
+                            .setTitle("Error")
+                            .setDescription(`Command name ${failParseCommandName} does not exist! (to prevent this error, type command names correctly, multiple commands seperated with command like "test,embedtest,userinfo" and so on)`)
+                            .setColor("FF0000")
+                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                            .setTimestamp()
+                        ]});
+                    return;
                 }
-                case("list"): {
-                    
+
+                guildSchema.DisabledCommands = updatedDisabledCommands;
+                guildSchema.markModified("DisabledCommands");
+                guildSchema.save().then(async () => {
+                    await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
+                    await interaction.editReply("Successfully added the new disabled commands for this server.");
+                }).catch((err) => {
+                    throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                });
+            } else if (interaction.options.getSubcommand() === "remove") {
+                const targetCommands = ([]).concat(interaction.options.getString("commands").split(","));
+                var disabledCommands = guildSchema.DisabledCommands;
+                for (const targetCommand of targetCommands) {
+                    if (disabledCommands[targetCommand]) {
+                        delete(disabledCommands[targetCommand]);
+                    }
                 }
+                guildSchema.DisabledCommands = disabledCommands;
+                guildSchema.markModified("DisabledCommands");
+                guildSchema.save().then(async () => {
+                    await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
+                    await interaction.editReply("Successfully removed the disabled commands for this server.");
+                }).catch((err) => {
+                    throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                });
+            } else if (interaction.options.getSubcommand() === "list") {
+                const embed = new MessageEmbed()
+                                .setTitle("List of disabled commands")
+                                .setDescription("Below are the commands that are disabled:\n(Note: disabled command categories override this setting!)")
+                                .setColor("0099ff")
+                                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+                                .setTimestamp()
+                for (const [name, desc] of Object.entries(guildSchema.DisabledCommands)) {
+                    if (guildSchema.DisabledCommands.hasOwnProperty(name)) {
+                        embed.addField(name, desc);
+                    }
+                }
+                await interaction.editReply({ embeds: [embed] });
             }
         } else {
             await interaction.editReply({ embeds: [
