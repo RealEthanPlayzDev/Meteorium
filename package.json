@@ -23,6 +23,7 @@
     "discord.js": "^13.2.0",
     "holodex.js": "^1.1.0",
     "mongoose": "^6.0.10",
+    "neko-love.js": "^1.0.4",
     "request": "^2.88.2",
     "something-random-on-discord": "^3.4.4"
   }

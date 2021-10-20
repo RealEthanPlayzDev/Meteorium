@@ -95,6 +95,7 @@ class MeteoriumCommandHandler {
         const guildExists = this.client.guilds.cache.has(String(guildId));
         if (guildExists) {
             const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) })
+            console.log(guildSchema);
             try {
                 this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
                 this.disabledCommandCategoryCache[String(guildId)] = guildSchema.DisabledCommandCategories;
@@ -102,7 +103,7 @@ class MeteoriumCommandHandler {
 
             }
         }
-        //console.log(this.disabledCommandCache);
+        console.log(this.disabledCommandCache);
     }
 }
 

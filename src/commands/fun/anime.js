@@ -1,13 +1,13 @@
 const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
-const srod = require("something-random-on-discord");
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const Neko = require("neko-love.js");
 
 module.exports = new MeteoriumCommand("anime", "Random anime pictures", async (interaction, client) => {
     await interaction.deferReply();
     const action = interaction.options.getString("action")
     try {
-        const pic = await srod.Random.getAnimeImgURL(action);
+        const pic = await Neko(action);
         await interaction.editReply({ embeds: [
             new MessageEmbed()
                 .setTitle(`Random anime ${action} picture`)

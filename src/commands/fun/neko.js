@@ -1,15 +1,15 @@
 const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
-const srod = require("something-random-on-discord")
+const Neko = require("neko-love.js");
 
 module.exports = new MeteoriumCommand("neko", "Random nekomimi/catgirl picture", async (interaction, client) => {
     await interaction.deferReply();
     try {
-        const nekoembed = await srod.Random.getNeko();
+        const nekoembed = await Neko("neko");
         await interaction.editReply({ embeds: [
             new MessageEmbed()
                 .setTitle("Random neko picture")
-                .setImage(nekoembed.embed.image.url)
+                .setImage(nekoembed.embed.image.ur)
                 .setColor("0099ff")
         ]});
     } catch(err) {
