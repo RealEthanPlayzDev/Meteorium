@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
 const Neko = require("neko-love.js");
 
-module.exports = MeteoriumCommand("kitsune", "Random kitsune pictures", async (interaction, client) => {
+module.exports = new MeteoriumCommand("kitsune", "Random kitsune pictures", async (interaction, client) => {
     interaction.deferReply();
     try {
         const kitsunepic = await Neko("kitsune");
