@@ -3,5 +3,5 @@ const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("ping", "Returns latency number", async (interaction, client) => {
     const msg = await interaction.deferReply();
-    interaction.editReply(`Message ping: ${Date.now() - msg instanceof Message && msg.createdTimestamp || msg.timestamp}\nWebsocket ping: ${client.ws.ping}`);
+    interaction.editReply(`Websocket ping: ${client.ws.ping}`); // Message ping: ${Date.now() - msg instanceof Message && msg.createdTimestamp || msg.timestamp}\n
 });
