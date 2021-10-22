@@ -1,8 +1,6 @@
 // The command handler for Meteorium
 // Written by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev)
 
-// TODO - Probably make a seperate Command class? Well for now I'm sticking with normal dictionaries
-
 const fs = require("fs");
 const path = require("path");
 const { Collection, MessageEmbed } = require('discord.js');
