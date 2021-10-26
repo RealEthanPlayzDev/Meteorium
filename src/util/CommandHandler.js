@@ -101,7 +101,7 @@ class MeteoriumCommandHandler {
 
             }
         }
-        console.log(this.disabledCommandCache);
+        //console.log(this.disabledCommandCache);
     }
 }
 
