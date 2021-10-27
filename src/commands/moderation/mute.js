@@ -4,6 +4,8 @@ const MeteoriumCommand = require("../../util/Command");
 module.exports = new MeteoriumCommand("mute", "Mutes a person", async () => {
     await interaction.reply("Not yet implemented.");
 }, new SlashCommandBuilder()
+        .setName("mute")
+        .setDescription("Mutes a person")
         .addSubcommand(subcommand => subcommand.setName("user")
                                         .setDescription("Mute someone by their user mention")
                                         .addMentionableOption(option => option.setName("user").setDescription("Target user").setRequired(true)
