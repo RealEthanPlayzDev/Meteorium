@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const MeteoriumCommand = require("../../util/Command");
 
-module.exports = new MeteoriumCommand("mute", "Mutes a person", async () => {
+module.exports = new MeteoriumCommand("mute", "Mutes a person", async (interaction, client) => {
     await interaction.reply("Not yet implemented.");
 }, new SlashCommandBuilder()
     .setName("mute")
