@@ -6,8 +6,8 @@ const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
     if (interaction.member.permissions.has("MANAGE_MESSAGES", true)) {
         const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(interaction.guildId) }).exec();
-        const showExecutorName = (guildSchema.EnforceSayinExecutor && !interaction.member.permissions.has("ADMINISTRATOR", true) && true || (interaction.options.getBoolean("showexecutorname") && true || false))
-        const showSuccessMessage = interaction.options.getBoolean("showsuccessmessage") && false || true;
+        const showExecutorName = (guildSchema.EnforceSayinExecutor && !interaction.member.permissions.has("ADMINISTRATOR", true) && true || (interaction.options.getBoolean("showexecutorname") === null && true || false))
+        const showSuccessMessage = !(interaction.options.getBoolean("showsuccessmessage") === null && true || interaction.options.getBoolean("showsuccessmessage"));
         const msg = (showExecutorName && interaction.options.getString("message")+`\n\n(Sayin command executed by ${interaction.member})` || interaction.options.getString("message")), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
         if (!showSuccessMessage) {
             if (!interaction.member.permissions.has("ADMINISTRATOR", true)) {
