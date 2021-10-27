@@ -9,7 +9,7 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
         const showExecutorName = (guildSchema.EnforceSayinExecutor && !interaction.member.permissions.has("ADMINISTRATOR", true) && true || (interaction.options.getBoolean("showexecutorname") === null && true || false))
         const showSuccessMessage = !(interaction.options.getBoolean("showsuccessmessage") === null && true || interaction.options.getBoolean("showsuccessmessage"));
         const msg = (showExecutorName && interaction.options.getString("message")+`\n\n(Sayin command executed by ${interaction.member})` || interaction.options.getString("message")), channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel;
-        if (!showSuccessMessage) {
+        if (showSuccessMessage) {
             if (!interaction.member.permissions.has("ADMINISTRATOR", true)) {
                 await interaction.reply({ embeds: [
                     new MessageEmbed()
