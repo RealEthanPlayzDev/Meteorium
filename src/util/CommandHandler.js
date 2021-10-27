@@ -38,16 +38,24 @@ class MeteoriumCommandHandler {
         }
     }
 
-    DeployCommandInteraction(GuildId) {
-        (async() => {
-            try {
-                console.log(`MeteoriumCommandHandler: Deploying interaction for guildId ${GuildId}`);
-                await this.REST.put(Routes.applicationGuildCommands(this.applicationId, GuildId), { body: this.interactionDeployCommands });
-                console.log(`MeteoriumCommandHandler: Interaction deployed for guildId ${GuildId}`);
-            } catch (err) {
-                console.error(`MeteoriumCommandHandler: Error occured when deploying command interaction, \n${err}`);
-            }
-        })();
+    async DeployCommandInteraction(GuildId) {
+        try {
+            console.log(`MeteoriumCommandHandler: Deploying interaction for guildId ${GuildId}`);
+            await this.REST.put(Routes.applicationGuildCommands(this.applicationId, GuildId), { body: this.interactionDeployCommands });
+            console.log(`MeteoriumCommandHandler: Interaction deployed for guildId ${GuildId}`);
+        } catch (err) {
+            console.error(`MeteoriumCommandHandler: Error occured when deploying command interaction for guild ${GuildId}, \n${err.stack}`);
+        }
+    }
+
+    async DeployGlobalCommandInteraction() {
+        try {
+            console.log(`MeteoriumCommandHandler: Deploying global interaction`);
+            await this.REST.put(Routes.applicationCommands(this.applicationId), { body: this.interactionDeployCommands });
+            console.log(`MeteoriumCommandHandler: Global interaction deployed successfully.`);
+        } catch (err) {
+            console.error(`MeteoriumCommandHandler: Error occured when deploying global command interaction, \n${err.stack}`);
+        }
     }
 
     async HandleCommandInteraction(interaction) {
