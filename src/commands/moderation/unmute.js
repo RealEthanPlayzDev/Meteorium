@@ -9,10 +9,11 @@ module.exports = new MeteoriumCommand("unmute", "Unmutes a person", async (inter
         .addSubcommand(subcommand => subcommand.setName("user")
                                         .setDescription("Unmute someone by their user mention")
                                         .addMentionableOption(option => option.setName("user").setDescription("Target user").setRequired(true)
+            )                       
         )
         .addSubcommand(subcommand => subcommand.setName("id")
                                         .setDescription("Unmute someone by their user id")
-                                        .addStringOption(option => option.setName("userid").setDescription("Target userid").setRequired(true))
+                                        .addStringOption(option => option.setName("userid").setDescription("Target userid").setRequired(true)
+            )
         )
-    )
 );
