@@ -1,4 +1,3 @@
-const { Message } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("ping", "Returns latency number", async (interaction, client) => {
