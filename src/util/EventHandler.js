@@ -19,11 +19,11 @@ class MeteoriumEventHandler {
                 try {
                     const event = require(path.join(__dirname, targetDir, file));
                     if (event.once) {
-                        this.client.once(event.name, () => {
+                        this.client.once(event.name, (...arguments) => {
                             event.execute(this.client, this.client.CommandHandler, ...arguments);
                         });
                     } else {
-                        this.client.on(event.name, () => {
+                        this.client.on(event.name, (...arguments) => {
                             event.execute(this.client, this.client.CommandHandler, ...arguments);
                         });
                     }
