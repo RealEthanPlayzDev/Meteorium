@@ -4,7 +4,7 @@ module.exports = {
     name: "guildCreate",
     once: false,
     async execute(guild) {  
-        if (!await GuildSettingSchema.findOne({ GuildId: String(guild.id) })) {
+        if ( await GuildSettingSchema.findOne({ GuildId: String(guild.id) }) === null ) {
             const newGuildSettingSchema = new GuildSettingSchema({
                 GuildId: guild.id,
                 EnforceSayinExecutor: false,
