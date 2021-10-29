@@ -62,7 +62,7 @@ class MeteoriumCommandHandler {
         if (!interaction.isCommand()) return;
         const targetCommand = this.parsedCommands.get(interaction.commandName);
         if (!targetCommand) return;
-        if (this.disabledCommandCache[interaction.guildId][interaction.commandName]) {
+        if (this.disabledCommandCache[interaction.guildId] && this.disabledCommandCache[interaction.guildId][interaction.commandName]) {
             await interaction.reply({ embeds: [
                 new MessageEmbed()
                     .setTitle("Cannot run command")
@@ -100,9 +100,10 @@ class MeteoriumCommandHandler {
         if (!guildId) { throw new Error("MeteoriumCommandHandler: no guildId specified for UpdateDisabledCommandCache") }
         const guildExists = this.client.guilds.cache.has(String(guildId));
         if (guildExists) {
-            const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) })
+            const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) });
             //console.log(guildSchema);
             try {
+                console.log(`MeteoriumCommandHandler: Updating guild disabled commands cache for GuildId ${guildId}\n${guildSchema.DisabledCommands}`);
                 this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
                 this.disabledCommandCategoryCache[String(guildId)] = guildSchema.DisabledCommandCategories;
             } catch(err) {

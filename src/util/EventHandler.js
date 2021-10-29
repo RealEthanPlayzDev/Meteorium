@@ -19,9 +19,13 @@ class MeteoriumEventHandler {
                 try {
                     const event = require(path.join(__dirname, targetDir, file));
                     if (event.once) {
-                        this.client.once(event.name, event.execute);
+                        this.client.once(event.name, () => {
+                            event.execute(this.client, this.client.CommandHandler, ...arguments);
+                        });
                     } else {
-                        this.client.on(event.name, event.execute);
+                        this.client.on(event.name, () => {
+                            event.execute(this.client, this.client.CommandHandler, ...arguments);
+                        });
                     }
                 } catch(err) {
                     console.warn(`MeteoriumEventHandler: An error occured when attempting to parse event file: ${file}\n${err.stack}`);
