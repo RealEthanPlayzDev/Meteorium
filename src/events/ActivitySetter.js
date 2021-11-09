@@ -1,5 +1,5 @@
 module.exports = {
-    name: "ready",
+    name: "shardResume",
     once: true,
     async execute(client) {
         client.user.setPresence({
