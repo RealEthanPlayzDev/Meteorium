@@ -113,6 +113,18 @@ class MeteoriumCommandHandler {
             } catch(err) {
 
             }
+        } else {
+            console.warn(`MeteoriumCommandHandler: Guild ${guildId} doesn't exist on database? Creating new entry`);
+            const newGuildSettingSchema = new GuildSettingSchema({
+                GuildId: guild.id,
+                EnforceSayinExecutor: false,
+                DisabledCommands: {},
+                DisabledCommandCategories: {},
+                MuteRoleId: ""
+            });
+            function save() { newGuildSettingSchema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { save() }) }
+            CommandHandler.UpdateDisabledCommandCache(guild.id);
+            save();
         }
         //console.log(this.disabledCommandCache);
     }
