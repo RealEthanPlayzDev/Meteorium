@@ -125,7 +125,7 @@ class MeteoriumCommandHandler {
                 });
                 function save() { newGuildSettingSchema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { save() }) }
                 save();
-                CommandHandler.UpdateDisabledCommandCache(guild.id);
+                this.UpdateDisabledCommandCache(guild.id);
             }
         }
         //console.log(this.disabledCommandCache);
