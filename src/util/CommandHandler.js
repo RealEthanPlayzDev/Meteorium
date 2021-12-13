@@ -117,7 +117,7 @@ class MeteoriumCommandHandler {
             } else {
                 console.warn(`MeteoriumCommandHandler: Guild ${guildId} doesn't exist on database? Creating new entry`);
                 const newGuildSettingSchema = new GuildSettingSchema({
-                    GuildId: guild.id,
+                    GuildId: Number(guildId),
                     EnforceSayinExecutor: false,
                     DisabledCommands: {},
                     DisabledCommandCategories: {},
