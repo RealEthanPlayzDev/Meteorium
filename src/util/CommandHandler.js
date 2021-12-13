@@ -106,27 +106,25 @@ class MeteoriumCommandHandler {
         if (guildExists) {
             const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) });
             //console.log(guildSchema);
-            if (guildSchema) {
-                try {
-                    console.log(`MeteoriumCommandHandler: Updating guild disabled commands cache for GuildId ${guildId}\n${guildSchema.DisabledCommands}`);
-                    this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
-                    this.disabledCommandCategoryCache[String(guildId)] = guildSchema.DisabledCommandCategories;
-                } catch(err) {
-    
-                }
-            } else {
-                console.warn(`MeteoriumCommandHandler: Guild ${guildId} doesn't exist on database? Creating new entry`);
-                const newGuildSettingSchema = new GuildSettingSchema({
-                    GuildId: guild.id,
-                    EnforceSayinExecutor: false,
-                    DisabledCommands: {},
-                    DisabledCommandCategories: {},
-                    MuteRoleId: ""
-                });
-                function save() { newGuildSettingSchema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { save() }) }
-                save();
-                CommandHandler.UpdateDisabledCommandCache(guild.id);
+            try {
+                console.log(`MeteoriumCommandHandler: Updating guild disabled commands cache for GuildId ${guildId}\n${guildSchema.DisabledCommands}`);
+                this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
+                this.disabledCommandCategoryCache[String(guildId)] = guildSchema.DisabledCommandCategories;
+            } catch(err) {
+
             }
+        } else {
+            console.warn(`MeteoriumCommandHandler: Guild ${guildId} doesn't exist on database? Creating new entry`);
+            const newGuildSettingSchema = new GuildSettingSchema({
+                GuildId: guild.id,
+                EnforceSayinExecutor: false,
+                DisabledCommands: {},
+                DisabledCommandCategories: {},
+                MuteRoleId: ""
+            });
+            function save() { newGuildSettingSchema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { save() }) }
+            CommandHandler.UpdateDisabledCommandCache(guild.id);
+            save();
         }
         //console.log(this.disabledCommandCache);
     }
