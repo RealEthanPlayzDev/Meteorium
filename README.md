@@ -5,6 +5,7 @@ A Discord bot developed by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev) a
 The ``config.json`` is normally under .gitignore and is required for the bot to run, the file content example is shown below:
 ```
 {
+    "mongodb_urlstring": "insert mongodb server url connection here",
     "token": "token here",
     "prefix": "mt!",
     "applicationId": "application id here",
@@ -17,3 +18,6 @@ The ``config.json`` is normally under .gitignore and is required for the bot to 
 
 ## Running the bot
 The bot is using discord.js v13, which requires node.js v16, make sure you have node.js v16 before attempting to run the bot (otherwise it will crash)
+
+## TODO(s)
+- [ ] Use .env instead of a plain text config json
