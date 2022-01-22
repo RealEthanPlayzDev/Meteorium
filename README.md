@@ -12,7 +12,9 @@ The ``config.json`` is normally under .gitignore and is required for the bot to 
     "targetGuildIds": [
         "put guild ids where you want to register interaction commands into (or leave empty)"
     ],
-    "holodexApiKey": "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started"
+    "holodexApiKey": "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started",
+    "ratelimitMaxLimit": put a number here (like 20), this controls on the max amount of time the bot can reconnect under ``ratelimitMaxLimitTime`` seconds,
+    "ratelimitMaxLimitTime": put a number here (like 5), this controls ``ratelimitMaxLimit``, also it's in seconds
 }
 ```
 

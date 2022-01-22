@@ -28,7 +28,20 @@ class MeteoriumClient extends Client {
         this.CommandHandler.ParseCommands();
 
         // Websocket disconnect/reconnects
-        super.on("shardReconnecting", (id) => console.warn(`MeteoriumClient: Shard reconnecting (id: ${id})`));
+        var DisconnectAmount = 0, LastDisconnect = process.uptime();
+        super.on("shardReconnecting", (id) => {
+            if (DisconnectAmount >= this.config.ratelimitMaxLimit) {
+                if ((process.uptime() - LastDisconnect) >= this.config.ratelimitMaxLimitTime) {
+                    console.error(`Disconnected more than ${this.config.ratelimitMaxLimit} times in ${this.config.ratelimitMaxLimitTime} seconds! Exiting with code 1`);
+                    process.exit(1);
+                } else {
+                    DisconnectAmount = 0
+                }
+            }
+            DisconnectAmount += 1
+            LastDisconnect = process.uptime()
+            console.warn(`MeteoriumClient: Shard reconnecting (id: ${id})`)
+        });
         super.on("shardDisconnect", (closeEvent, shardNumber) => console.error(`MeteoriumClient: Shard disconnected and will not longer reconnect\nnumber: ${shardNumber}\ncode: ${closeEvent.code}\nreason: ${closeEvent.reason})`));
         super.on("shardResume", (id) => console.log(`MeteoriumClient: Shard reconnected successfully (id: ${id})`));
         super.on("shardError", (err, id) => console.error(`MeteoriumClient: Shard websocket error occured (id: ${id})\n${err.stack}`));
