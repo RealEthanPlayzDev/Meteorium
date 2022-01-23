@@ -128,7 +128,7 @@ class MeteoriumCommandHandler {
             console.warn(`MeteoriumCommandHandler: Guild ${guildId} doesn't exist on database? Creating new entry`);
             const newGuildSettingSchema = this.CreateNewGuildSettingSchema(guildId);
             this.SaveGuildSettingSchema(newGuildSettingSchema);
-            CommandHandler.UpdateDisabledCommandCache(guildId);
+            this.UpdateDisabledCommandCache(guildId);
             save();
         }
         //console.log(this.disabledCommandCache);
