@@ -129,7 +129,6 @@ class MeteoriumCommandHandler {
             const newGuildSettingSchema = this.CreateNewGuildSettingSchema(guildId);
             this.SaveGuildSettingSchema(newGuildSettingSchema);
             this.UpdateDisabledCommandCache(guildId);
-            save();
         }
         //console.log(this.disabledCommandCache);
     }
