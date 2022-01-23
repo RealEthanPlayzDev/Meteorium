@@ -103,11 +103,11 @@ class MeteoriumCommandHandler {
     CreateNewGuildSettingSchema(id, enforcesayinexecutor=false, disabledcommands={}, disabledcommandcategories={}, muteroleid="") {
         if (!id) { throw new Error("id not specified") }
         return new GuildSettingSchema({
-            GuildId: guild.id,
-            EnforceSayinExecutor: false,
-            DisabledCommands: {},
-            DisabledCommandCategories: {},
-            MuteRoleId: ""
+            GuildId: id,
+            EnforceSayinExecutor: enforcesayinexecutor,
+            DisabledCommands: disabledcommands,
+            DisabledCommandCategories: disabledcommandcategories,
+            MuteRoleId: muteroleid
         });
 
     }
