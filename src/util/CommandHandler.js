@@ -112,7 +112,7 @@ class MeteoriumCommandHandler {
 
     }
 
-    async SaveGuildSettingSchema(guildsettingschema) { guildsettingschema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { this.save(guildsettingschema) }) }
+    async SaveGuildSettingSchema(guildsettingschema) { guildsettingschema.save().then(() => { console.log("Successfully registered schema for guild "+guild.id) }).catch(() => { this.SaveGuildSettingSchema(guildsettingschema) }) }
 
     async UpdateDisabledCommandCache(guildId) {
         if (!guildId) { throw new Error("MeteoriumCommandHandler: no guildId specified for UpdateDisabledCommandCache") }
