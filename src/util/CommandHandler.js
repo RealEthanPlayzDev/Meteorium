@@ -116,11 +116,9 @@ class MeteoriumCommandHandler {
 
     async UpdateDisabledCommandCache(guildId) {
         if (!guildId) { throw new Error("MeteoriumCommandHandler: no guildId specified for UpdateDisabledCommandCache") }
-        const guildExists = this.client.guilds.cache.has(String(guildId));
-        console.log(`${guildId} -> ${guildExists}`)
-        if (guildExists) {
-            const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) });
-            //console.log(guildSchema);
+        const guildSchema = await GuildSettingSchema.findOne({ GuildId: String(guildId) })
+        console.log(`${guildId} -> ${guildSchema}`)
+        if (guildSchema) {
             try {
                 console.log(`MeteoriumCommandHandler: Updating guild disabled commands cache for GuildId ${guildId}`);
                 this.disabledCommandCache[String(guildId)] = guildSchema.DisabledCommands;
