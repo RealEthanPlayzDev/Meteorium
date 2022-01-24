@@ -13,7 +13,7 @@ class MeteoriumClient extends Client {
         this.config = require("../../config.json");
         this.CommandHandler = new MeteoriumCommandHandler(this, this.config.prefix, this.config.applicationId, this.config.token);
         this.EventHandler = new MeteoriumEventHandler(this);
-        this.Player = new Player();
+        this.Player = new Player(this);
 
         // Connect to MongoDB server using mongoose
         mongoose.connect(this.config.mongodb_urlstring, {

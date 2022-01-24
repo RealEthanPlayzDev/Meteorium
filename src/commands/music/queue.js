@@ -3,8 +3,11 @@ const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("queue", "Get the queue of songs in this server", async (interaction, client) => {
     const queue = client.Player.getQueue(interaction.guildId);
+    if (!queue) {
+        return await interaction.reply({ content: "The bot doesn't seem to be connected to any voice channels." });
+    }
     const currentTrack = queue.current;
-	const tracks = queue.tracks.slice(0, 10).map((m, i) => {
+	const tracks = queue.tracks.slice(0, 25).map((m, i) => {
 		return `${i + 1}. [**${m.title}**](${m.url}) - ${
 			m.requestedBy.tag
 		}`;

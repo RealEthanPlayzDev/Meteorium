@@ -4,6 +4,9 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = new MeteoriumCommand("volume", "Set the volume of the music player", async (interaction, client) => {
     const queue = client.Player.getQueue(interaction.guildId);
+    if (!queue) {
+        return await interaction.reply({ content: "The bot doesn't seem to be connected to any voice channels." });
+    }
     const volpercent = interaction.options.getNumber("volumepercentage");
     if (!queue?.playing) {
         return await interaction.reply({ embeds: [

@@ -1,13 +1,16 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
-const { Player } = require("discord-player")
+const { QueryType } = require("discord-player")
 
 module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", async (interaction, client) => {
-    if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!", ephemeral: true });
-    if (interaction.guild.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.me.voice.channelId) return await interaction.reply({ content: "You are not in my voice channel!", ephemeral: true });
+    if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!" });
+    if (interaction.guild.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.me.voice.channelId) return await interaction.reply({ content: "You are not in my voice channel!" });
     await interaction.deferReply();
     const query = interaction.options.getString("query", true);
+    if (client.Player.getQueue(interaction.guildId)) {
+        client.Player.getQueue(interaction.guildId).destroy(true);
+    }
     const queue = await client.Player.createQueue(interaction.guild, {
         metadata: interaction.channel
     });
@@ -26,15 +29,18 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
         ]})
     }
 
-    const track = await client.Player.search(query, {
-        requestedBy: interaction.user
-    }).then(x => x.tracks[0]);
-    if (!track) return await interaction.followUp({ content: `❌ | Track **${query}** not found!` });
-    queue.play(track);
+    const sr = await client.Player.search(query, {
+        requestedBy: interaction.user,
+        searchEngine: QueryType.AUTO
+    });
+    sr.playlist ? queue.addTracks(sr.tracks) : queue.addTrack(sr.tracks[0]);
+    if (!queue.playing) {
+        await queue.play();
+    }
 
     return await interaction.followUp({ embeds: [
         new MessageEmbed()
-            .setTitle("Loading and playing")
+            .setTitle("Playing")
             .setDescription(query)
             .setColor("0099ff")
             .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
