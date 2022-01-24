@@ -6,7 +6,7 @@ const ytdl = require("ytdl-core");
 const { AudioPlayerStatus, StreamType, createAudioPlayer, createAudioResource, joinVoiceChannel } = require('@discordjs/voice');
 
 module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", async (interaction, client) => {
-    const link = interaction.option.getString("link"), vc = interaction.option.getChannel("voicechannel")
+    const link = interaction.options.getString("link"), vc = interaction.options.getChannel("voicechannel")
     const connection = joinVoiceChannel({
         channelId: vc.id,
         guildId: interaction.guildId,
