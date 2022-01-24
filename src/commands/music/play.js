@@ -18,6 +18,14 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
     player.play(resource);
     connection.subscribe(player);
     player.on(AudioPlayerStatus.Idle, () => connection.destroy());
+    await interaction.reply({ embeds: [
+        new MessageEmbed()
+            .setTitle("Playing")
+            .setDescription(link)
+            .setColor("0099ff")
+            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
+            .setTimestamp()
+    ]})
 }, new SlashCommandBuilder()
     .setName("play")
     .setDescription("Play sound/music from YouTube")
