@@ -4,7 +4,7 @@ const { Collection } = require('@discordjs/collection');
 const CachedManager = require('./CachedManager');
 const { TypeError, Error } = require('../errors');
 const GuildBan = require('../structures/GuildBan');
-const GuildMember = require('../structures/GuildMember');
+const { GuildMember } = require('../structures/GuildMember');
 
 /**
  * Manages API methods for GuildBans and stores their cache.
@@ -144,10 +144,8 @@ class GuildBanManager extends CachedManager {
       .guilds(this.guild.id)
       .bans(id)
       .put({
-        data: {
-          reason: options.reason,
-          delete_message_days: options.days,
-        },
+        data: { delete_message_days: options.days },
+        reason: options.reason,
       });
     if (user instanceof GuildMember) return user;
     const _user = this.client.users.resolve(id);
