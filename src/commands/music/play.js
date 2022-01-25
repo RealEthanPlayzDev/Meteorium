@@ -8,9 +8,6 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
     if (interaction.guild.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.me.voice.channelId) return await interaction.reply({ content: "You are not in my voice channel!" });
     await interaction.deferReply();
     const query = interaction.options.getString("query", true);
-    if (client.Player.getQueue(interaction.guildId)) {
-        client.Player.getQueue(interaction.guildId).destroy(true);
-    }
     const queue = await client.Player.createQueue(interaction.guild, {
         metadata: interaction.channel
     });
