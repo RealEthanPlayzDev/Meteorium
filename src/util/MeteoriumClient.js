@@ -1,16 +1,32 @@
 // Extended version of the discordjs client object with MeteoriumCommandHandler, MeteoriumEventHandler, and the configuration built in
 // Written by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev)
 
+// Load .ENV
+const dotenv = require("dotenv");
 const { Client } = require("discord.js");
 const MeteoriumCommandHandler = require("../util/CommandHandler");
 const MeteoriumEventHandler = require("../util/EventHandler");
 const mongoose = require("mongoose");
 const { Player } = require("discord-player");
 
+const ParseDotEnvConfig = () => {
+    if (!process.env.METEORIUMBOTTOKEN) { dotenv.config({"path": "./.ENV"}); }
+    const tgid = String(process.env.DEPLOYGUILDIDS).split(",")
+    return {
+        "mongodb_urlstring": String(process.env.METEORIUMMONGODBURI),
+        "token": String(process.env.METEORIUMBOTTOKEN),
+        "applicationId": String(process.env.METEORIUMAPPLICATIONID),
+        "targetGuildIds": tgid,
+        "holodexApiKey": String(process.env.METEORIUMHOLODEXTOKEN),
+        "ratelimitMaxLimit": Number(process.env.RATELIMITMAXLIMIT),
+        "ratelimitMaxLimitTime": Number(process.env.RATELIMITMAXLIMITTIME)
+    }
+}
+
 class MeteoriumClient extends Client {
     constructor(options) {super(options)} // Setting up the client is at the login
     async login() {
-        this.config = require("../../config.json");
+        this.config = ParseDotEnvConfig();
         this.CommandHandler = new MeteoriumCommandHandler(this, this.config.prefix, this.config.applicationId, this.config.token);
         this.EventHandler = new MeteoriumEventHandler(this);
         this.Player = new Player(this);

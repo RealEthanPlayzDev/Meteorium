@@ -5,29 +5,25 @@ A Discord bot developed by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev) a
 You must have ffmpeg/avconv installed in your system. (only ffmpeg was tested, you can use ``ffmpeg-static`` from npm aswell to install ffmpeg)
 Simply do ``npm ci`` on the root directory or do the following command:
 ```
-npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core
-npm i discord-player @discordjs/opus --save
+npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core discord-player @discordjs/opus dotenv --save
 ```
 
 ## Configuration file
-The ``config.json`` is normally under .gitignore and is required for the bot to run, the file content example is shown below:
+The configuration file uses ``dotenv``, create a file named ".ENV" on the project root and use the following example:
 ```
-{
-    "mongodb_urlstring": "insert mongodb server url connection here",
-    "token": "token here",
-    "prefix": "mt!",
-    "applicationId": "application id here",
-    "targetGuildIds": [
-        "put guild ids where you want to register interaction commands into (or leave empty)"
-    ],
-    "holodexApiKey": "holodex api key here, optional, see https://holodex.stoplight.io/docs/holodex/ZG9jOjQ2Nzk1-getting-started",
-    "ratelimitMaxLimit": put a number here (like 20), this controls on the max amount of time the bot can reconnect under ``ratelimitMaxLimitTime`` seconds,
-    "ratelimitMaxLimitTime": put a number here (like 5), this controls ``ratelimitMaxLimit``, also it's in seconds
-}
+METEORIUMBOTTOKEN=bot_token_here
+METEORIUMMONGODBURI=mongodb_uri_here
+METEORIUMHOLODEXTOKEN=holodex_token_here_optional
+METEORIUMAPPLICATIONID=bot_app_id_here
+RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER_HERE
+RATELIMITMAXLIMITTIME=after_when_should_ratelimit_reset_PUT_A_NUMBER_HERE
+DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
 ```
 
 ## Running the bot
-The bot is using discord.js v13, which requires node.js v16, make sure you have node.js v16 before attempting to run the bot (otherwise it will crash)
+The bot is using discord.js v13, which requires node.js v16 or above, make sure you have node.js v16 or above before attempting to run the bot (otherwise it will crash)
 
 ## TODO(s)
-- [ ] Use .env instead of a plain text config json
+- [x] Use .env instead of a plain text config json
+- [x] Music player
+- [ ] Finish moderation commands

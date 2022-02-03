@@ -1,10 +1,10 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const MeteoriumCommand = require("../../util/Command");
 const { HolodexApiClient } = require("holodex.js");
-const { holodexApiKey } = require("../../../config.json");
+const holodexApiKey  = process.env.METEORIUMHOLODEXTOKEN
 const { MessageEmbed } = require("discord.js");
 const holodexClient = new HolodexApiClient({
-    apiKey: holodexApiKey || ""
+    apiKey: holodexApiKey ? holodexApiKey : ""
 });
 
 module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcommands (Powered by https://holodex.net)", async (interaction, client) => {
