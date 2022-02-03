@@ -5,7 +5,7 @@ A Discord bot developed by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev) a
 You must have ffmpeg/avconv installed in your system. (only ffmpeg was tested, you can use ``ffmpeg-static`` from npm aswell to install ffmpeg)
 Simply do ``npm ci`` on the root directory or do the following command:
 ```
-npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core discord-player @discordjs/opus dotenv --save
+npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core discord-player @discordjs/opus dotenv ffmpeg-static --save
 ```
 
 ## Configuration file

@@ -27,6 +27,7 @@
     "discord-player": "^5.2.0",
     "discord.js": "^13.2.0",
     "dotenv": "^16.0.0",
+    "ffmpeg-static": "^4.4.1",
     "holodex.js": "^1.1.0",
     "mongoose": "^6.0.10",
     "neko-love.js": "^1.0.4",
