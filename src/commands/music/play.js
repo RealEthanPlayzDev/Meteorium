@@ -15,6 +15,10 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
         async onBeforeCreateStream(track, source, _queue) {
             if (source === "youtube") {
                 return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
+            } else if(source === "soundcloud") {
+                return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
+            } else {
+                return (await playdl.stream(await playdl.search(`${track.author} ${track.title} lyric`, { limit : 1, source : { youtube : "video" } }).then(x => x[0].url), { discordPlayerCompatibility : true })).stream;
             }
         }
     });
