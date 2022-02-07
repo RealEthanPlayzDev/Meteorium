@@ -33,6 +33,7 @@
     "neko-love.js": "^1.0.4",
     "play-dl": "^1.8.6",
     "querystring": "^0.2.1",
+    "youtube-sr": "^4.1.13",
     "ytdl-core": "^4.10.0"
   }
 }

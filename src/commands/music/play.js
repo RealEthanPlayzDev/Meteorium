@@ -3,6 +3,7 @@ const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
 const { QueryType } = require("discord-player");
 const playdl = require("play-dl");
+const youtubesr = require("youtube-sr");
 
 module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", async (interaction, client) => {
     if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!" });
@@ -13,6 +14,8 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
         metadata: interaction.channel,
         spotifyBridge: true,
         async onBeforeCreateStream(track, source, _queue) {
+            return (await playdl.stream(await youtubesr.YouTube.search(`${track.author} ${track.title}`, {type: "video"}).then(x => x[0].url), { discordPlayerCompatibility : true })).stream;
+            /*
             if (source === "youtube") {
                 return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
             } else if(source === "soundcloud") {
@@ -20,6 +23,7 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
             } else {
                 return (await playdl.stream(await playdl.search(`${track.author} ${track.title} lyric`, { limit : 1, source : { youtube : "video" } }).then(x => x[0].url), { discordPlayerCompatibility : true })).stream;
             }
+            */
         }
     });
 
