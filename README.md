@@ -8,6 +8,13 @@ Simply do ``npm ci`` on the root directory or do the following command:
 npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core discord-player @discordjs/opus dotenv ffmpeg-static play-dl youtube-sr --save
 ```
 
+## Running the bot
+TODO: FINISH THIS SECTION!
+Since the bot now uses TypeScript, you have to install the ``typescript`` npm module:
+```
+npm i typescript -G
+```
+
 ## Configuration file
 The configuration file uses ``dotenv``, create a file named ".ENV" on the project root and use the following example:
 ```
@@ -27,4 +34,5 @@ The bot is using discord.js v13, which requires node.js v16 or above, make sure 
 - [x] Use .env instead of a plain text config json
 - [x] Music player
 - [x] Use ``play-dl`` instead of ``ytdl-core``
+- [ ] TypeScript rewrite!
 - [ ] Finish moderation commands

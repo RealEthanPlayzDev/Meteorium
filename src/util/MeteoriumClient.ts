@@ -2,15 +2,16 @@
 // Written by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev)
 
 // Load .ENV
-const dotenv = require("dotenv");
-const { Client } = require("discord.js");
+import process from "node:process"
+import { config as configenvironment } from "dotenv";
+import { Client } from 'discord.js';
 const MeteoriumCommandHandler = require("../util/CommandHandler");
 const MeteoriumEventHandler = require("../util/EventHandler");
-const mongoose = require("mongoose");
-const { Player } = require("discord-player");
+import mongoose from "mongoose";
+import { Player } from "discord-player";
 
 const ParseDotEnvConfig = () => {
-    if (!process.env.METEORIUMBOTTOKEN) { dotenv.config({"path": "./.ENV"}); }
+    if (!process.env.METEORIUMBOTTOKEN) { configenvironment({"path": "./.ENV"}); }
     const tgid = String(process.env.DEPLOYGUILDIDS).split(",")
     return {
         "mongodb_urlstring": String(process.env.METEORIUMMONGODBURI),
@@ -23,19 +24,15 @@ const ParseDotEnvConfig = () => {
     }
 }
 
-class MeteoriumClient extends Client {
-    constructor(options) {super(options)} // Setting up the client is at the login
-    async login() {
-        this.config = ParseDotEnvConfig();
-        this.CommandHandler = new MeteoriumCommandHandler(this, this.config.prefix, this.config.applicationId, this.config.token);
-        this.EventHandler = new MeteoriumEventHandler(this);
-        this.Player = new Player(this);
+export class MeteoriumClient extends Client<true> {
+    public config = ParseDotEnvConfig(); // {mongodb_urlstring: "", token: "", applicationId: "", targetGuildIds: "", holodexApiKey: "", ratelimitMaxLimit: "", ratelimitMaxLimitTime: ""};
+    public CommandHandler = new MeteoriumCommandHandler(this, "", this.config.applicationId, this.config.token);
+    public EventHandler = new MeteoriumEventHandler(this);
+    public Player = new Player(this);
 
+    async login() {
         // Connect to MongoDB server using mongoose
-        mongoose.connect(this.config.mongodb_urlstring, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }).then(() => {
+        mongoose.connect(this.config.mongodb_urlstring).then(() => {
             console.log("MeteoriumClient: Successfully connected to MongoDB database");
         }).catch((err) => {
             throw err;
@@ -68,5 +65,3 @@ class MeteoriumClient extends Client {
         return super.login(this.config.token);
     }
 }
-
-module.exports = MeteoriumClient;
