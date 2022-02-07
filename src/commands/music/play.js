@@ -11,8 +11,9 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
     const query = interaction.options.getString("query", true);
     const queue = await client.Player.createQueue(interaction.guild, {
         metadata: interaction.channel,
-        async onBeforeCreateStream(track, streamsource) {
-            if (streamsource === "youtube") {
+        spotifyBridge: true,
+        async onBeforeCreateStream(track, source, _queue) {
+            if (source === "youtube") {
                 return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
             }
         }
