@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
-const { QueryType } = require("discord-player")
+const { QueryType } = require("discord-player");
+const playdl = require("play-dl");
 
 module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", async (interaction, client) => {
     if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!" });
@@ -9,7 +10,12 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
     await interaction.deferReply();
     const query = interaction.options.getString("query", true);
     const queue = await client.Player.createQueue(interaction.guild, {
-        metadata: interaction.channel
+        metadata: interaction.channel,
+        async onBeforeCreateStream(track, streamsource) {
+            if (streamsource === "youtube") {
+                return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
+            }
+        }
     });
 
     try {
