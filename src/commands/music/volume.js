@@ -10,13 +10,8 @@ module.exports = new MeteoriumCommand("volume", "Set the volume of the music pla
     const volpercent = interaction.options.getNumber("volumepercentage");
     if (!queue?.playing) {
         return await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Nothing is in the music queue!")
-                .setDescription(`The music queue is empty.`)
-                .setColor("0099ff")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
-        ]})
+            new MeteoriumCommand("Nothing is in the music queue!", "The music queue is empty.", "FF0000")
+        ]});
     }
     if (!volpercent) {
 		return interaction.reply({content: `The current volume is ${queue.volume}%`,})

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 
 module.exports = new MeteoriumCommand("sayin", "Says message in a optional channel (or current channel) in this server", async (interaction, client) => {
@@ -13,24 +13,14 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
         if (doNotShowSuccessMessage) {
             if (!interaction.member.permissions.has("ADMINISTRATOR", true)) {
                 await interaction.reply({ embeds: [
-                    new MessageEmbed()
-                        .setTitle("Cannot do sayin")
-                        .setDescription("You do not have permission to not show the success message (Missing ADMINISTRATOR permission).")
-                        .setColor("FF0000")
-                        .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                        .setTimestamp()
+                    new MeteoriumEmbed("Cannot do sayin", "You do not have permission to not show the success message (Missing ADMINISTRATOR permission).", "FF0000")
                 ]})
                 return;
             }
         }
         if (!channel.isText()) {
             await interaction.reply({ embeds: [
-                new MessageEmbed()
-                    .setTitle("Cannot do sayin")
-                    .setDescription("Specified channel is not a text channel.")
-                    .setColor("FF0000")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+                new MeteoriumEmbed("Cannot do sayin", "Specified channel is not a text channel.", "FF0000")
             ], ephemeral: doNotShowSuccessMessage })
             return;
         }
@@ -38,12 +28,7 @@ module.exports = new MeteoriumCommand("sayin", "Says message in a optional chann
         await interaction.reply({ content: "Successfully sent message.", ephemeral: doNotShowSuccessMessage });
     } else {
         await interaction.reply({embeds: [
-            new MessageEmbed()
-                .setTitle("Cannot do sayin")
-                .setDescription("You do not have permission to use this command! (Missing permission MANAGE_MESSAGES)")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
+            new MeteoriumEmbed("Cannot do sayin", "You do not have permission to use this command! (Missing permission MANAGE_MESSAGES)", "FF0000")
         ]})
     }
 }, new SlashCommandBuilder()

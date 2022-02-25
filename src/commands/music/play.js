@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 const { QueryType } = require("discord-player");
 const playdl = require("play-dl");
@@ -32,13 +32,8 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
     } catch(e) {
         queue.destroy();
         return await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Couldn't connext to voice chat!")
-                .setDescription(`An error occured when attempting to join the voice chat:\n${e}`)
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
-        ]})
+            new MeteoriumEmbed("Couldn't connext to voice chat!", `An error occured when attempting to join the voice chat:\n${e}`, "FF0000")
+        ]});
     }
 
     const sr = await client.Player.search(query, {
@@ -46,17 +41,13 @@ module.exports = new MeteoriumCommand("play", "Play sound/music from YouTube", a
         searchEngine: QueryType.AUTO
     });
     sr.playlist ? queue.addTracks(sr.tracks) : queue.addTrack(sr.tracks[0]);
-    if (!queue.playing) {
+    const isPlaying = queue.playing
+    if (!isPlaying) {
         await queue.play();
     }
 
     return await interaction.followUp({ embeds: [
-        new MessageEmbed()
-            .setTitle("Playing")
-            .setDescription(query)
-            .setColor("0099ff")
-            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-            .setTimestamp()
+        new MeteoriumEmbed(isPlaying ? "Added to queue" : "Playing", query)
     ]})
 }, new SlashCommandBuilder()
     .setName("play")

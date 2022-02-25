@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 
@@ -14,12 +14,7 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
              });
          } else {
              await interaction.editReply({ embeds: [
-                 new MessageEmbed()
-                    .setTitle("Cannot change this setting")
-                    .setDescription("You do not have permission to change this setting! (Missing permission ADMINISTRATOR)")
-                    .setColor("FF0000")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+                 new MeteoriumEmbed("Cannot change this setting", "You do not have permission to change this setting! (Missing permission ADMINISTRATOR)", "FF0000")
              ]});
          }
     } else if (interaction.options.getSubcommandGroup() === "disabledcommands") {
@@ -42,13 +37,8 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
 
                 if (!parseSuccess) {
                     await interaction.editReply({ embeds: [
-                        new MessageEmbed()
-                            .setTitle("Error")
-                            .setDescription(`Command name ${failParseCommandName} does not exist! (to prevent this error, type command names correctly, multiple commands seperated with command like "test,embedtest,userinfo" and so on)`)
-                            .setColor("FF0000")
-                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                            .setTimestamp()
-                        ]});
+                        new MeteoriumEmbed("Error", `Command name ${failParseCommandName} does not exist! (to prevent this error, type command names correctly, multiple commands seperated with command like "test,embedtest,userinfo" and so on)`, "FF0000")
+                    ]});
                     return;
                 }
 
@@ -77,12 +67,7 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
                     throw new Error(`An error occured when updated the settings database\n${err.stack}`);
                 });
             } else if (interaction.options.getSubcommand() === "list") {
-                const embed = new MessageEmbed()
-                                .setTitle("List of disabled commands")
-                                .setDescription("Below are the commands that are disabled:\n(Note: disabled command categories override this setting!)")
-                                .setColor("0099ff")
-                                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                                .setTimestamp()
+                const embed = new MeteoriumEmbed("List of disabled commands", "Below are the commands that are disabled:\n(Note: disabled command categories override this setting!)")
                 for (const [name, desc] of Object.entries(guildSchema.DisabledCommands)) {
                     if (guildSchema.DisabledCommands.hasOwnProperty(name)) {
                         embed.addField(name, desc);
@@ -92,12 +77,7 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
             }
         } else {
             await interaction.editReply({ embeds: [
-                new MessageEmbed()
-                   .setTitle("Cannot change this setting")
-                   .setDescription("You do not have permission to change this setting! (Missing permission ADMINISTRATOR)")
-                   .setColor("FF0000")
-                   .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                   .setTimestamp()
+                new MeteoriumEmbed("Cannot change this setting", "You do not have permission to change this setting! (Missing permission ADMINISTRATOR)", "FF0000")
             ]});
         }
     } else if (interaction.options.getSubcommand() === "setmuterole") {

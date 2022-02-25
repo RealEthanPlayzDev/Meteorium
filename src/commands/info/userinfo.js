@@ -1,8 +1,9 @@
 // Thanks to Syjalo for https://github.com/Syjalo/Alex/blob/main/src/commands/info/userinfo.js, it helped
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed, GuildMember, User } = require("discord.js");
+const { GuildMember, User } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 
 module.exports = new MeteoriumCommand("userinfo", "Returns information about the specified user", async (interaction, client) => {
     await interaction.deferReply()
@@ -26,7 +27,7 @@ module.exports = new MeteoriumCommand("userinfo", "Returns information about the
 
     // Turn into embeds
     for (const parseddata of parsed) {
-        const embed = new MessageEmbed();
+        const embed = new MeteoriumEmbed();
         if (parseddata instanceof GuildMember) {
             let status = "Unknown";
             if (parseddata.presence && parseddata.presence["status"]) {
@@ -34,9 +35,9 @@ module.exports = new MeteoriumCommand("userinfo", "Returns information about the
                 if (status === "dnd") { status = `do not disturb - ${parseddata.presence.clientStatus}` }
             }
             embed.setDescription(String(parseddata))
-                .setAuthor(parseddata.user.tag, null, `https://discordapp.com/users/${parseddata.user.id}`)
+                .setAuthor({ name: parseddata.user.tag, url: `https://discordapp.com/users/${parseddata.user.id}` })
                 .setThumbnail(parseddata.user.displayAvatarURL({ dynamic: true }))
-                .setColor(parseddata.displayColor || "0099ff")
+                .setColor(parseddata.displayColor ? parseddata.displayColor : "0099ff")
                 .addFields(
                     { name: "Status", value: status },
                     { name: "UserId", value: parseddata.user.id },
@@ -45,17 +46,14 @@ module.exports = new MeteoriumCommand("userinfo", "Returns information about the
                     { name: "Server Nitro Booster", value: `${parseddata.premiumSince ? `Booster since <t:${Math.round(parseddata.premiumSinceTimestamp / 1000)}:f> (<t:${Math.round(parseddata.premiumSinceTimestamp / 1000)}:R>)` : "Not a booster"}`},
                     { name: `Roles (${parseddata.roles.cache.filter(role => role.name !== "@everyone").size} in total without @everyone)`, value: parseddata.roles.cache.filter(role => role.name !== '@everyone').size ? (() => parseddata.roles.cache.filter(role => role.name !== '@everyone').sort((role1, role2) => role2.rawPosition - role1.rawPosition).map(role => role).join(', '))() : '———' },
                 )
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)");
         } else if (parseddata instanceof User) {
             embed.setDescription(String(parseddata))
-                .setAuthor(parseddata.tag, null, `https://discordapp.com/users/${parseddata.id}`)
+                .setAuthor({ name: parseddata.tag, url: `https://discordapp.com/users/${parseddata.id}` })
                 .setThumbnail(parseddata.displayAvatarURL({ dynamic: true }))
                 .addFields(
                     { name: "UserId", value: parseddata.id },
                     { name: "Joined Discord at", value: `<t:${Math.round(parseddata.createdTimestamp / 1000)}:f>\n${parseddata.createdAt}\n(<t:${Math.round(parseddata.createdTimestamp / 1000)}:R>)` }
                 )
-                .setColor("0099ff")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)");
         }
         embeds.push(embed)
     }

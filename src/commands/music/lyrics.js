@@ -1,7 +1,7 @@
 const MeteoriumCommand = require("../../util/Command");
 const Axios = require("axios");
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 
 function getLyrics(title) {
     return new Promise(async (ful, rej) => {
@@ -34,23 +34,12 @@ async function createResponse(title) {
 
         const embed = substring(4096, data.lyrics).map((value, index) => {
             const isFirst = index === 0;
-            return new MessageEmbed()
-                    .setTitle(isFirst ? `${data.title} - ${data.author}` : "null?")
-                    .setDescription(value)
-                    .setColor("0099ff")
-                    .setThumbnail(isFirst ? { url: data.thumbnail.genius } : "")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+            return new MeteoriumEmbed(isFirst ? `${data.title} - ${data.author}` : "null?", value).setThumbnail(isFirst ? { url: data.thumbnail.genius } : "");
         });
 
         return embed;
     } catch (error) {
-        return new MessageEmbed()
-            .setTitle("Error occured when finding lyrics")
-            .setDescription(`Couldn't find any lyrics for this song!\n${error}`)
-            .setColor("FF0000")
-            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-            .setTimestamp()
+        return new MeteoriumEmbed("Error occured when finding lyrics", `Couldn't find any lyrics for this song!\n${error}`, "FF0000");
     }
 }
 

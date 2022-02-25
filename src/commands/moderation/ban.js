@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("ban", "Bans a user", async (interaction, client) => {
@@ -9,22 +9,12 @@ module.exports = new MeteoriumCommand("ban", "Bans a user", async (interaction, 
             if (targetUser.bannable) {
                 targetUser.ban({days: 0, reason: `Administrative ban issued by ${interaction.user.username}`});
                 await interaction.reply({ embeds: [
-                    new MessageEmbed()
-                        .setTitle("User banned")
-                        .setDescription("User has been successfully banned")
-                        .setColor("0099ff")
-                        .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                        .setTimestamp()
-                ]})
+                    new MeteoriumEmbed("User banned", "User has been successfully banned")
+                ]});
             } else {
                 await interaction.reply({ embeds: [
-                    new MessageEmbed()
-                        .setTitle("Cannot ban user")
-                        .setDescription("This user cannot be banned! (bannable == false)")
-                        .setColor("FF0000")
-                        .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                        .setTimestamp()
-                ]})
+                    new MeteoriumEmbed("Cannot ban user", "This user cannot be banned! (bannable == false)", "FF0000")
+                ]});
             }
         } else if(interaction.options.getSubcommand() === "userid") {
             const userId = interaction.options.getString("userid");
@@ -33,34 +23,19 @@ module.exports = new MeteoriumCommand("ban", "Bans a user", async (interaction, 
                 if (targetUser.bannable) {
                     targetUser.ban({days: 0, reason: `Administrative ban requested by ${interaction.user.username}`});
                     await interaction.reply({ embeds: [
-                        new MessageEmbed()
-                            .setTitle("User banned")
-                            .setDescription("User has been successfully banned")
-                            .setColor("0099ff")
-                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                            .setTimestamp()
-                    ]})
+                        new MeteoriumEmbed("User banned", "User has been successfully banned")
+                    ]});
                 } else {
                     await interaction.reply({ embeds: [
-                        new MessageEmbed()
-                            .setTitle("Cannot ban user")
-                            .setDescription("This user cannot be banned! (bannable == false) ")
-                            .setColor("FF0000")
-                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                            .setTimestamp()
-                    ]})
+                        new MeteoriumEmbed("Cannot ban user", "This user cannot be banned! (bannable == false)", "FF0000")
+                    ]});
                 }
             }
         }
     } else {
         await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Cannot ban user")
-                .setDescription("You do not have permission to kick this user! (Missing permission BAN_MEMBERS)")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
-        ]})
+            new MeteoriumEmbed("Cannot ban user", "You do not have permission to kick this user! (Missing permission BAN_MEMBERS)", "FF0000")
+        ]});
     }
 }, new SlashCommandBuilder()
     .setName("ban")

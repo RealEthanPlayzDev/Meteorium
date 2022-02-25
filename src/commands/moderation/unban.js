@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("unban", "Unbans a user using their UserId", async (interaction, client) => {
@@ -9,32 +9,17 @@ module.exports = new MeteoriumCommand("unban", "Unbans a user using their UserId
         if (banList.has(userId)) {
             interaction.guild.members.unban(userId, `Administrative unban issued by ${interaction.user.username}`);
             await interaction.reply({ embeds: [
-                new MessageEmbed()
-                    .setTitle("User unbanned")
-                    .setDescription("User has been successfully unbanned")
-                    .setColor("0099ff")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+                new MeteoriumEmbed("User unbanned", "User has been successfully unbanned")
             ]});
         } else {
             await interaction.reply({ embeds: [
-                new MessageEmbed()
-                    .setTitle("Cannot unban user")
-                    .setDescription("This user isn't banned!")
-                    .setColor("0099ff")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+                new MeteoriumEmbed("Cannot unban user", "This user isn't banned!", "FF0000")
             ]});
         }
     } else {
         await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Cannot unban user")
-                .setDescription("You do not have permission to run this command! (Missing permission BAN_MEMBERS)")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
-        ]})
+            new MeteoriumEmbed("Cannot unban user", "You do not have permission to run this command! (Missing permission BAN_MEMBERS)", "FF0000")
+        ]});
     }
 }, new SlashCommandBuilder()
     .setName("unban")

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 const Neko = require("neko-love.js");
 
@@ -7,19 +7,11 @@ module.exports = new MeteoriumCommand("kitsune", "Random kitsune pictures", asyn
     try {
         const kitsunepic = await Neko("kitsune");
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Random kitsune picture")
-                .setImage(kitsunepic)
-                .setColor("FF0000")
+            new MeteoriumEmbed("Random kitsune picture").setImage(kitsunepic)
         ]});
     } catch(err) {
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Failed getting a random kitsunr picture")
-                .setDescription(String(err))
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
+            new MessageEmbed("Failed getting a random kitsune picture", String(err), "FF0000")
         ]});
     }
 });

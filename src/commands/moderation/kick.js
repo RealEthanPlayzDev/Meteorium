@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
 const MeteoriumCommand = require("../../util/Command");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 
 module.exports = new MeteoriumCommand("kick", "Kicks a user", async (interaction, client) => {
     if (interaction.member.permissions.has("KICK_MEMBERS", true)) {
@@ -9,21 +9,11 @@ module.exports = new MeteoriumCommand("kick", "Kicks a user", async (interaction
             if (targetUser.kickable) {
                 targetUser.kick(`Administrative kick issued by ${interaction.user.username}`);
                 await interaction.reply({ embeds: [
-                    new MessageEmbed()
-                        .setTitle("User kicked")
-                        .setDescription("User has been successfully kicked")
-                        .setColor("0099ff")
-                        .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                        .setTimestamp()
+                    new MeteoriumEmbed("User kicked", "User has been successfully kicked")
                 ]})
             } else {
                 await interaction.reply({ embeds: [
-                    new MessageEmbed()
-                        .setTitle("Cannot kick user")
-                        .setDescription("This user cannot be kicked! (kickable == false)")
-                        .setColor("FF0000")
-                        .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                        .setTimestamp()
+                    new MeteoriumEmbed("Cannot kick user", "This user cannot be kicked! (kickable == false)", "FF0000")
                 ]})
             }
         } else if(interaction.options.getSubcommand() === "userid") {
@@ -33,33 +23,18 @@ module.exports = new MeteoriumCommand("kick", "Kicks a user", async (interaction
                 if (targetUser.kickable) {
                     targetUser.kick(`Administrative kick requested by ${interaction.user.username}`);
                     await interaction.reply({ embeds: [
-                        new MessageEmbed()
-                            .setTitle("User kicked")
-                            .setDescription("User has been successfully kicked")
-                            .setColor("0099ff")
-                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                            .setTimestamp()
+                        new MeteoriumEmbed("User kicked", "User has been successfully kicked", "0099ff")
                     ]})
                 } else {
                     await interaction.reply({ embeds: [
-                        new MessageEmbed()
-                            .setTitle("Cannot kick user")
-                            .setDescription("This user cannot be kicked! (kickable == false) ")
-                            .setColor("FF0000")
-                            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                            .setTimestamp()
+                        new MeteoriumEmbed("Cannot kick user", "This user cannot be kicked! (kickable == false)", "FF0000")
                     ]})
                 }
             }
         }
     } else {
         await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Cannot kick user")
-                .setDescription("You do not have permission to kick this user! (Missing permission KICK_MEMBERS)")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
+            new MeteoriumEmbed("Cannot kick user", "You do not have permission to kick this user! (Missing permission KICK_MEMBERS)", "FF0000")
         ]})
     }
 }, new SlashCommandBuilder()

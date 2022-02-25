@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const MeteoriumCommand = require("../../util/Command");
 const { HolodexApiClient } = require("holodex.js");
 const holodexApiKey  = process.env.METEORIUMHOLODEXTOKEN
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const holodexClient = new HolodexApiClient({
     apiKey: holodexApiKey ? holodexApiKey : ""
 });
@@ -12,10 +12,9 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
     if (interaction.options.getSubcommand() === "getchannelinfo") {
         const channel = (await holodexClient.getChannel(interaction.options.getString("channelid"))).toRaw();
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setAuthor(channel.name, null, `https://www.youtube.com/channel/${channel.channelId}`)
+            new MeteoriumEmbed("", channel.description)
+                .setAuthor({ name: channel.name, url: `https://www.youtube.com/channel/${channel.channelId}` })
                 .setThumbnail(channel.photo)
-                .setDescription(channel.description)
                 .addFields(
                     { name: "English name", value: channel.english_name || channel.name },
                     { name: "Organization", value: channel.org || "None" },
@@ -25,10 +24,8 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                     { name: "Subscribers", value: channel.subscriber_count },
                     { name: "Inactive", value: channel.inactive ? "Yes" : "No" },
                 )
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setColor("0099ff")
-                .setTimestamp()
-        ]});
+            ]
+        });
     } else if (interaction.options.getSubcommand() === "getvideoinfo") {
         const video = (await holodexClient.getVideo(interaction.options.getString("videoid"), false)).toRaw();
 
@@ -47,10 +44,9 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
         if (songs === "") { songs = "No songs" }
 
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setAuthor(video.title, null, `https://www.youtube.com/watch?v=${video.id}`)
-                .setThumbnail((video.channel.photo === "" && "a" || video.channel.photo))
-                .setDescription((video.description === "" && "(No description available)" || video.description))
+            new MeteoriumEmbed(video.description ? "" : "(No description available)")
+                .setAuthor({ name: video.title, url: `https://www.youtube.com/watch?v=${video.id}` })
+                .setThumbnail(video.channel.photo === "" ? "a" : video.channel.photo)
                 .addFields(
                     // Video metadata
                     { name: `Video link`, value: `https://www.youtube.com/watch?v=${video.id}` },
@@ -75,10 +71,8 @@ module.exports = new MeteoriumCommand("holodexapi", "Holodex API - See subcomman
                     { name: "Channel link", value: `https://www.youtube.com/channel/${video.channel.id}` },
                     { name: "For more information about the channel", value: "Do the command ``/holodexapi getchannelinfo channelid:"+video.channel.id+"``" },
                 )
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setColor("0099ff")
-                .setTimestamp()
-        ]});
+            ]
+        });
     }
 }, new SlashCommandBuilder()
     .setName("holodexapi")

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 
 module.exports = new MeteoriumCommand("queue", "Get the queue of songs in this server", async (interaction, client) => {
@@ -12,9 +12,9 @@ module.exports = new MeteoriumCommand("queue", "Get the queue of songs in this s
 			m.requestedBy.tag
 		}`;
 	});
+    
     return await interaction.reply({ embeds: [
-        new MessageEmbed()
-            .setTitle("Music queue")
+        new MeteoriumEmbed("Music queue")
             .setDescription(`${tracks.join("\n")}${
                 queue.tracks.length > tracks.length
                     ? `\n...${
@@ -28,9 +28,6 @@ module.exports = new MeteoriumCommand("queue", "Get the queue of songs in this s
                     }`
                     : ""
             }`)
-            .setColor("0099ff")
             .addField("Now playing", `${currentTrack.title} - ${currentTrack.url} ${currentTrack.requestedBy.tag}`)
-            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-            .setTimestamp()
-    ]})
+    ]});
 })

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const MeteoriumCommand = require("../../util/Command");
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const Neko = require("neko-love.js");
@@ -9,20 +9,12 @@ module.exports = new MeteoriumCommand("anime", "Random anime pictures", async (i
     try {
         const pic = await Neko(action);
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setTitle(`Random anime ${action} picture`)
-                .setImage(pic)
-                .setColor("0099ff")
+            new MeteoriumEmbed(`Random anime ${action} picture`, "", "0099ff").setImage(pic)
         ]});
     } catch(err) {
         await interaction.editReply({ embeds: [
-            new MessageEmbed()
-                .setTitle(`Failed getting a random anime ${action} picture`)
-                .setDescription(String(err))
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
-        ]})
+            new MeteoriumEmbed(`Failed getting a random anime ${action} picture`, String(err), "FF0000")
+        ]});
     }
 }, new SlashCommandBuilder()
     .setName("anime")
@@ -37,4 +29,5 @@ module.exports = new MeteoriumCommand("anime", "Random anime pictures", async (i
                                 .addChoice("kiss", "kiss")
                                 .addChoice("slap", "slap")
                                 .addChoice("smug", "smug")
-                                .addChoice("punch", "punch")));
+                                .addChoice("punch", "punch"))
+);

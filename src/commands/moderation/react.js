@@ -1,16 +1,11 @@
 const MeteoriumCommand = require("../../util/Command");
-const { MessageEmbed } = require("discord.js");
+const MeteoriumEmbed = require("../../util/MeteoriumEmbed");
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = new MeteoriumCommand("react", "Reacts to a message with a specified emoji", async (interaction, client) => {
     if (!interaction.member.permissions.has("MANAGE_MESSAGES", true)) {
         return await interaction.reply({ embeds: [
-            new MessageEmbed()
-                .setTitle("Cannot react to message")
-                .setDescription("You do not have permission to use this command. (Missing permission MANAGE_MESSAGES)")
-                .setColor("FF0000")
-                .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                .setTimestamp()
+            new MeteoriumEmbed("Cannot react to message", "You do not have permission to use this command. (Missing permission MANAGE_MESSAGES)", "FF0000")
         ]})
     }
     await interaction.deferReply();
