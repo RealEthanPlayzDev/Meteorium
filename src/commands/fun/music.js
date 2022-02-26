@@ -38,31 +38,18 @@ async function createResponse(title) {
 
         const embed = substring(4096, data.lyrics).map((value, index) => {
             const isFirst = index === 0;
-            return new MessageEmbed()
-                    .setTitle(isFirst ? `${data.title} - ${data.author}` : "null?")
-                    .setDescription(value)
-                    .setColor("0099ff")
-                    .setThumbnail(isFirst ? { url: data.thumbnail.genius } : "")
-                    .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-                    .setTimestamp()
+            return new MeteoriumEmbed(isFirst ? `${data.title} - ${data.author}` : "null?", value).setThumbnail(isFirst ? { url: data.thumbnail.genius } : "");
         });
 
         return embed;
     } catch (error) {
-        return new MessageEmbed()
-            .setTitle("Error occured when finding lyrics")
-            .setDescription(`Couldn't find any lyrics for this song!\n${error}`)
-            .setColor("FF0000")
-            .setFooter("Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)")
-            .setTimestamp()
+        return new MeteoriumEmbed("Error occured when finding lyrics", `Couldn't find any lyrics for this song!\n${error}`, "FF0000");
     }
 }
 
 // Export
-module.exports = new MeteoriumCommand("clearqueue", "Clears the queue", async (interaction, client) => {
-    console.log("music command")
+module.exports = new MeteoriumCommand("music", "Meteorium's music management command", async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand()
-    console.log("music command subcommand: " + subcommand)
     var queue = client.Player.getQueue(interaction.guildId);
     if (!queue && !subcommand === "play") {
         return await interaction.reply({ content: "The bot doesn't seem to be connected to any voice channels." });
@@ -142,7 +129,7 @@ module.exports = new MeteoriumCommand("clearqueue", "Clears the queue", async (i
                 return interaction.reply({content: "The volume must be betweeen 1% and 100%",});
             }
             queue.setVolume(volpercent);
-            return interaction.reply({content: `Setted the volume to ${volpercent}%`})
+            return interaction.reply({content: `Set the volume to ${volpercent}%`})
         }
         case "resume" : {
             queue.setPaused(false);
@@ -203,7 +190,7 @@ module.exports = new MeteoriumCommand("clearqueue", "Clears the queue", async (i
     }
 }, new SlashCommandBuilder()
     .setName("music")
-    .setDescription("Clears the queue")
+    .setDescription("Meteorium's music management command")
     .addSubcommand(subcommand => subcommand.setName("play").setDescription("Play sound/music from YouTube")
                                     .addStringOption(option => option.setName("query").setDescription("A link/search term to the target YouTube video").setRequired(true))
                 )

@@ -11,7 +11,7 @@ module.exports = new MeteoriumCommand("kitsune", "Random kitsune pictures", asyn
         ]});
     } catch(err) {
         await interaction.editReply({ embeds: [
-            new MessageEmbed("Failed getting a random kitsune picture", String(err), "FF0000")
+            new MeteoriumEmbed("Failed getting a random kitsune picture", String(err), "FF0000")
         ]});
     }
 });
