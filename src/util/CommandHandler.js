@@ -99,7 +99,7 @@ class MeteoriumCommandHandler {
     }
 
     async DeleteRegisteredGlobalSlashCommands() {
-        this.client.application.commands.cache.forEach(async (command) => {
+        (await this.client.application.fetch()).commands.cache.forEach(async (command) => {
             await command.delete();
             console.log(`Deleted global slash command ${command.name} (${command.id})`);
         });
