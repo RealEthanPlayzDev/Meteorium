@@ -25,11 +25,19 @@ const ParseDotEnvConfig = () => {
 
 class MeteoriumClient extends Client {
     constructor(options) {super(options)} // Setting up the client is at the login
-    async login() {
+    async login(resetslashcommands) {
         this.config = ParseDotEnvConfig();
         this.CommandHandler = new MeteoriumCommandHandler(this, this.config.prefix, this.config.applicationId, this.config.token);
         this.EventHandler = new MeteoriumEventHandler(this);
         this.Player = new Player(this);
+
+        if (resetslashcommands) {
+            console.warn("MeteoriumClient: SLASH COMMAND RESET MODE");
+            await super.login(this.config.token);
+            await this.DeleteSlashCommands();
+            console.warn("MeteoriumClient: FINISHED DELETING SLASH COMMANDS");
+            return;
+        }
 
         // Connect to MongoDB server using mongoose
         mongoose.connect(this.config.mongodb_urlstring, {
@@ -66,6 +74,16 @@ class MeteoriumClient extends Client {
 
         // Login
         return super.login(this.config.token);
+    }
+
+    async DeleteSlashCommands() {
+        console.log("Deleting global slash commands registry")
+        await this.CommandHandler.DeleteRegisteredGlobalSlashCommands();
+        this.config.targetGuildIds.forEach(async (guildid) => {
+            console.log(`Deleting slash command registry for guild ${guildid}`)
+            await this.CommandHandler.DeleteRegisteredSlashCommands(guildid);
+        });
+        return true;
     }
 }
 

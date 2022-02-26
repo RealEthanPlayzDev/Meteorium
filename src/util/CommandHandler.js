@@ -100,6 +100,22 @@ class MeteoriumCommandHandler {
         }
     }
 
+    async DeleteRegisteredSlashCommands(guildId) {
+        this.client.guilds.fetch(guildId)?.commands?.cache?.forEach(async (command) => {
+            await command.delete();
+            console.log(`Deleted slash command ${command.name} (${command.id}) for guild ${guildId}`);
+        })
+        return true;
+    }
+
+    async DeleteRegisteredGlobalSlashCommands() {
+        this.client.application.commands.cache.forEach(async (command) => {
+            await command.delete();
+            console.log(`Deleted global slash command ${command.name} (${command.id})`);
+        });
+        return true;
+    }
+
     CreateNewGuildSettingSchema(id, enforcesayinexecutor=false, disabledcommands={}, disabledcommandcategories={}, muteroleid="") {
         if (!id) { throw new Error("id not specified") }
         return new GuildSettingSchema({
