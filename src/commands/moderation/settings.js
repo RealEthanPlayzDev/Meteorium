@@ -5,91 +5,113 @@ const GuildSettingSchema = require("../../schemas/GuildSettingSchema");
 
 module.exports = new MeteoriumCommand("settings", "Command to change settings for this server", async (interaction, client) => {
     await interaction.deferReply();
-    if (interaction.options.getSubcommand() === "enforcesayinexecutor") {
-         if (interaction.member.permissions.has("ADMINISTRATOR", true)) {
-            GuildSettingSchema.findOneAndUpdate({ GuildId: String(interaction.guildId) }, { EnforceSayinExecutor: interaction.options.getBoolean("enabled") }).then(async () => {
-                await interaction.editReply(`Successfully changed setting "EnforceSayinExecutor", new value: ${interaction.options.getBoolean("enabled")}`);
-             }).catch((err) => {
-                throw new Error(`An error occured when updated the settings database\n${err.stack}`);
-             });
-         } else {
-             await interaction.editReply({ embeds: [
-                 new MeteoriumEmbed("Cannot change this setting", "You do not have permission to change this setting! (Missing permission ADMINISTRATOR)", "FF0000")
-             ]});
-         }
-    } else if (interaction.options.getSubcommandGroup() === "disabledcommands") {
-        if (interaction.member.permissions.has("ADMINISTRATOR", true)) {
-            const guildSchema = await GuildSettingSchema.findOne({ GuildId: interaction.guildId });
-            if (interaction.options.getSubcommand() === "add") {
-                const targetCommands = ([]).concat(interaction.options.getString("commands").split(",")), updatedDisabledCommands = guildSchema.DisabledCommands;
-                var parseSuccess = true, failParseCommandName = "";
 
-                for (const targetCommand of targetCommands) {
-                    if (client.CommandHandler.parsedCommands.get(targetCommand)) {
-                        console.log(targetCommand)
-                        updatedDisabledCommands[client.CommandHandler.parsedCommands.get(targetCommand).name] = client.CommandHandler.parsedCommands.get(targetCommand).description
-                    } else {
-                        failParseCommandName = targetCommand;
-                        parseSuccess = false;
-                        break;
-                    }
+    if (!interaction.member.permissions.has("ADMINISTRATOR", true)) {
+        await interaction.editReply({ embeds: [
+            new MeteoriumEmbed("Cannot change setting", "You do not have permission to use this command! (Missing permission ADMINISTRATOR)", "FF0000")
+        ]});
+        return
+    }
+
+    const subcommandgroup = interaction.options.getSubcommandGroup(), subcommand = interaction.options.getSubcommand();
+    const guildSchema = await GuildSettingSchema.findOne({ GuildId: interaction.guildId });
+
+    switch(subcommandgroup) {
+        case "general" : {
+            switch(subcommand) {
+                case "enforcesayinexecutor": {
+                    GuildSettingSchema.findOneAndUpdate({ GuildId: String(interaction.guildId) }, { EnforceSayinExecutor: interaction.options.getBoolean("enabled") }).then(async () => {
+                        await interaction.editReply(`Successfully changed setting "EnforceSayinExecutor", new value: ${interaction.options.getBoolean("enabled")}`);
+                    }).catch((err) => {
+                        throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                    });
+                     return
                 }
+                case "setmuterole" : {
+                    const role = interaction.options.getRole("role");
+                    GuildSettingSchema.findOneAndUpdate({ GuildId: String(interaction.guildId) }, { MuteRoleId: String(role.id) }).then(async() => {
+                        await interaction.editReply("Successfully set the mute role.");
+                    }).catch((err) => {
+                        throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                    })
+                    return
+                }
+            }
+            return
+        }
+        case "disabledcommands" : {
+            switch(subcommand) {
+                case "add" : {
+                    const targetCommands = ([]).concat(interaction.options.getString("commands").split(",")), updatedDisabledCommands = guildSchema.DisabledCommands;
+                    var parseSuccess = true, failParseCommandName = "";
 
-                if (!parseSuccess) {
-                    await interaction.editReply({ embeds: [
-                        new MeteoriumEmbed("Error", `Command name ${failParseCommandName} does not exist! (to prevent this error, type command names correctly, multiple commands seperated with command like "test,embedtest,userinfo" and so on)`, "FF0000")
-                    ]});
+                    for (const targetCommand of targetCommands) {
+                        if (client.CommandHandler.parsedCommands.get(targetCommand)) {
+                            console.log(targetCommand)
+                            updatedDisabledCommands[client.CommandHandler.parsedCommands.get(targetCommand).name] = client.CommandHandler.parsedCommands.get(targetCommand).description
+                        } else {
+                            failParseCommandName = targetCommand;
+                            parseSuccess = false;
+                            break;
+                        }
+                    }
+
+                    if (!parseSuccess) {
+                        await interaction.editReply({ embeds: [
+                            new MeteoriumEmbed("Error", `Command name ${failParseCommandName} does not exist! (to prevent this error, type command names correctly, multiple commands seperated with command like "test,embedtest,userinfo" and so on)`, "FF0000")
+                        ]});
+                        return;
+                    }
+
+                    GuildSettingSchema.findOneAndUpdate({ GuildId: String(interaction.guildId) }, { DisabledCommands: updatedDisabledCommands }).then(async() => {
+                        await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
+                        await interaction.editReply("Successfully added the new disabled commands for this server.");
+                    }).catch((err) => {
+                        throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                    })
                     return;
                 }
-
-                guildSchema.DisabledCommands = updatedDisabledCommands;
-                guildSchema.markModified("DisabledCommands");
-                guildSchema.save().then(async () => {
-                    await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
-                    await interaction.editReply("Successfully added the new disabled commands for this server.");
-                }).catch((err) => {
-                    throw new Error(`An error occured when updated the settings database\n${err.stack}`);
-                });
-            } else if (interaction.options.getSubcommand() === "remove") {
-                const targetCommands = ([]).concat(interaction.options.getString("commands").split(","));
-                var disabledCommands = guildSchema.DisabledCommands;
-                for (const targetCommand of targetCommands) {
-                    if (disabledCommands[targetCommand]) {
-                        delete(disabledCommands[targetCommand]);
+                case "remove" : {
+                    const targetCommands = ([]).concat(interaction.options.getString("commands").split(","));
+                    var disabledCommands = guildSchema.DisabledCommands;
+                    for (const targetCommand of targetCommands) {
+                        if (disabledCommands[targetCommand]) {
+                            delete(disabledCommands[targetCommand]);
+                        }
                     }
+                    GuildSettingSchema.findOneAndUpdate({ GuildId: String(interaction.guildId) }, { DisabledCommands: disabledCommands }).then(async() => {
+                        await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
+                        await interaction.editReply("Successfully removed the disabled commands for this server.");
+                    }).catch((err) => {
+                        throw new Error(`An error occured when updated the settings database\n${err.stack}`);
+                    })
+                    return;
                 }
-                guildSchema.DisabledCommands = disabledCommands;
-                guildSchema.markModified("DisabledCommands");
-                guildSchema.save().then(async () => {
-                    await client.CommandHandler.UpdateDisabledCommandCache(interaction.guildId);
-                    await interaction.editReply("Successfully removed the disabled commands for this server.");
-                }).catch((err) => {
-                    throw new Error(`An error occured when updated the settings database\n${err.stack}`);
-                });
-            } else if (interaction.options.getSubcommand() === "list") {
-                const embed = new MeteoriumEmbed("List of disabled commands", "Below are the commands that are disabled:\n(Note: disabled command categories override this setting!)")
-                for (const [name, desc] of Object.entries(guildSchema.DisabledCommands)) {
-                    if (guildSchema.DisabledCommands.hasOwnProperty(name)) {
-                        embed.addField(name, desc);
+                case "list" : {
+                    const embed = new MeteoriumEmbed("List of disabled commands", "Below are the commands that are disabled:\n(Note: disabled command categories override this setting!)")
+                    for (const [name, desc] of Object.entries(guildSchema.DisabledCommands)) {
+                        if (guildSchema.DisabledCommands.hasOwnProperty(name)) {
+                            embed.addField(name, desc);
+                        }
                     }
+                    await interaction.editReply({ embeds: [embed] });
+                    return;
                 }
-                await interaction.editReply({ embeds: [embed] });
             }
-        } else {
-            await interaction.editReply({ embeds: [
-                new MeteoriumEmbed("Cannot change this setting", "You do not have permission to change this setting! (Missing permission ADMINISTRATOR)", "FF0000")
-            ]});
         }
-    } else if (interaction.options.getSubcommand() === "setmuterole") {
-        await interaction.reply("Not yet implemented");
     }
 }, new SlashCommandBuilder()
     .setName("settings")
     .setDescription("Command to change settings for this server")
-    .addSubcommand(subcommand => subcommand.setName("enforcesayinexecutor")
+    .addSubcommandGroup(new SlashCommandSubcommandGroupBuilder()
+                            .setName("general")
+                            .setDescription("General guild settings")
+                            .addSubcommand(subcommand => subcommand.setName("enforcesayinexecutor")
                                     .setDescription("If true, sayin command will enforce telling the executor's name no matter what.")
-                                    .addBooleanOption(option => option.setName("enabled").setDescription("Enabled or not").setRequired(true))
-    )
+                                    .addBooleanOption(option => option.setName("enabled").setDescription("Enabled or not").setRequired(true)))
+                            .addSubcommand(subcommand => subcommand.setName("setmuterole")
+                                    .setDescription("Mute role setting")
+                                    .addRoleOption(option => option.setName("role").setDescription("The mute role").setRequired(true))))
     .addSubcommandGroup(new SlashCommandSubcommandGroupBuilder()
                             .setName("disabledcommands")
                             .setDescription("Setting for disabled commands for this server")
@@ -102,8 +124,5 @@ module.exports = new MeteoriumCommand("settings", "Command to change settings fo
                             .addSubcommand(subcommand => subcommand.setName("list")
                                                             .setDescription("Returns a list of commands that are disabled."))
     )
-    .addSubcommand(subcommand => subcommand.setName("setmuterole")
-                                    .setDescription("Mute role setting")
-                                    .addRoleOption(option => option.setName("role").setDescription("The mute role").setRequired(true))
-    )
+    
 );
