@@ -8,8 +8,8 @@ module.exports = new MeteoriumCommand("react", "Reacts to a message with a speci
             new MeteoriumEmbed("Cannot react to message", "You do not have permission to use this command. (Missing permission MANAGE_MESSAGES)", "FF0000")
         ]})
     }
-    await interaction.deferReply();
-    const channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel, messageid = interaction.options.getString("messageid"), emoji = interaction.options.getString("emoji"), ephmeral = interaction.options.getBoolean("ephmeral") ? interaction.options.getBoolean("ephmeral") : false;
+    const channel = interaction.options.getChannel("channel") ? interaction.options.getChannel("channel") : interaction.channel, messageid = interaction.options.getString("messageid"), emoji = interaction.options.getString("emoji"), ephmeral = interaction.options.getBoolean("ephemeral") ? interaction.options.getBoolean("ephemeral") : false;
+    await interaction.deferReply({ ephemeral: ephmeral });
     let targetmessage, targetemoji;
 
     try {
@@ -22,12 +22,12 @@ module.exports = new MeteoriumCommand("react", "Reacts to a message with a speci
     } else {
         targetemoji = undefined;
     }
-    if (!channel.isText()) { return await interaction.editReply({ content: "This text channel is not a text/thread channel", ephemeral: ephmeral }) }
-    if (!targetmessage) { return await interaction.editReply({ content: `Cannot find message "${messageid}" in channel <#${channel.id}> (${channel.id})`, ephemeral: ephmeral }) }
-    if (!targetemoji) { return await interaction.editReply({ content: "Cannot find emoji in cache", ephemeral: ephmeral }) }
+    if (!channel.isText()) { return await interaction.editReply({ content: "This text channel is not a text/thread channel" }) }
+    if (!targetmessage) { return await interaction.editReply({ content: `Cannot find message "${messageid}" in channel <#${channel.id}> (${channel.id})` }) }
+    if (!targetemoji) { return await interaction.editReply({ content: "Cannot find emoji in cache" }) }
 
     targetmessage.react(targetemoji);
-    return await interaction.editReply({ content: "Successfully reacted to message", ephmeral: ephmeral })
+    return await interaction.editReply({ content: "Successfully reacted to message" })
 }, new SlashCommandBuilder()
     .setName("react")
     .setDescription("Reacts to a message with a specified emoji")
