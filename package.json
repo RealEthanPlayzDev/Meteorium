@@ -29,7 +29,7 @@
     "dotenv": "^16.0.0",
     "ffmpeg-static": "^5.0.0",
     "holodex.js": "^1.1.0",
-    "mongoose": "^6.0.10",
+    "mongoose": "^6.4.6",
     "neko-love.js": "^1.0.4",
     "noblox.js": "^4.13.1",
     "play-dl": "^1.8.6",
