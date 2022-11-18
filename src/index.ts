@@ -5,9 +5,3 @@ const Client = new MeteoriumClient({
 });
 
 await Client.login();
-
-console.log("Login finished, setting presence");
-Client.user.setPresence({
-    status: "idle",
-    activities: [{ name: "no" }]
-});

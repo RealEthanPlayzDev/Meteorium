@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "compile": "tsc -w",
+    "compile": "tsc",
     "start": "node --enable-source-maps --es-module-specifier-resolution=node ."
   },
   "repository": {
