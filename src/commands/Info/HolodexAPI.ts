@@ -31,6 +31,7 @@ export const Command: MeteoriumCommand = {
                 const Channel = (await HolodexClient.getChannel(interaction.options.getString("channelid", true))).toRaw();
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Channel")
+                    .setDescription("A channel")
                     .setAuthor({ name: Channel.name, url: `https://www.youtube.com/channel/${Channel.id}` })
                     .addFields([
                         { name: "English name", value: Channel.english_name || Channel.name },
@@ -52,6 +53,7 @@ export const Command: MeteoriumCommand = {
                 
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Video")
+                    .setDescription("A video")
                     .setAuthor({ name: Video.title, url: `https://www.youtube.com/watch?v=${Video.id}` })
                     .addFields([
                         // Video metadata
