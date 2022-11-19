@@ -2,6 +2,7 @@ import type { Awaitable, ChatInputCommandInteraction, SlashCommandBuilder } from
 import type { MeteoriumClient } from '../util/MeteoriumClient';
 
 export * as test from "./test/test";
+export * as embedtest from "./test/EmbedTest";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
