@@ -14,6 +14,9 @@ export * as ping from "./Info/Ping";
 export * as userinfo from "./Info/UserInfo";
 export * as holodexapi from "./Info/HolodexAPI";
 
+// Category - Fun
+export * as nekoloveapi from "./Fun/NekoLoveAPI";
+
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
     Callback(interaction: ChatInputCommandInteraction<'cached'>, client: MeteoriumClient): Awaitable<any>

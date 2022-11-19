@@ -40,10 +40,12 @@ DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
 - [holodex.js](https://github.com/HolodexNet/holodex.js)
 - [mongodb](https://github.com/mongodb/node-mongodb-native)
 - [dotenv](https://github.com/motdotla/dotenv)
+- [neko-love](https://github.com/Androz2091/neko-love)
 
 ## Acknowledgements
 - All discord.js contributors and authors
 - All holodex.js contributors and authors
 - All mongodb contributors and authors
 - All dotenv contributors and authors
+- All [neko-love.xyz](https://neko-love.xyz) (and neko-love) contributors and authors
 - Syjalo
