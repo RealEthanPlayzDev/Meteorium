@@ -1,7 +1,7 @@
 import { APIEmbed, EmbedBuilder, EmbedData, User } from "discord.js";
 
 export class MeteoriumEmbedBuilder extends EmbedBuilder {
-    constructor(data: EmbedData | APIEmbed | undefined, user?: User, dontsetinitialdata?: boolean) {
+    constructor(data?: EmbedData | APIEmbed | undefined, user?: User, dontsetinitialdata?: boolean) {
         super(data);
         if (!dontsetinitialdata) {
             this.setTitle("MeteoriumEmbed")
