@@ -21,15 +21,16 @@ export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>;
     public override async login() {
+        console.log("a");
         console.log("Registering commands");
         for(const [Name, { Command }] of Object.entries(Commands)) {
-            console.log("Registering command -> " + Name);
+            console.log("Registering command -> ", Name, Command);
             this.Commands.set(Name, Command);
         }
 
         console.log("Registering events");
         for (const [Name, { Event }] of Object.entries(Events)) {
-            console.log("Registering event -> " + Name);
+            console.log("Registering event ->", Name, Event);
             if (Event.Once) {
               // @ts-ignore
               this.once(Name, (...args) => Event.Callback(this, ...args));
@@ -37,9 +38,9 @@ export class MeteoriumClient extends Client<true> {
               // @ts-ignore
               this.on(Name, (...args) => Event.Callback(this, ...args));
             }
-          }
+        }
 
         console.log("Logging into Discord");
-        return await super.login(this.Config.DiscordToken);
+        return super.login(this.Config.DiscordToken);
     };
 }
