@@ -6,7 +6,7 @@ export const Event: MeteoriumEvent<"ready"> = {
         console.log("Registering slash commands");
         await client.application.commands.set(client.Commands.map((Command) => Command.InteractionData.toJSON()));
 
-        console.log("Setting user presence")
+        console.log("Setting user presence");
         client.user.setPresence({
             status: "idle",
             activities: [{ name: "no", type: ActivityType.Playing }]

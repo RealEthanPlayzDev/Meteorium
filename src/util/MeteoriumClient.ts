@@ -29,14 +29,17 @@ export class MeteoriumClient extends Client<true> {
 
         console.log("Registering events");
         for (const [Name, { Event }] of Object.entries(Events)) {
+            console.log("Registering event -> " + Name);
             if (Event.Once) {
+              // @ts-ignore
               this.once(Name, (...args) => Event.Callback(this, ...args));
             } else {
+              // @ts-ignore
               this.on(Name, (...args) => Event.Callback(this, ...args));
             }
           }
 
         console.log("Logging into Discord");
-        return super.login(this.Config.DiscordToken);
+        return await super.login(this.Config.DiscordToken);
     };
 }
