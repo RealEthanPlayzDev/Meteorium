@@ -12,6 +12,7 @@ export * as optionstest from "./Tests/OptionsTest";
 export * as help from "./Info/Help";
 export * as ping from "./Info/Ping";
 export * as userinfo from "./Info/UserInfo";
+export * as holodexapi from "./Info/HolodexAPI";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
