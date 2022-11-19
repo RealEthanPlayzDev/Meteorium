@@ -2,6 +2,7 @@ import { Client, Collection } from "discord.js";
 import { config } from "dotenv";
 import * as Commands from '../commands';
 import * as Events from "../events";
+import { MeteoriumDatabase } from "./MeteoriumDatabase";
 
 const ParseDotEnvConfig = () => {
     if (!process.env.METEORIUMBOTTOKEN) { config({"path": "./.ENV"}); }
@@ -20,8 +21,11 @@ const ParseDotEnvConfig = () => {
 export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>;
+    public Database = new MeteoriumDatabase(this.Config.MongoDB_URI);
     public override async login() {
-        console.log("a");
+        console.log("Connecting to Mongo database")
+        await Promise.all([ this.Database.connect() ])
+
         console.log("Registering commands");
         for(const [Name, { Command }] of Object.entries(Commands)) {
             console.log("Registering command -> ", Name, Command);
