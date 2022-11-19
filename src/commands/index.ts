@@ -9,7 +9,8 @@ export * as deferrederrortest from "./Tests/DeferredErrorTest";
 export * as optionstest from "./Tests/OptionsTest";
 
 // Category - Info
-export * as help from "./Info/Help"
+export * as help from "./Info/Help";
+export * as ping from "./Info/Ping";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
