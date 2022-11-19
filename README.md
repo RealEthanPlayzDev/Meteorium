@@ -34,3 +34,16 @@ RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER
 RATELIMITMAXLIMITTIME=after_when_should_ratelimit_reset_PUT_A_NUMBER_HERE
 DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
 ```
+
+## Credits
+- [discord.js](https://github.com/discordjs/discord.js)
+- [holodex.js](https://github.com/HolodexNet/holodex.js)
+- [mongodb](https://github.com/mongodb/node-mongodb-native)
+- [dotenv](https://github.com/motdotla/dotenv)
+
+## Acknowledgements
+- All discord.js contributors and authors
+- All holodex.js contributors and authors
+- All mongodb contributors and authors
+- All dotenv contributors and authors
+- Syjalo
