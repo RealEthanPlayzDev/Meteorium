@@ -8,6 +8,9 @@ export * as errortest from "./Tests/ErrorTest";
 export * as deferrederrortest from "./Tests/DeferredErrorTest";
 export * as optionstest from "./Tests/OptionsTest";
 
+// Category - Info
+export * as help from "./Info/Help"
+
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
     Callback(interaction: ChatInputCommandInteraction<'cached'>, client: MeteoriumClient): Awaitable<any>
