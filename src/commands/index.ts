@@ -11,6 +11,7 @@ export * as optionstest from "./Tests/OptionsTest";
 // Category - Info
 export * as help from "./Info/Help";
 export * as ping from "./Info/Ping";
+export * as userinfo from "./Info/UserInfo";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
