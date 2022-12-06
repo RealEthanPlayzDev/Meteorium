@@ -6,9 +6,6 @@ Since the ts rewrite, some of the source might ressemble [PojavBot](https://gith
 ## UNSTABLE - THIS IS A FULL REWRITE
 This branch is a full rewrite, not all features have been implemented!
 
-## INACTIVE DEVELOPMENT
-This bot will enter a inactive development state, feel free to make a pr if you want to add or change something, however I sort of lost the motivation to work on this bot, this also means there will be no TypeScript rewrite most likely, additionally Heroku is going to stop giving free dynos by the end of November, and I don't have any other way to host it (even self-hosting isn't possible yet for me at the time I am writing this), this basically killed my motivation completely to work on this hobby project, I don't know if I will ever come back to this or not, but I suppose that's all I have to say.
-
 ## Installing required dependencies
 TODO: Redo this section since ts rewrite changed how it works
 
