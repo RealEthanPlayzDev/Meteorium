@@ -1,13 +1,16 @@
 # Meteorium
 A Discord bot developed by RadiatedExodus (RealEthanPlayzDev) as a side (and personal) project, written in Javascript using Node.js and Discord.js, also being used as a way for me to learn JavaScript and TypeScript.
 
-Since the ts rewrite, some of the source might ressemble [PojavBot](https://github.com/PojavLauncherTeam/PojavBot) as I took some references from there.
+Since the ts rewrite, some of the source might ressemble [PojavBot](https://github.com/PojavLauncherTeam/PojavBot) as I took several references from there.
 
 ## UNSTABLE - THIS IS A FULL REWRITE
 This branch is a full rewrite, not all features have been implemented!
 
 ## Installing required dependencies
-TODO: Redo this section since ts rewrite changed how it works
+Ensure ``yarn`` is installed (``npm install --global yarn``), then just run it at the root of the repository
+```
+yarn
+```
 
 ## Building and running
 To build:
@@ -35,6 +38,7 @@ DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
 ## Credits
 - [discord.js](https://github.com/discordjs/discord.js)
 - [holodex.js](https://github.com/HolodexNet/holodex.js)
+- [noblox.js](https://github.com/noblox/noblox.js)
 - [mongodb](https://github.com/mongodb/node-mongodb-native)
 - [dotenv](https://github.com/motdotla/dotenv)
 - [neko-love](https://github.com/Androz2091/neko-love)
@@ -42,6 +46,7 @@ DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
 ## Acknowledgements
 - All discord.js contributors and authors
 - All holodex.js contributors and authors
+- All noblox.js contributors and authors
 - All mongodb contributors and authors
 - All dotenv contributors and authors
 - All [neko-love.xyz](https://neko-love.xyz) (and neko-love) contributors and authors
