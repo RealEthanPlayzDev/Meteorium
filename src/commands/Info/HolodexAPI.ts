@@ -9,7 +9,7 @@ let ClientNeedsResetup = true;
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
         .setName("holodexapi")
-        .setDescription("Shows information about a vtuber/vtuber's video. (Powered by https://holodex.net)")
+        .setDescription("Shows information about a vtuber's content. (Powered by https://holodex.net)")
         .addSubcommand(subcommand => subcommand.setName("getchannelinfo")
                                                .setDescription("Gets information about a vtuber's channel")
                                                .addStringOption(option => option.setName("channelid").setDescription("The vtuber's YouTube channel id").setRequired(true))

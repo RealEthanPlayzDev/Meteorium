@@ -24,6 +24,7 @@
     "dotenv": "^16.0.3",
     "holodex.js": "^2.0.5",
     "mongodb": "^4.12.0",
-    "neko-love": "^2.0.2"
+    "neko-love": "^2.0.2",
+    "noblox.js": "^4.13.1"
   }
 }
