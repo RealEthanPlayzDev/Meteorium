@@ -31,6 +31,9 @@
     "neko-love": "^2.0.2",
     "noblox.js": "^4.13.1",
     "play-dl": "^1.9.6",
-    "youtube-sr": "^4.3.4"
+    "soundcloud-scraper": "^5.0.3",
+    "spotify-url-info": "^3.2.3",
+    "youtube-sr": "^4.3.4",
+    "ytdl-core": "^4.11.2"
   }
 }
