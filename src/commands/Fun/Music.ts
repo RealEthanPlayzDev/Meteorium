@@ -20,6 +20,12 @@ export const Command: MeteoriumCommand = {
                                                .setDescription("Set the volume of the music player")
                                                .addNumberOption(option => option.setName("volumepercentage").setDescription("Volume percentage (1-100), if not specified then will reply with current volume.").setRequired(false))
                     )
+        .addSubcommand(subcommand => subcommand.setName("bassboost")
+                                               .setDescription("Bass boost filter toggle")
+                                               .addBooleanOption(option => option.setName("enabled").setDescription("Whether bass boost is enabled or not, if not specified, returns the current enabled state.").setRequired(false))
+                    )
+        .addSubcommand(subcommand => subcommand.setName("currenttrack").setDescription("Gets information about the current track"))
+        .addSubcommand(subcommand => subcommand.setName("back").setDescription("Goes back to the previous track"))
         .addSubcommand(subcommand => subcommand.setName("resume").setDescription("Resumes the current track"))
         .addSubcommand(subcommand => subcommand.setName("pause").setDescription("Pause the current track"))
         .addSubcommand(subcommand => subcommand.setName("stop").setDescription("Stop and disconnect the bot"))
@@ -91,6 +97,37 @@ export const Command: MeteoriumCommand = {
                 Queue.setVolume(VolumePercentage);
                 return await interaction.editReply({ content: `Set the volume to ${VolumePercentage}%` });
             }
+            case("bassboost"): {
+                const Enabled = interaction.options.getBoolean("enabled", false);
+                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                const OldEnabledState = Queue.getFiltersEnabled().includes("bassboost");
+                if (Enabled === null) return await interaction.editReply({ content: `Current bass boost enabled state: ${OldEnabledState ? "Enabled" : "Disabled"}` });
+                Queue.setFilters({ bassboost: Enabled, normalizer2: Enabled });
+                return await interaction.editReply({ content: `Set the bass boost enabled state to ${Enabled ? "enabled" : "disabled"}.` });
+            }
+            case("currenttrack"): {
+                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                if (!Queue.current) return await interaction.editReply({ content: "The bot isn't playing anything." });
+                const Track = Queue.current
+                const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle(Track.title)
+                                    .setDescription(`${Track.author} - ${Track.title}`)
+                                    .setThumbnail(Track.thumbnail)
+                                    .setURL(Track.url)
+                                    .addFields([
+                                        { name: "Author", value: String(Track.author) },
+                                        { name: "Duration", value: String(Track.duration) },
+                                        { name: "Requested by", value: String(Track.requestedBy.tag) },
+                                        { name: "Views", value: String(Track.views) },
+                                        { name: "Id", value: String(Track.id) }
+                                    ]);
+                return await interaction.editReply({ embeds: [ Embed ] });
+            }
+            case("back"): {
+                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                Queue.back();
+                return await interaction.editReply({ content: "Now playing the previous track." });
+            }
             case("resume"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
                 Queue.setPaused(false);
@@ -119,6 +156,7 @@ export const Command: MeteoriumCommand = {
             }
             case("queue"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                if (!Queue || !Queue.playing && Queue.tracks.length === 0) return await interaction.editReply({ content: "The bot isn't playing anything and there is nothing at the queue." });
                 const CurrentTrack = Queue.current;
                 const QueueTracks = Queue.tracks.slice(0, 25).map((track, i) => {
                     return `${i + 1}. [**${track.title}**](${track.url}) - ${track.requestedBy.tag}`;
