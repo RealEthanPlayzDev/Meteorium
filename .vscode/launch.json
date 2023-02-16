@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Compile",
+            "request": "launch",
+            "command": "yarn compile",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "node-terminal",
+            "name": "Run",
+            "request": "launch",
+            "command": "yarn start",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
