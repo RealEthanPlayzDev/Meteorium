@@ -21,70 +21,22 @@ export const Command: MeteoriumCommand = {
             case("assetid"): {
                 const AssetInfo = await getProductInfo(interaction.options.getNumber("assetid", true));
                 const EmbedFields = [
-                    {
-                        name: "Creator",
-                        value: `@${AssetInfo.Creator.Name} (${AssetInfo.Creator.Id})`
-                    },
-                    {
-                        name: "AssetId",
-                        value: String(AssetInfo.AssetId ? AssetInfo.AssetId : "N/A")
-                    },
-                    {
-                        name: "ProductId",
-                        value: String(AssetInfo.ProductId ? AssetInfo.ProductId : "N/A")
-                    },
-                    {
-                        name: "Asset type id",
-                        value: String(AssetInfo.AssetTypeId ? AssetInfo.AssetTypeId : "N/A")
-                    },
-                    {
-                        name: "Sales",
-                        value: String(AssetInfo.Sales ? AssetInfo.Sales : "N/A")
-                    },
-                    {
-                        name: "Remaining",
-                        value: String(AssetInfo.Remaining ? AssetInfo.Remaining : "N/A")
-                    },
-                    {
-                        name: "Created at",
-                        value: String(AssetInfo.Created ? AssetInfo.Created : "N/A")
-                    },
-                    {
-                        name: "Last updated at",
-                        value: String(AssetInfo.Updated ? AssetInfo.Updated : "N/A")
-                    },
-                    {
-                        name: "Price (in Robux)",
-                        value: String(AssetInfo.PriceInRobux ? AssetInfo.PriceInRobux : "N/A")
-                    },
-                    {
-                        name: "On sale",
-                        value: String(AssetInfo.IsForSale ? AssetInfo.IsForSale : "N/A")
-                    },
-                    {
-                        name: "Asset is a limited",
-                        value: String(AssetInfo.IsLimited ? AssetInfo.IsLimited : "N/A")
-                    },
-                    {
-                        name: "Asset is a unique limited",
-                        value: String(AssetInfo.IsLimitedUnique ? AssetInfo.IsLimitedUnique : "N/A")
-                    },
-                    {
-                        name: "IsNew",
-                        value: String(AssetInfo.IsNew ? AssetInfo.IsNew : "N/A")
-                    },
-                    {
-                        name: "IsPublicDomain",
-                        value: String(AssetInfo.IsPublicDomain ? AssetInfo.IsPublicDomain : "N/A")
-                    },
-                    {
-                        name: "Minimum membership level",
-                        value: String(AssetInfo.MinimumMembershipLevel ? AssetInfo.MinimumMembershipLevel : "N/A")
-                    },
-                    {
-                        name: "ContentRatingTypeId",
-                        value: String(AssetInfo.ContentRatingTypeId ? AssetInfo.ContentRatingTypeId : "N/A")
-                    }
+                    { name: "Creator", value: `@${AssetInfo.Creator.Name} (${AssetInfo.Creator.Id})` },
+                    { name: "AssetId",value: String(AssetInfo.AssetId ? AssetInfo.AssetId : "N/A") },
+                    { name: "ProductId",value: String(AssetInfo.ProductId ? AssetInfo.ProductId : "N/A") },
+                    { name: "Asset type id", value: String(AssetInfo.AssetTypeId ? AssetInfo.AssetTypeId : "N/A") },
+                    { name: "Sales", value: String(AssetInfo.Sales ? AssetInfo.Sales : "N/A") },
+                    { name: "Remaining", value: String(AssetInfo.Remaining ? AssetInfo.Remaining : "N/A") },
+                    { name: "Created at", value: String(AssetInfo.Created ? AssetInfo.Created : "N/A") },
+                    { name: "Last updated at", value: String(AssetInfo.Updated ? AssetInfo.Updated : "N/A") },
+                    { name: "Price (in Robux)", value: String(AssetInfo.PriceInRobux ? AssetInfo.PriceInRobux : "N/A") },
+                    { name: "On sale", value: String(AssetInfo.IsForSale ? AssetInfo.IsForSale : "N/A") },
+                    { name: "Asset is a limited", value: String(AssetInfo.IsLimited ? AssetInfo.IsLimited : "N/A") },
+                    { name: "Asset is a unique limited", value: String(AssetInfo.IsLimitedUnique ? AssetInfo.IsLimitedUnique : "N/A") },
+                    { name: "IsNew", value: String(AssetInfo.IsNew ? AssetInfo.IsNew : "N/A") },
+                    { name: "IsPublicDomain", value: String(AssetInfo.IsPublicDomain ? AssetInfo.IsPublicDomain : "N/A") },
+                    { name: "Minimum membership level", value: String(AssetInfo.MinimumMembershipLevel ? AssetInfo.MinimumMembershipLevel : "N/A") },
+                    { name: "ContentRatingTypeId", value: String(AssetInfo.ContentRatingTypeId ? AssetInfo.ContentRatingTypeId : "N/A") }
                 ]
 
                 return await interaction.editReply({
