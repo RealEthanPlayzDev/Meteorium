@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { QueryType } from "discord-player"; 
-import { stream } from 'play-dl';
-import { YouTube } from 'youtube-sr';
+import { stream, search } from 'play-dl';
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from '../../util/MeteoriumEmbedBuilder';
 
@@ -48,21 +47,11 @@ export const Command: MeteoriumCommand = {
                 Queue = await client.Player.createQueue(interaction.guild, {
                     metadata: interaction.channel,
                     spotifyBridge: true,
+                    initialVolume: 50,
+                    leaveOnEmpty: true,
                     async onBeforeCreateStream(track, _, __) {
-                        return (await stream(await YouTube.search(`${track.author} ${track.title}`, { type: "video" }).then(x => {
-                            let Index = 0, Url = "";
-                            while (Index >= x.length) {
-                                if (x[Index] == undefined) {
-                                    if (Index > 30) break;
-                                    Index += 1;
-                                } else {
-                                    const IndexedVideo = x[Index];
-                                    Url = IndexedVideo ? IndexedVideo.url : "";
-                                    break;
-                                }
-                            }
-                            return Url;
-                        }), { discordPlayerCompatibility : true })).stream;
+                        const SearchResult = await search(`${track.author} - ${track.title}`, { limit: 1 });
+                        return (await stream(SearchResult[0]?.url || "", { discordPlayerCompatibility: true })).stream;
                     }
                 })
 
@@ -131,32 +120,16 @@ export const Command: MeteoriumCommand = {
             case("queue"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
                 const CurrentTrack = Queue.current;
-                const QueueTracks = Queue.tracks.slice(0, 25).map((m, i) => {
-                    return `${i + 1}. [**${m.title}**](${m.url}) - ${
-                        m.requestedBy.tag
-                    }`;
+                const QueueTracks = Queue.tracks.slice(0, 25).map((track, i) => {
+                    return `${i + 1}. [**${track.title}**](${track.url}) - ${track.requestedBy.tag}`;
                 });
-                
-                return await interaction.editReply({
-                    embeds: [
-                        new MeteoriumEmbedBuilder(undefined, interaction.user)
-                            .setTitle("Music/sound queue")
-                            .setDescription(`${QueueTracks.join("\n")}${
-                                Queue.tracks.length > QueueTracks.length
-                                    ? `\n...${
-                                        Queue.tracks.length - QueueTracks.length === 1
-                                            ? `${
-                                                Queue.tracks.length - QueueTracks.length
-                                            } more track`
-                                            : `${
-                                                Queue.tracks.length - QueueTracks.length
-                                            } more tracks`
-                                    }`
-                                    : ""
-                            }`)
-                            .addFields([ { name: "Now playing", value: `${CurrentTrack.title} - ${CurrentTrack.url} ${CurrentTrack.requestedBy.tag}` } ])
-                    ]
-                });
+
+                const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle("Music/sound queue")
+                                    .setDescription(`Keep in mind only the first 25 music(s)/sound(s) are listed here:\n${QueueTracks.join("\n")}`);
+                if (CurrentTrack) Embed.setFields({ name: "Currently playing", value: `[**${CurrentTrack.title}**](${CurrentTrack.url}) - ${CurrentTrack.requestedBy.tag}` });
+
+                return await interaction.editReply({ embeds: [ Embed ] });
             }
             case("clearqueue"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
