@@ -9,7 +9,7 @@ export const Command: MeteoriumCommand = {
         .addSubcommandGroup(subcommandgroup => subcommandgroup.setName("generalmoderation")
                                                               .setDescription("Moderation-related functionality configuration")
                                                               .addSubcommand(subcommand => subcommand.setName("enforcesayinexecutor")
-                                                                                                     .setDescription("If true, /sayin command will enforce telling the executor's name no matter what. (Admin users are imnune to this)")
+                                                                                                     .setDescription("If true, /sayin command will enforce telling the executor's name no matter what. (Admins are imnune)")
                                                                                                      .addBooleanOption(option => option.setName("enabled").setDescription("Enabled or not").setRequired(true))
                                                                             )
                                                               .addSubcommand(subcommand => subcommand.setName("muterole")
