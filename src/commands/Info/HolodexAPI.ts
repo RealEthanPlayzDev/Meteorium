@@ -1,10 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { HolodexApiClient } from 'holodex.js';
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from '../../util/MeteoriumEmbedBuilder';
-
-let HolodexClient = new HolodexApiClient({ apiKey: "" });
-let ClientNeedsResetup = true;
 
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
@@ -23,12 +19,11 @@ export const Command: MeteoriumCommand = {
     async Callback(interaction, client) {
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
-        if (ClientNeedsResetup) HolodexClient = new HolodexApiClient({ apiKey: client.Config.HolodexAPIKey });
 
         const SubcommandTarget = interaction.options.getSubcommand();
         switch(SubcommandTarget) {
             case("getchannelinfo"): {
-                const Channel = (await HolodexClient.getChannel(interaction.options.getString("channelid", true))).toRaw();
+                const Channel = (await client.HolodexClient.getChannel(interaction.options.getString("channelid", true))).toRaw();
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Channel")
                     .setDescription("A channel")
@@ -49,7 +44,7 @@ export const Command: MeteoriumCommand = {
                 break;
             }
             case("getvideoinfo"): {
-                const Video = (await HolodexClient.getVideo(interaction.options.getString("videoid", true))).toRaw();
+                const Video = (await client.HolodexClient.getVideo(interaction.options.getString("videoid", true))).toRaw();
                 
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Video")

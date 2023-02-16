@@ -1,6 +1,7 @@
 import { Client, Collection } from "discord.js";
 import { config } from "dotenv";
 import { Player } from "discord-player";
+import { HolodexApiClient } from 'holodex.js';
 import * as Commands from '../commands';
 import * as Events from "../events";
 import { MeteoriumDatabase } from "./MeteoriumDatabase";
@@ -24,6 +25,7 @@ export class MeteoriumClient extends Client<true> {
     public Commands = new Collection<string, Commands.MeteoriumCommand>;
     public Database = new MeteoriumDatabase(this.Config.MongoDB_URI);
     public Player = new Player(this);
+    public HolodexClient = new HolodexApiClient({ apiKey: this.Config.HolodexAPIKey });
     public override async login() {
         console.log("Connecting to Mongo database")
         await Promise.all([ this.Database.connect() ])
