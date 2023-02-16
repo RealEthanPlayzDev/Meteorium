@@ -13,9 +13,14 @@ export * as help from "./Info/Help";
 export * as ping from "./Info/Ping";
 export * as userinfo from "./Info/UserInfo";
 export * as holodexapi from "./Info/HolodexAPI";
+// export * as rbxapi from "./Info/RbxAPI";
 
 // Category - Fun
 export * as nekoloveapi from "./Fun/NekoLoveAPI";
+export * as music from "./Fun/Music";
+
+// Category - Moderation
+export * as settings from "./Moderation/Settings";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
