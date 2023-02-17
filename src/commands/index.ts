@@ -21,6 +21,8 @@ export * as music from "./Fun/Music";
 
 // Category - Moderation
 export * as settings from "./Moderation/Settings";
+export * as sayin from "./Moderation/SayIn";
+export * as reactto from "./Moderation/ReactTo";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
