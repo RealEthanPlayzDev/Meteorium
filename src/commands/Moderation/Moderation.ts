@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import type { MeteoriumCommand } from "..";
+import { MeteoriumEmbedBuilder } from '../../util/MeteoriumEmbedBuilder';
 
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
@@ -63,7 +64,14 @@ export const Command: MeteoriumCommand = {
                         return await interaction.editReply({ content: `Unbanned user "${TargetUser.tag} (${TargetUser.id}) with reason "${Reason}"` });
                     }
                     case("list"): {
-                        return await interaction.editReply({ content: "This feature is not implemented yet" });
+                        const BanList = (await interaction.guild.bans.fetch({ limit: 25 })).map(user => `${user.user.tag} (${user.user.id})`);
+                        return await interaction.editReply({
+                            embeds: [
+                                new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle("Banned users (1-25)")
+                                    .setDescription(BanList.join("\n"))
+                            ]
+                        });
                     }
                 }
                 break;

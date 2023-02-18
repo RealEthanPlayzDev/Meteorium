@@ -23,6 +23,7 @@ export * as music from "./Fun/Music";
 export * as settings from "./Moderation/Settings";
 export * as sayin from "./Moderation/SayIn";
 export * as reactto from "./Moderation/ReactTo";
+export * as moderation from "./Moderation/Moderation";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
