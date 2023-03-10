@@ -8,12 +8,12 @@ import { MeteoriumDatabase } from "./MeteoriumDatabase";
 
 const ParseDotEnvConfig = () => {
     if (!process.env.METEORIUMBOTTOKEN) { config({"path": "./.ENV"}); }
-    const tgid = String(process.env.DEPLOYGUILDIDS).split(",")
+    const InteractionFirstDeployGuildIds = String(process.env.DEPLOYGUILDIDS).split(",");
     return {
         "MongoDB_URI": String(process.env.METEORIUMMONGODBURI),
         "DiscordToken": String(process.env.METEORIUMBOTTOKEN),
         "DiscordApplicationId": String(process.env.METEORIUMAPPLICATIONID),
-        "InteractionFirstDeployGuildIds": tgid,
+        "InteractionFirstDeployGuildIds": InteractionFirstDeployGuildIds,
         "HolodexAPIKey": String(process.env.METEORIUMHOLODEXTOKEN),
         "RatelimitMaxLimit": Number(process.env.RATELIMITMAXLIMIT),
         "RatelimitMaxLimitTime": Number(process.env.RATELIMITMAXLIMITTIME)
@@ -27,10 +27,11 @@ export class MeteoriumClient extends Client<true> {
     public Player = new Player(this);
     public HolodexClient = new HolodexApiClient({ apiKey: this.Config.HolodexAPIKey });
     public override async login() {
-        console.log("Connecting to Mongo database")
-        await Promise.all([ this.Database.connect() ])
+        console.log("Connecting to Mongo database");
+        await Promise.all([ this.Database.connect() ]);
 
         console.log("Registering commands");
+        this.Commands.clear();
         for(const [Name, { Command }] of Object.entries(Commands)) {
             console.log("Registering command -> ", Name, Command);
             this.Commands.set(Name, Command);

@@ -1,1 +1,0 @@
-// TODO: A static logging class that provides functions for standardised log format
