@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { getProductInfo } from 'noblox.js';
+// import { getProductInfo } from 'noblox.js';
+import * as nobloxjs from 'noblox.js'; // This is a workaround to solve noblox.js's module export error, see https://github.com/noblox/noblox.js/issues/670
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from '../../util/MeteoriumEmbedBuilder';
 
@@ -7,7 +8,7 @@ export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
         .setName("rbxapi")
         .setDescription("Shows information about something from Roblox (powered by noblox.js)")
-        .addSubcommand(subcommand => subcommand.setName("fetchAssetInfo")
+        .addSubcommand(subcommand => subcommand.setName("fetchassetinfo")
                                                .setDescription("Gets information about a asset using a asset id")
                                                .addNumberOption(option => option.setName("assetid").setDescription("The asset id").setRequired(true))
                                                .addBooleanOption(option => option.setName("ephemeral").setDescription("If true, the response will be only shown to you").setRequired(false))
@@ -19,7 +20,7 @@ export const Command: MeteoriumCommand = {
         const SubcommandTarget = interaction.options.getSubcommand();
         switch(SubcommandTarget) {
             case("assetid"): {
-                const AssetInfo = await getProductInfo(interaction.options.getNumber("assetid", true));
+                const AssetInfo = await nobloxjs.getProductInfo(interaction.options.getNumber("assetid", true));
                 const EmbedFields = [
                     { name: "Creator", value: `@${AssetInfo.Creator.Name} (${AssetInfo.Creator.Id})` },
                     { name: "AssetId",value: String(AssetInfo.AssetId ? AssetInfo.AssetId : "N/A") },

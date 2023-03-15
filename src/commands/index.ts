@@ -13,7 +13,7 @@ export * as help from "./Info/Help";
 export * as ping from "./Info/Ping";
 export * as userinfo from "./Info/UserInfo";
 export * as holodexapi from "./Info/HolodexAPI";
-// export * as rbxapi from "./Info/RbxAPI";
+export * as rbxapi from "./Info/RbxAPI";
 
 // Category - Fun
 export * as nekoloveapi from "./Fun/NekoLoveAPI";

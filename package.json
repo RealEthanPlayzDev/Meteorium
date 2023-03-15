@@ -29,7 +29,7 @@
     "libsodium-wrappers": "^0.7.10",
     "mongodb": "^4.12.0",
     "neko-love": "^2.0.2",
-    "noblox.js": "^4.13.1",
+    "noblox.js": "4.14.0",
     "play-dl": "^1.9.6",
     "soundcloud-scraper": "^5.0.3",
     "spotify-url-info": "^3.2.3",
