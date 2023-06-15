@@ -70,7 +70,9 @@ export const Command: MeteoriumCommand = {
                 return await interaction.editReply({ content: `Now playing your query (${Query})` });
             }
             case("lyrics"): {
-                const lyrics = await client.LyricsExtractor.search('alan walker faded').catch(() => null);
+                const Query = interaction.options.getString("songtitle", false) ? interaction.options.getString("songtitle", false) : Queue?.currentTrack?.title
+                if (!Query) return await interaction.editReply({ content: "No query." });
+                const lyrics = await client.LyricsExtractor.search(Query).catch(() => null);
                 if (!lyrics) return await interaction.editReply({ content: "No lyrics found." });
                 const TrimmedLyrics = lyrics.lyrics.substring(0, 1997);
 
@@ -96,7 +98,12 @@ export const Command: MeteoriumCommand = {
                 return await interaction.editReply({ content: `Set the volume to ${VolumePercentage}%` });
             }
             case("bassboost"): {
-                return await interaction.editReply({ content: "TODO: Rewrite for discord-player v6.x.x" });
+                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                const Enabled = interaction.options.getBoolean("enabled", false);
+                const OldEnabledState = Queue.filters.ffmpeg.getFiltersEnabled().includes("bassboost");
+                if (Enabled === null) return await interaction.editReply({ content: `Current bass boost enabled state: ${OldEnabledState ? "Enabled" : "Disabled"}` });
+                Queue.filters.ffmpeg.setFilters(["bassboost", "normalizer2"]);
+                return await interaction.editReply({ content: "Enabled bass boost (TODO: Add disabling the effect on v6.x.x upgrade)" });
             }
             case("currenttrack"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
