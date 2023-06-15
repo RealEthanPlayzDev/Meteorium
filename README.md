@@ -33,6 +33,7 @@ METEORIUMAPPLICATIONID=bot_app_id_here
 RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER_HERE
 RATELIMITMAXLIMITTIME=after_when_should_ratelimit_reset_PUT_A_NUMBER_HERE
 DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
+GENIUSAPIKEY=genius_api_key_here
 ```
 
 ## Credits

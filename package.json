@@ -20,9 +20,10 @@
   "homepage": "https://github.com/RealEthanPlayzDev/Meteorium#readme",
   "devDependencies": {},
   "dependencies": {
+    "@discord-player/extractor": "^4.3.1",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.14.0",
-    "discord-player": "^5.4.0",
+    "discord-player": "6.5.0",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
     "holodex.js": "^2.0.5",

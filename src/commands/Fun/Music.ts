@@ -1,6 +1,4 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { QueryType } from "discord-player"; 
-import { stream, search } from 'play-dl';
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from '../../util/MeteoriumEmbedBuilder';
 
@@ -38,77 +36,72 @@ export const Command: MeteoriumCommand = {
 
         // Check subcommand and queue
         const SubcommandTarget = interaction.options.getSubcommand();
-        let Queue = client.Player.getQueue(interaction.guildId);
+
+        // Get the current queue node
+        let Queue = client.DiscordPlayer.nodes.get(interaction.guildId);
 
         // Fetching guild members
         if (!interaction.guild.available) return await interaction.editReply({ content: "Guild/server not available. (Is there a outage at the moment?)" });
         
         switch(SubcommandTarget) {
             case("play"): {
-                if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!" });
-                if (interaction.guild.members.me?.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me?.voice.channelId) return await interaction.reply({ content: "You are not in the same voice channel!" });
                 const Query = interaction.options.getString("query", true);
+                const VoiceChannel = interaction.member.voice.channel
+                if (!VoiceChannel) return await interaction.reply({ content: "You are not in a voice channel!" });
+                if (interaction.guild.members.me?.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me?.voice.channelId) return await interaction.reply({ content: "You are not in the same voice channel!" });
 
-                // Creating a queue object
-                Queue = await client.Player.createQueue(interaction.guild, {
-                    metadata: interaction.channel,
-                    spotifyBridge: true,
-                    initialVolume: 50,
-                    leaveOnEmpty: true,
-                    async onBeforeCreateStream(track, _, __) {
-                        const SearchResult = await search(`${track.author} - ${track.title}`, { limit: 1 });
-                        return (await stream(SearchResult[0]?.url || "", { discordPlayerCompatibility: true })).stream;
-                    }
-                })
+                const SearchResult = await client.DiscordPlayer.search(Query, { requestedBy: interaction.user });
+                if (!SearchResult.hasTracks()) return await interaction.reply({ content: "Found no tracks for this query." });
 
-                // Try connecting to a voice channel
                 try {
-                    if (!interaction.member.voice.channel) throw Error("member.voice.channel === undefined, can't continue");
-                    if (!Queue.connection && interaction.member.voice.channel) await Queue.connect(interaction.member.voice.channel);
+                    await client.DiscordPlayer.play(VoiceChannel, SearchResult, {
+                        nodeOptions: {
+                            metadata: interaction,
+                            selfDeaf: true,
+                            leaveOnEmpty: true,
+                            leaveOnEnd: true
+                        }
+                    })
                 } catch(e) {
-                    Queue.destroy();
-                    console.error(`Music command connect fail:\n${e}`);
-                    return await interaction.editReply({ content: "Error occured while connecting to the voice channel.\nPlease try again later" });
+                    console.error(`Error occured while trying to play on discord-player: ${e}`);
+                    return await interaction.editReply({ content: "An error has occured while trying to play your query." });
                 }
 
-                // Searching and adding to the queue
-                const SearchResult = await client.Player.search(Query, {
-                    requestedBy: interaction.user,
-                    searchEngine: QueryType.AUTO
-                });
-                Queue.addTracks(SearchResult.tracks);
-
-                // Check play state
-                if (!Queue.playing) {
-                    Queue.play();
-                }
-
-                return await interaction.editReply({ content: `Added "${Query}" to the queue` });
+                return await interaction.editReply({ content: `Now playing your query (${Query})` });
             }
             case("lyrics"): {
-                // const SongTitle = interaction.options.getString("songtitle", false);
-                return await interaction.editReply({ content: "Unfortunately, this functionality is disabled right now due to it's unusability, it may or may not be removed in the future." })
+                const lyrics = await client.LyricsExtractor.search('alan walker faded').catch(() => null);
+                if (!lyrics) return await interaction.editReply({ content: "No lyrics found." });
+                const TrimmedLyrics = lyrics.lyrics.substring(0, 1997);
+
+                const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle(lyrics.title)
+                                    .setURL(lyrics.url)
+                                    .setThumbnail(lyrics.thumbnail)
+                                    .setAuthor({
+                                        name: lyrics.artist.name,
+                                        iconURL: lyrics.artist.image,
+                                        url: lyrics.artist.url
+                                    })
+                                    .setDescription(TrimmedLyrics.length === 1997 ? `${TrimmedLyrics}...` : TrimmedLyrics);
+
+                return await interaction.editReply({ embeds: [ Embed ] });
             }
             case("volume"): {
                 const VolumePercentage = interaction.options.getNumber("volumepercentage", false);
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                if (!VolumePercentage) return await interaction.editReply({ content: `The current volume is ${Queue.volume}%` });
+                if (!VolumePercentage) return await interaction.editReply({ content: `The current volume is ${Queue.node.volume}%` });
                 if (VolumePercentage < 0 || VolumePercentage > 100) return await interaction.editReply({ content: "The volume must be betweeen 1% and 100%" });
-                Queue.setVolume(VolumePercentage);
+                Queue.node.setVolume(VolumePercentage);
                 return await interaction.editReply({ content: `Set the volume to ${VolumePercentage}%` });
             }
             case("bassboost"): {
-                const Enabled = interaction.options.getBoolean("enabled", false);
-                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                const OldEnabledState = Queue.getFiltersEnabled().includes("bassboost");
-                if (Enabled === null) return await interaction.editReply({ content: `Current bass boost enabled state: ${OldEnabledState ? "Enabled" : "Disabled"}` });
-                Queue.setFilters({ bassboost: Enabled, normalizer2: Enabled });
-                return await interaction.editReply({ content: `Set the bass boost enabled state to ${Enabled ? "enabled" : "disabled"}.` });
+                return await interaction.editReply({ content: "TODO: Rewrite for discord-player v6.x.x" });
             }
             case("currenttrack"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                if (!Queue.current) return await interaction.editReply({ content: "The bot isn't playing anything." });
-                const Track = Queue.current
+                if (!Queue.currentTrack) return await interaction.editReply({ content: "The bot isn't playing anything." });
+                const Track = Queue.currentTrack
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                                     .setTitle(Track.title)
                                     .setDescription(`${Track.author} - ${Track.title}`)
@@ -117,7 +110,7 @@ export const Command: MeteoriumCommand = {
                                     .addFields([
                                         { name: "Author", value: String(Track.author) },
                                         { name: "Duration", value: String(Track.duration) },
-                                        { name: "Requested by", value: String(Track.requestedBy.tag) },
+                                        { name: "Requested by", value: String(Track.requestedBy) },
                                         { name: "Views", value: String(Track.views) },
                                         { name: "Id", value: String(Track.id) }
                                     ]);
@@ -125,54 +118,54 @@ export const Command: MeteoriumCommand = {
             }
             case("back"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                Queue.back();
+                Queue.history.back();
                 return await interaction.editReply({ content: "Now playing the previous track." });
             }
             case("resume"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                Queue.setPaused(false);
-                return await interaction.editReply({ content: "Resumed the queue." });
+                Queue.node.resume();
+                return await interaction.editReply({ content: "Resume the queue." });
             }
             case("pause"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                Queue.setPaused(true);
+                Queue.node.pause();
                 return await interaction.editReply({ content: "Paused the queue." });
             }
             case("stop"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                Queue.destroy();
+                Queue.delete();
                 return await interaction.editReply({ content: "Stopped and disconnected the bot." });
             }
             case("skip"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
                 const AmountOfTracksToSkip = interaction.options.getNumber("amountoftracks", false);
                 if (!AmountOfTracksToSkip) {
-                    Queue.skip();
+                    Queue.node.skip();
                     return interaction.editReply({ content: "Skipped the current track." });
                 } else {
-                    Queue.skipTo(AmountOfTracksToSkip);
+                    Queue.node.skipTo(AmountOfTracksToSkip);
                     return interaction.editReply({ content: `Skipped ${AmountOfTracksToSkip} tracks.` });
                 }
             }
             case("queue"): {
                 if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
-                if (!Queue || !Queue.playing && Queue.tracks.length === 0) return await interaction.editReply({ content: "The bot isn't playing anything and there is nothing at the queue." });
-                const CurrentTrack = Queue.current;
-                const QueueTracks = Queue.tracks.slice(0, 25).map((track, i) => {
-                    return `${i + 1}. [**${track.title}**](${track.url}) - ${track.requestedBy.tag}`;
+                if (!Queue || !Queue.node.isPlaying() && Queue.tracks.size === 0) return await interaction.editReply({ content: "The bot isn't playing anything and there is nothing at the queue." });
+                const CurrentTrack = Queue.currentTrack;
+                const QueueTracks = Queue.tracks.toArray().slice(0, 25).map((track, i) => {
+                    return `${i + 1}. [**${track.title}**](${track.url}) - ${track.requestedBy}`;
                 });
 
                 const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                                     .setTitle("Music/sound queue")
                                     .setDescription(`Keep in mind only the first 25 music(s)/sound(s) are listed here:\n${QueueTracks.join("\n")}`);
-                if (CurrentTrack) Embed.setFields({ name: "Currently playing", value: `[**${CurrentTrack.title}**](${CurrentTrack.url}) - ${CurrentTrack.requestedBy.tag}` });
+                if (CurrentTrack) Embed.setFields({ name: "Currently playing", value: `[**${CurrentTrack.title}**](${CurrentTrack.url}) - ${CurrentTrack.requestedBy}` });
 
                 return await interaction.editReply({ embeds: [ Embed ] });
             }
             case("clearqueue"): {
-                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel." });
+                if (!Queue) return await interaction.editReply({ content: "The bot isn't connected to any voice channel or the queue is empty." });
                 Queue.clear();
-                return await interaction.editReply({ content: "Cleared the queue." });
+                return await interaction.editReply({ content: "TODO: Rewrite for discord-player v6.x.x" });
             }
         }
         return;

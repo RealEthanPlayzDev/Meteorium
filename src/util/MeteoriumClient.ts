@@ -2,6 +2,7 @@ import { Client, Collection } from "discord.js";
 import { config } from "dotenv";
 import { Player } from "discord-player";
 import { HolodexApiClient } from 'holodex.js';
+import { lyricsExtractor } from '@discord-player/extractor';
 import * as Commands from '../commands';
 import * as Events from "../events";
 import { MeteoriumDatabase } from "./MeteoriumDatabase";
@@ -16,7 +17,8 @@ const ParseDotEnvConfig = () => {
         "InteractionFirstDeployGuildIds": InteractionFirstDeployGuildIds,
         "HolodexAPIKey": String(process.env.METEORIUMHOLODEXTOKEN),
         "RatelimitMaxLimit": Number(process.env.RATELIMITMAXLIMIT),
-        "RatelimitMaxLimitTime": Number(process.env.RATELIMITMAXLIMITTIME)
+        "RatelimitMaxLimitTime": Number(process.env.RATELIMITMAXLIMITTIME),
+        "GeniusAPIKey": String(process.env.GENIUSAPIKEY)
     }
 }
 
@@ -24,11 +26,15 @@ export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>;
     public Database = new MeteoriumDatabase(this.Config.MongoDB_URI);
-    public Player = new Player(this);
+    public DiscordPlayer = new Player(this);
+    public LyricsExtractor = lyricsExtractor(this.Config.GeniusAPIKey);
     public HolodexClient = new HolodexApiClient({ apiKey: this.Config.HolodexAPIKey });
     public override async login() {
         console.log("Connecting to Mongo database");
         await Promise.all([ this.Database.connect() ]);
+
+        console.log("Loading discord-player default extractors");
+        this.DiscordPlayer.extractors.loadDefault();
 
         console.log("Registering commands");
         this.Commands.clear();
