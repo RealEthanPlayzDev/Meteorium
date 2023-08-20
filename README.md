@@ -1,14 +1,26 @@
 # Meteorium
-A Discord bot developed by RadiatedExodus (ItzEthanPlayz_YT/RealEthanPlayzDev) as a side (and personal) project, written in Javascript using Node.js and Discord.js, also being used as a way for me to learn Javascript.
+A Discord bot developed by RadiatedExodus (RealEthanPlayzDev) as a side (and personal) project, written in Javascript using Node.js and Discord.js, also being used as a way for me to learn JavaScript and TypeScript.
 
-## INACTIVE DEVELOPMENT
-This bot will enter a inactive development state, feel free to make a pr if you want to add or change something, however I sort of lost the motivation to work on this bot, this also means there will be no TypeScript rewrite most likely, additionally Heroku is going to stop giving free dynos by the end of November, and I don't have any other way to host it (even self-hosting isn't possible yet for me at the time I am writing this), this basically killed my motivation completely to work on this hobby project, I don't know if I will ever come back to this or not, but I suppose that's all I have to say.
+Since the ts rewrite, some of the source might ressemble [PojavBot](https://github.com/PojavLauncherTeam/PojavBot) as I took several references from there.
+
+## UNSTABLE - THIS IS A FULL REWRITE
+This branch is a full rewrite, not all features have been implemented!
 
 ## Installing required dependencies
-You must have ffmpeg/avconv installed in your system. (only ffmpeg was tested, you can use ``ffmpeg-static`` from npm aswell to install ffmpeg)
-Simply do ``npm ci`` on the root directory or do the following command:
+Ensure ``yarn`` is installed (``npm install --global yarn``), then just run it at the root of the repository
 ```
-npm i @discordjs/builders @discordjs/rest @discordjs/voice axios discord-api-types discord.js holodex.js mongoose neko-love.js ytdl-core discord-player @discordjs/opus dotenv ffmpeg-static play-dl youtube-sr --save
+yarn
+```
+
+## Building and running
+To build:
+```
+yarn compile
+```
+
+To run the bot:
+```
+yarn start
 ```
 
 ## Configuration file
@@ -21,13 +33,22 @@ METEORIUMAPPLICATIONID=bot_app_id_here
 RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER_HERE
 RATELIMITMAXLIMITTIME=after_when_should_ratelimit_reset_PUT_A_NUMBER_HERE
 DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
+GENIUSAPIKEY=genius_api_key_here
 ```
 
-## Running the bot
-The bot is using discord.js v13, which requires node.js v16 or above, make sure you have node.js v16 or above before attempting to run the bot (otherwise it will crash)
+## Credits
+- [discord.js](https://github.com/discordjs/discord.js)
+- [holodex.js](https://github.com/HolodexNet/holodex.js)
+- [noblox.js](https://github.com/noblox/noblox.js)
+- [mongodb](https://github.com/mongodb/node-mongodb-native)
+- [dotenv](https://github.com/motdotla/dotenv)
+- [neko-love](https://github.com/Androz2091/neko-love)
 
-## TODO(s)
-- [x] Use .env instead of a plain text config json
-- [x] Music player
-- [x] Use ``play-dl`` instead of ``ytdl-core``
-- [ ] Finish moderation commands
+## Acknowledgements
+- All discord.js contributors and authors
+- All holodex.js contributors and authors
+- All noblox.js contributors and authors
+- All mongodb contributors and authors
+- All dotenv contributors and authors
+- All [neko-love.xyz](https://neko-love.xyz) (and neko-love) contributors and authors
+- Syjalo

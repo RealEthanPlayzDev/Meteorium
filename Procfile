@@ -1,1 +1,0 @@
-meteoriumbot: node .
