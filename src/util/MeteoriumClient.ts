@@ -3,9 +3,10 @@ import { config } from "dotenv";
 import { Player } from "discord-player";
 import { HolodexApiClient } from 'holodex.js';
 import { lyricsExtractor } from '@discord-player/extractor';
+import { PrismaClient } from "@prisma/client";
+
 import * as Commands from '../commands';
 import * as Events from "../events";
-import { MeteoriumDatabase } from "./MeteoriumDatabase";
 
 const ParseDotEnvConfig = () => {
     if (!process.env.METEORIUMBOTTOKEN) { config({"path": "./.ENV"}); }
@@ -25,14 +26,11 @@ const ParseDotEnvConfig = () => {
 export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>;
-    public Database = new MeteoriumDatabase(this.Config.MongoDB_URI);
+    public Database = new PrismaClient();
     public DiscordPlayer = new Player(this);
     public LyricsExtractor = lyricsExtractor(this.Config.GeniusAPIKey);
     public HolodexClient = new HolodexApiClient({ apiKey: this.Config.HolodexAPIKey });
     public override async login() {
-        console.log("Connecting to Mongo database");
-        await Promise.all([ this.Database.connect() ]);
-
         console.log("Loading discord-player default extractors");
         this.DiscordPlayer.extractors.loadDefault();
 

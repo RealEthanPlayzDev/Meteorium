@@ -44,7 +44,7 @@ export const Command: MeteoriumCommand = {
         }
 
         // Getting the schema for this guild from the database
-        const GuildSchema = await client.Database.Guilds.findOne({ GuildId: interaction.guildId });
+        const GuildSchema = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
         if(!GuildSchema) return await interaction.editReply({ content: "Guild does not have schematic?" })
 
         // Subcommand switch
@@ -56,7 +56,7 @@ export const Command: MeteoriumCommand = {
                 switch(Subcommand) {
                     case("enforcesayinexecutor"): {
                         const Enabled = interaction.options.getBoolean("enabled", true);
-                        client.Database.Guilds.updateOne({ GuildId: interaction.guildId }, { EnforceSayinExecutor: Enabled }).then(async() => {
+                        client.Database.guild.update({ where: { GuildId: GuildSchema.GuildId }, data: { EnforceSayInExecutor: Enabled } }).then(async() => {
                             return await interaction.editReply({ content: `Successfully configured the \`\`EnforceSayinExecutor\`\` setting (new value is ${Enabled})` });
                         }).catch(async(err) => {
                             console.error(`Error while update guild configuration:\n${err}`);
@@ -66,7 +66,7 @@ export const Command: MeteoriumCommand = {
                     }
                     case("muterole"): {
                         const Role = interaction.options.getRole("role", true);
-                        client.Database.Guilds.updateOne({ GuildId: interaction.guildId }, { MuteRoleId: Role.id }).then(async() => {
+                        client.Database.guild.update({ where: { GuildId: GuildSchema.GuildId }, data: { MuteRoleId: Role.id } }).then(async() => {
                             return await interaction.editReply({ content: `Successfully configured the \`\`MuteRoleId\`\` setting (new value is ${Role.id})` });
                         }).catch(async(err) => {
                             console.error(`Error while update guild configuration:\n${err}`);
@@ -78,12 +78,10 @@ export const Command: MeteoriumCommand = {
                 break;
             }
             case("disabledcommands"): {
-                const GuildSetting = await client.Database.Guilds.findOne({ GuildId: interaction.guildId });
-                if (!GuildSetting) return;
                 switch(Subcommand) {
                     case("add"): {
                         const TargetDisabledCommands = interaction.options.getString("commands", true).split(",")
-                        const UpdatedDisabledCommands = GuildSetting.DisabledCommands.concat(TargetDisabledCommands);
+                        const UpdatedDisabledCommands = GuildSchema.DisabledCommands.concat(TargetDisabledCommands);
                         
                         // Check if command names are valid
                         let InvalidCommands = []
@@ -97,7 +95,7 @@ export const Command: MeteoriumCommand = {
                         });
 
                         // Update in database
-                        client.Database.Guilds.updateOne({ GuildId: interaction.guildId }, { DisabledCommands: UpdatedDisabledCommands }).then(async() => {
+                        client.Database.guild.update({ where: { GuildId: GuildSchema.GuildId }, data: { DisabledCommands: UpdatedDisabledCommands } }).then(async() => {
                             return await interaction.editReply({ content: `Successfully added the new disabled commands.` });
                         }).catch(async(err) => {
                             console.error(`Error while update guild configuration:\n${err}`);
@@ -107,13 +105,13 @@ export const Command: MeteoriumCommand = {
                     }
                     case("remove"): {
                         const TargetRemoveDisabledCommands = interaction.options.getString("commands", true).split(",");
-                        const UpdatedDisabledCommands = GuildSetting.DisabledCommands
+                        const UpdatedDisabledCommands = GuildSchema.DisabledCommands
 
                         // Remove the commands that the user wants to remove
                         UpdatedDisabledCommands.filter(item => { return TargetRemoveDisabledCommands.indexOf(item) === -1 });
 
                         // Update in database
-                        client.Database.Guilds.updateOne({ GuildId: interaction.guildId }, { DisabledCommands: UpdatedDisabledCommands }).then(async() => {
+                        client.Database.guild.update({ where: { GuildId: GuildSchema.GuildId }, data: { DisabledCommands: UpdatedDisabledCommands } }).then(async() => {
                             return await interaction.editReply({ content: `Successfully removed the disabled commands.` });
                         }).catch(async(err) => {
                             console.error(`Error while update guild configuration:\n${err}`);
@@ -126,7 +124,7 @@ export const Command: MeteoriumCommand = {
                             embeds: [
                                 new MeteoriumEmbedBuilder(undefined, interaction.user)
                                     .setTitle("List of disabled commands")
-                                    .setDescription(`\`\`\`\n${GuildSetting.DisabledCommands.join(", ")}\n\`\`\``)
+                                    .setDescription(`\`\`\`\n${GuildSchema.DisabledCommands.join(", ")}\n\`\`\``)
                             ]
                         });
                     }
