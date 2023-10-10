@@ -17,3 +17,19 @@ model Guild {
     DisabledCommandCategories String[] @default([])
     MuteRoleId                String   @default("")
 }
+
+enum ModerationAction {
+    Ban
+    Kick
+    Mute
+    Warn
+}
+
+model ModerationCase {
+    CaseId          Int              @id @default(autoincrement())
+    Action          ModerationAction
+    TargetUserId    String
+    ModeratorUserId String
+    Reason          String
+    AttachmentProof String
+}

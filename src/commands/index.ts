@@ -22,7 +22,13 @@ export * as music from "./Fun/Music";
 export * as settings from "./Moderation/Settings";
 export * as sayin from "./Moderation/SayIn";
 export * as reactto from "./Moderation/ReactTo";
-export * as moderation from "./Moderation/Moderation";
+export * as ban from "./Moderation/Ban";
+export * as kick from "./Moderation/Kick";
+export * as mute from "./Moderation/Mute";
+export * as warn from "./Moderation/Warn";
+export * as punishments from "./Moderation/Punishments";
+export * as case from "./Moderation/Case";
+export * as removecase from "./Moderation/RemoveCase";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
