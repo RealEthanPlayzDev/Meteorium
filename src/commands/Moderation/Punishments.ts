@@ -14,8 +14,6 @@ export const Command: MeteoriumCommand = {
         const User = interaction.options.getUser("user", true);
 
         const Embed = new MeteoriumEmbedBuilder()
-            .setTitle("")
-            .setDescription("")
             .setAuthor({ name: `${User.username}`, iconURL: User.displayAvatarURL({ extension: "png" }) })
             .setTimestamp()
             .SetNormalColor();

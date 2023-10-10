@@ -32,8 +32,6 @@ export const Command: MeteoriumCommand = {
         return await interaction.reply({
             embeds: [
                 new MeteoriumEmbedBuilder(undefined, interaction.user)
-                    .setTitle("")
-                    .setDescription("")
                     .setAuthor({ name: `Case: #${CaseResult.CaseId} | warn | ${User.username}`, iconURL: User.displayAvatarURL({ extension: "png" }) })
                     .addFields(
                         { name: "User", value: `<@${User.id}>` },
