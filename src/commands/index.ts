@@ -16,7 +16,6 @@ export * as holodexapi from "./Info/HolodexAPI";
 export * as rbxapi from "./Info/RbxAPI";
 
 // Category - Fun
-// export * as nekoloveapi from "./Fun/NekoLoveAPI";
 export * as music from "./Fun/Music";
 
 // Category - Moderation
