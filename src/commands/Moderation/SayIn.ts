@@ -14,10 +14,10 @@ export const Command: MeteoriumCommand = {
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
 
-        const GuildSetting = await client.Database.Guilds.findOne({ GuildId: String(interaction.guildId) });
+        const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: String(interaction.guildId) } });
         if (!GuildSetting) return await interaction.editReply({ content: "No guild setting inside database?" });
 
-        const ShowExecutorName = GuildSetting.EnforceSayinExecutor && !interaction.member.permissions.has("Administrator", true)  ? true : (interaction.options.getBoolean("showexecutorname", false) ? true : false);
+        const ShowExecutorName = GuildSetting.EnforceSayInExecutor && !interaction.member.permissions.has("Administrator", true)  ? true : (interaction.options.getBoolean("showexecutorname", false) ? true : false);
         const Message = (ShowExecutorName ? `${interaction.options.getString("message", true)}\n\n(Sayin command executed by ${interaction.user.tag} (${interaction.user.id}))` : interaction.options.getString("message", true));
         const Channel = interaction.options.getChannel("channel", false) ? interaction.options.getChannel("channel") : interaction.channel;
         const ReplyTarget = interaction.options.getString("replyto", false);

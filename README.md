@@ -20,6 +20,7 @@ yarn compile
 
 To run the bot:
 ```
+yarn prisma db push
 yarn start
 ```
 
@@ -27,7 +28,7 @@ yarn start
 The configuration file uses ``dotenv``, create a file named ".ENV" on the project root and use the following example:
 ```
 METEORIUMBOTTOKEN=bot_token_here
-METEORIUMMONGODBURI=mongodb_uri_here
+METEORIUMPOSTGRESURL=postgres_url_here
 METEORIUMHOLODEXTOKEN=holodex_token_here_optional
 METEORIUMAPPLICATIONID=bot_app_id_here
 RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER_HERE
