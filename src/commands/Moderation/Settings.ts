@@ -25,15 +25,23 @@ export const Command: MeteoriumCommand = {
                         .setName("logchannel")
                         .setDescription("The channel where command verbose logging will be sent at")
                         .addChannelOption((option) =>
-                            option.setName("channel").setDescription("The channel where verbose logging will be sent at").setRequired(true),
+                            option
+                                .setName("channel")
+                                .setDescription("The channel where verbose logging will be sent at")
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
                     subcommand
                         .setName("publicmodlogchannel")
-                        .setDescription("The channel where moderation logs will be sent at (instead of the current chat)")
+                        .setDescription(
+                            "The channel where moderation logs will be sent at (instead of the current chat)",
+                        )
                         .addChannelOption((option) =>
-                            option.setName("channel").setDescription("The channel where moderation logs will be sent at").setRequired(true),
+                            option
+                                .setName("channel")
+                                .setDescription("The channel where moderation logs will be sent at")
+                                .setRequired(true),
                         ),
                 ),
         )
@@ -122,7 +130,10 @@ export const Command: MeteoriumCommand = {
                     }
                     case "logchannel": {
                         const Channel = interaction.options.getChannel("channel", true);
-                        if (!Channel.isTextBased()) return await interaction.editReply({ content: "The channel has to be a text-based channel!" });
+                        if (!Channel.isTextBased())
+                            return await interaction.editReply({
+                                content: "The channel has to be a text-based channel!",
+                            });
                         client.Database.guild
                             .update({
                                 where: { GuildId: GuildSchema.GuildId },
@@ -144,7 +155,10 @@ export const Command: MeteoriumCommand = {
                     }
                     case "publicmodlogchannel": {
                         const Channel = interaction.options.getChannel("channel", true);
-                        if (!Channel.isTextBased()) return await interaction.editReply({ content: "The channel has to be a text-based channel!" });
+                        if (!Channel.isTextBased())
+                            return await interaction.editReply({
+                                content: "The channel has to be a text-based channel!",
+                            });
                         client.Database.guild
                             .update({
                                 where: { GuildId: GuildSchema.GuildId },
@@ -164,7 +178,8 @@ export const Command: MeteoriumCommand = {
                             });
                         break;
                     }
-                    default: break;
+                    default:
+                        break;
                 }
                 break;
             }

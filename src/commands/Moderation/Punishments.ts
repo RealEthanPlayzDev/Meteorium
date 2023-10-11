@@ -23,7 +23,7 @@ export const Command: MeteoriumCommand = {
         await interaction.deferReply();
 
         const Punishments = await client.Database.moderationCase.findMany({
-            where: { TargetUserId: User.id },
+            where: { TargetUserId: User.id, GuildId: interaction.guildId },
             orderBy: [{ CaseId: "desc" }],
         });
 

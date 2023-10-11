@@ -55,11 +55,17 @@ export const Command: MeteoriumCommand = {
                 ephemeral: true,
             });
 
+        await client.Database.guild.update({
+            where: { GuildId: interaction.guildId },
+            data: { CurrentCaseId: GuildSchema.CurrentCaseId + 1 },
+        });
         const CaseResult = await client.Database.moderationCase.create({
             data: {
+                CaseId: GuildSchema.CurrentCaseId + 1,
                 Action: ModerationAction.Mute,
                 TargetUserId: User.id,
                 ModeratorUserId: interaction.user.id,
+                GuildId: interaction.guildId,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
                 MuteDuration: Duration,
@@ -88,13 +94,19 @@ export const Command: MeteoriumCommand = {
             .setTimestamp()
             .setColor("Red");
 
-        const PublicModLogChannel = await interaction.guild.channels.fetch(GuildSchema.PublicModLogChannelId).catch(() => null);
-        if (PublicModLogChannel != null && PublicModLogChannel.isTextBased()) await PublicModLogChannel.send({ embeds: [ LogEmbed ] });
-    
+        const PublicModLogChannel = await interaction.guild.channels
+            .fetch(GuildSchema.PublicModLogChannelId)
+            .catch(() => null);
+        if (PublicModLogChannel != null && PublicModLogChannel.isTextBased())
+            await PublicModLogChannel.send({ embeds: [LogEmbed] });
+
         return await interaction.reply({
-            content: (PublicModLogChannel != null && PublicModLogChannel.isTextBased()) ? undefined : "(Warning: could not send log message to the public mod log channel)",
-            embeds: [ LogEmbed ],
-            ephemeral: GuildSchema?.PublicModLogChannelId != ""
+            content:
+                PublicModLogChannel != null && PublicModLogChannel.isTextBased()
+                    ? undefined
+                    : "(Warning: could not send log message to the public mod log channel)",
+            embeds: [LogEmbed],
+            ephemeral: GuildSchema?.PublicModLogChannelId != "",
         });
     },
 };

@@ -17,6 +17,7 @@ model Guild {
     DisabledCommandCategories String[] @default([])
     PublicModLogChannelId     String   @default("")
     LoggingChannelId          String   @default("")
+    CurrentCaseId             Int      @default(0)
 }
 
 enum ModerationAction {
@@ -27,10 +28,12 @@ enum ModerationAction {
 }
 
 model ModerationCase {
-    CaseId          Int              @id @default(autoincrement())
+    GlobalCaseId    Int              @id @default(autoincrement())
+    CaseId          Int
     Action          ModerationAction
     TargetUserId    String
     ModeratorUserId String
+    GuildId         String
     Reason          String
     AttachmentProof String
     MuteDuration    String           @default("0")
