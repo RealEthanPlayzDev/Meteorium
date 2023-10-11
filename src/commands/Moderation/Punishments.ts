@@ -50,11 +50,8 @@ export const Command: MeteoriumCommand = {
             const PunishmentPages: ModerationCase[][] = [[]];
             for (let i = 1; i < Punishments.length; i++) {
                 const Case = Punishments[i]!
-                if ((i + 1) % 10 == 0) {
-                    PunishmentPages.push([Case])
-                } else {
-                    PunishmentPages.at(-1)!.push(Case);
-                }
+                if ((i + 1) % 10 == 0) PunishmentPages.push([]);
+                PunishmentPages.at(-1)!.push(Case);
                 switch(Case.Action) {
                     case ModerationAction.Ban: {
                         TotalBan++;
@@ -75,7 +72,7 @@ export const Command: MeteoriumCommand = {
                     default: break;
                 }
             }
-            console.log(PunishmentPages);
+            console.log(Punishments, PunishmentPages);
 
             const GeneratePageEmbed = (index: number) => {
                 if (PunishmentPages[index] == undefined) throw Error("invalid page index");
