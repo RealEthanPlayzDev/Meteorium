@@ -66,10 +66,11 @@ export const Command: MeteoriumCommand = {
                         .setDescription(`Case ${CaseId} has been removed.`)
                         .setColor("Green");
 
-                    const GuildUser = await interaction.guild.members.fetch(Case.TargetUserId);
-                    if (Case.Action == ModerationAction.Mute)
-                        await GuildUser.timeout(null, `Case ${CaseId} removed by ${interaction.user.id}`);
-                    else if (Case.Action == ModerationAction.Ban)
+                    await client.Database.moderationCase.delete({ where: { CaseId: Case.CaseId } });
+                    if (Case.Action == ModerationAction.Mute) {
+                        const GuildUser = await interaction.guild.members.fetch(Case.TargetUserId).catch(() => null);
+                        if (GuildUser) await GuildUser.timeout(null, `Case ${CaseId} removed by ${interaction.user.id}`);
+                    } else if (Case.Action == ModerationAction.Ban)
                         await interaction.guild.members.unban(
                             Case.TargetUserId,
                             `Case ${CaseId} removed by ${interaction.user.id}`,

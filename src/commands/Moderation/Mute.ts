@@ -50,7 +50,7 @@ export const Command: MeteoriumCommand = {
         GuildUser.timeout(Timeout, `Moderation action carried by ${interaction.user.id}: ${Reason}`);
         const CaseResult = await client.Database.moderationCase.create({
             data: {
-                Action: ModerationAction.Ban,
+                Action: ModerationAction.Mute,
                 TargetUserId: User.id,
                 ModeratorUserId: interaction.user.id,
                 Reason: Reason,
