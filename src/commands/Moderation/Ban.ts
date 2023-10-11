@@ -83,7 +83,7 @@ export const Command: MeteoriumCommand = {
         const PublicModLogChannel = await interaction.guild.channels
             .fetch(GuildSchema.PublicModLogChannelId)
             .catch(() => null);
-        if (PublicModLogChannel != null && PublicModLogChannel.isTextBased())
+        if (PublicModLogChannel && PublicModLogChannel.isTextBased())
             await PublicModLogChannel.send({ embeds: [LogEmbed] });
 
         return await interaction.reply({
