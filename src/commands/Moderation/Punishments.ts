@@ -1,5 +1,5 @@
-import { ModerationAction } from "@prisma/client";
-import { SlashCommandBuilder } from "discord.js";
+import { ModerationCase } from "@prisma/client";
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
@@ -14,16 +14,9 @@ export const Command: MeteoriumCommand = {
                 content: "You do not have permission to view user punishments.",
             });
 
+        await interaction.deferReply();
+
         const User = interaction.options.getUser("user", true);
-
-        const Embed = new MeteoriumEmbedBuilder()
-            .setAuthor({
-                name: `${User.username}`,
-                iconURL: User.displayAvatarURL({ extension: "png" }),
-            })
-            .setTimestamp()
-            .setNormalColor();
-
         const Punishments = await client.Database.moderationCase.findMany({
             where: { TargetUserId: User.id },
             orderBy: { CaseId: "desc" },
@@ -33,45 +26,96 @@ export const Command: MeteoriumCommand = {
             TotalBan = 0,
             TotalMute = 0;
         if (Punishments.length == 0) {
-            Embed.setDescription("This user has no moderation punishments/cases recorded.");
+            return await interaction.editReply({
+                embeds: [
+                    new MeteoriumEmbedBuilder()
+                        .setAuthor({
+                            name: User.username,
+                            iconURL: User.displayAvatarURL({ extension: "png" }),
+                        })
+                        .setDescription("This user has no recorded punishments/cases.")
+                        .setTimestamp()
+                        .setNormalColor(),
+                ],
+            });
         } else {
-            let Count = 0;
-            for (const Case of Punishments) {
-                Count++;
-                if (Count <= 25) {
-                    Embed.addFields([
-                        {
+            const PunishmentPages: ModerationCase[][] = [[]];
+            for (let i = 1; i < Punishments.length; i++)
+                (i + 1) % 10 == 0
+                    ? PunishmentPages.push([Punishments[i]!])
+                    : PunishmentPages.at(-1)!.push(Punishments[i]!);
+
+            const GeneratePageEmbed = (index: number) => {
+                if (PunishmentPages[index] == undefined) throw Error("invalid page index");
+                return new MeteoriumEmbedBuilder()
+                    .setAuthor({
+                        name: User.username,
+                        iconURL: User.displayAvatarURL({ extension: "png" }),
+                    })
+                    .setFields([
+                        ...PunishmentPages[index]!.map((Case) => ({
                             name: `Case ${Case.CaseId} - ${Case.Action}`,
                             value: Case.Reason,
-                        },
-                    ]);
+                        })),
+                    ])
+                    .setFooter({
+                        text: `${
+                            PunishmentPages.length > 1 ? `Page ${index + 1}/${PunishmentPages.length} | ` : ""
+                        }Warned: ${TotalWarn} | Muted: ${TotalMute} | Kicked: ${TotalKick} | Banned: ${TotalBan}`,
+                    })
+                    .setNormalColor();
+            };
+
+            const GenerateActionRow = (index: number) => {
+                return new ActionRowBuilder<ButtonBuilder>().addComponents([
+                    new ButtonBuilder()
+                        .setCustomId(String(index - 1))
+                        .setLabel("Previous page")
+                        .setEmoji({ name: "◀️" })
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(index <= 0),
+                    new ButtonBuilder()
+                        .setCustomId(String(index + 1))
+                        .setLabel("Next page")
+                        .setEmoji({ name: "▶️" })
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(index < 0 || index == PunishmentPages.length - 1),
+                ]);
+            };
+
+            const GenerateMessageOptions = (index: number) => ({
+                embeds: [GeneratePageEmbed(index)],
+                components: PunishmentPages.length > 1 ? [GenerateActionRow(index)] : undefined,
+                fetchReply: true,
+            });
+
+            const InitialSendResult = await interaction.editReply(GenerateMessageOptions(0));
+            if (PunishmentPages.length <= 1) return;
+
+            const ResultCollector = InitialSendResult.createMessageComponentCollector({ idle: 150000 });
+            ResultCollector.on("collect", async (result) => {
+                if (result.user.id != interaction.user.id) {
+                    await interaction.reply({
+                        content: "You're not the one who requested this command!",
+                        ephemeral: true,
+                    });
+                    return;
                 }
-                switch (Case.Action) {
-                    case ModerationAction.Warn: {
-                        TotalWarn++;
-                        break;
-                    }
-                    case ModerationAction.Mute: {
-                        TotalMute++;
-                        break;
-                    }
-                    case ModerationAction.Kick: {
-                        TotalKick++;
-                        break;
-                    }
-                    case ModerationAction.Ban: {
-                        TotalBan++;
-                        break;
-                    }
-                    default:
-                        break;
+
+                let Index = -1;
+                try {
+                    Index = Number(result.customId);
+                } catch {}
+                if (Index == -1) {
+                    await interaction.reply({ content: "Invalid page index", ephemeral: true });
+                    return;
                 }
-            }
-            Embed.setFooter({
-                text: `Warned: ${TotalWarn} | Muted: ${TotalMute} | Kicked: ${TotalKick} | Banned: ${TotalBan}`,
+
+                await InitialSendResult.edit(GenerateMessageOptions(+Index));
+            });
+            ResultCollector.on("end", async () => {
+                await interaction.editReply({ components: [GenerateActionRow(-1)] });
             });
         }
-
-        return await interaction.reply({ embeds: [Embed] });
     },
 };

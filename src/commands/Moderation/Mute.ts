@@ -54,10 +54,13 @@ export const Command: MeteoriumCommand = {
                 ModeratorUserId: interaction.user.id,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
-                MuteDuration: Duration
+                MuteDuration: Duration,
             },
         });
-        await GuildUser.timeout(Timeout, `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`);
+        await GuildUser.timeout(
+            Timeout,
+            `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
+        );
 
         return await interaction.reply({
             embeds: [

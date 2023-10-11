@@ -30,8 +30,10 @@ export const Command: MeteoriumCommand = {
 
         const ConfirmationEmbed = new MeteoriumEmbedBuilder()
             .setAuthor({
-                name: `Case: #${CaseId} | ${Case.Action} | ${TargetUser != null ? TargetUser.username : Case.TargetUserId}`,
-                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined
+                name: `Case: #${CaseId} | ${Case.Action} | ${
+                    TargetUser != null ? TargetUser.username : Case.TargetUserId
+                }`,
+                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
             })
             .addFields(
                 { name: "User", value: `<@${Case.TargetUserId}>` },
@@ -72,7 +74,11 @@ export const Command: MeteoriumCommand = {
                     await client.Database.moderationCase.delete({ where: { CaseId: Case.CaseId } });
                     if (Case.Action == ModerationAction.Mute) {
                         const GuildUser = await interaction.guild.members.fetch(Case.TargetUserId).catch(() => null);
-                        if (GuildUser) await GuildUser.timeout(null, `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`);
+                        if (GuildUser)
+                            await GuildUser.timeout(
+                                null,
+                                `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`,
+                            );
                     } else if (Case.Action == ModerationAction.Ban)
                         await interaction.guild.members.unban(
                             Case.TargetUserId,

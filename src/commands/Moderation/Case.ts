@@ -30,8 +30,10 @@ export const Command: MeteoriumCommand = {
             embeds: [
                 new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setAuthor({
-                        name: `Case: #${CaseId} | ${Case.Action} | ${TargetUser != null ? TargetUser.username : Case.TargetUserId}`,
-                        iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined
+                        name: `Case: #${CaseId} | ${Case.Action} | ${
+                            TargetUser != null ? TargetUser.username : Case.TargetUserId
+                        }`,
+                        iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
                     })
                     .addFields(
                         { name: "User", value: `<@${Case.TargetUserId}>` },
