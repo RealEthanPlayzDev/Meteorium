@@ -27,9 +27,6 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
 
-        await interaction.guild.members.ban(User, {
-            reason: `Moderation action carried by ${interaction.user.id}: ${Reason}`,
-        });
         const CaseResult = await client.Database.moderationCase.create({
             data: {
                 Action: ModerationAction.Ban,
@@ -38,6 +35,9 @@ export const Command: MeteoriumCommand = {
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
             },
+        });
+        await interaction.guild.members.ban(User, {
+            reason: `Case ${CaseResult.CaseId} by ${interaction.user.id}: ${Reason}`,
         });
 
         return await interaction.reply({

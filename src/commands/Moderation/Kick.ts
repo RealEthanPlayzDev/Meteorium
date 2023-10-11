@@ -27,7 +27,6 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
 
-        await interaction.guild.members.kick(User, `Moderation action carried by ${interaction.user.id}: ${Reason}`);
         const CaseResult = await client.Database.moderationCase.create({
             data: {
                 Action: ModerationAction.Kick,
@@ -37,6 +36,7 @@ export const Command: MeteoriumCommand = {
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
             },
         });
+        await interaction.guild.members.kick(User, `Case ${CaseResult.CaseId} by ${interaction.user.id}: ${Reason}`);
 
         return await interaction.reply({
             embeds: [

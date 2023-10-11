@@ -19,7 +19,7 @@ export const Command: MeteoriumCommand = {
         ),
     async Callback(interaction, client) {
         // TODO: Warning users shouldn't be attached to viewing audit logs, find a good permission for this
-        if (!interaction.member.permissions.has("ViewAuditLog"))
+        if (!interaction.member.permissions.has("ManageMessages"))
             return await interaction.editReply({
                 content: "You do not have permission to warn users from this server.",
             });
@@ -28,7 +28,6 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
 
-        await interaction.guild.members.kick(User, `Moderation action carried by ${interaction.user.id}: ${Reason}`);
         const CaseResult = await client.Database.moderationCase.create({
             data: {
                 Action: ModerationAction.Warn,

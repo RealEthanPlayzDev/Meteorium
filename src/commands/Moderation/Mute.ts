@@ -47,7 +47,6 @@ export const Command: MeteoriumCommand = {
         if (!GuildUser.moderatable || GuildUser.roles.highest.position >= interaction.member.roles.highest.position)
             return interaction.reply({ content: "You can't moderate this user.", ephemeral: true });
 
-        GuildUser.timeout(Timeout, `Moderation action carried by ${interaction.user.id}: ${Reason}`);
         const CaseResult = await client.Database.moderationCase.create({
             data: {
                 Action: ModerationAction.Mute,
@@ -58,6 +57,7 @@ export const Command: MeteoriumCommand = {
                 MuteDuration: Duration
             },
         });
+        await GuildUser.timeout(Timeout, `Case ${CaseResult.CaseId} by ${interaction.user.id}: ${Reason}`);
 
         return await interaction.reply({
             embeds: [
