@@ -16,8 +16,8 @@ export const Command: MeteoriumCommand = {
             });
 
         const CaseId = interaction.options.getInteger("case", true);
-        const Case = await client.Database.moderationCase.findUnique({
-            where: { CaseId: CaseId },
+        const Case = await client.Database.moderationCase.findFirst({
+            where: { CaseId: CaseId, GuildId: interaction.guildId },
         });
         if (Case == null)
             return await interaction.reply({

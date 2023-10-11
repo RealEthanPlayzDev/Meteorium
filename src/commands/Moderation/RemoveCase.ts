@@ -18,7 +18,7 @@ export const Command: MeteoriumCommand = {
 
         const CaseId = interaction.options.getInteger("case", true);
 
-        const Case = await client.Database.moderationCase.findUnique({ where: { CaseId: CaseId } });
+        const Case = await client.Database.moderationCase.findFirst({ where: { CaseId: CaseId, GuildId: interaction.guildId } });
         if (Case == null) return await interaction.reply({ content: `Case ${CaseId} does not exist.` });
 
         const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
@@ -71,7 +71,7 @@ export const Command: MeteoriumCommand = {
                         .setDescription(`Case ${CaseId} removed.`)
                         .setColor("Green");
 
-                    await client.Database.moderationCase.delete({ where: { CaseId: Case.CaseId } });
+                    await client.Database.moderationCase.delete({ where: { GlobalCaseId: Case.GlobalCaseId } });
                     if (Case.Action == ModerationAction.Mute) {
                         const GuildUser = await interaction.guild.members.fetch(Case.TargetUserId).catch(() => null);
                         if (GuildUser)
