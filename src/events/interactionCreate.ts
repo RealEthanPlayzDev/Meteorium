@@ -12,6 +12,10 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                         interaction.commandName +
                         " doesn't exist on client.Commands.",
                 );
+            
+            const GuildExistInDb = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
+            if (GuildExistInDb == null) await client.Database.guild.create({ data: { GuildId: interaction.guildId } });
+
             try {
                 await Command.Callback(interaction, client);
             } catch (err) {

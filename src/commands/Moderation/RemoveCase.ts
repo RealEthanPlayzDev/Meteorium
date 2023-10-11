@@ -63,7 +63,7 @@ export const Command: MeteoriumCommand = {
                 case "yes": {
                     const SuccessDeleteEmbed = new MeteoriumEmbedBuilder()
                         .setTitle("Case removed")
-                        .setDescription(`Case ${CaseId} has been removed.`)
+                        .setDescription(`Case ${CaseId} removed.`)
                         .setColor("Green");
 
                     await client.Database.moderationCase.delete({ where: { CaseId: Case.CaseId } });
