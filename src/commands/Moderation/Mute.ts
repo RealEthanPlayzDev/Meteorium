@@ -32,20 +32,20 @@ export const Command: MeteoriumCommand = {
         const Duration = interaction.options.getString("duration", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const Timeout = ms(Duration);
-        const GuildUser = await interaction.guild.members.fetch(User);
+        const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
 
         if (Timeout < 1) return await interaction.reply({ content: "Invalid mute duration", ephemeral: true });
         if (Timeout >= ms("29d"))
             return await interaction.reply({
                 content:
-                    "It is not possible to mute a user longer than 29 days. Please sepcify a duration below 29 days.",
+                    "It is not possible to mute a user longer than 29 days. Please specify a duration below 29 days.",
                 ephemeral: true,
             });
         if (User.id == interaction.user.id)
             return await interaction.reply({ content: "You can't mute yourself!", ephemeral: true });
         if (User.bot) return await interaction.reply({ content: "You can't mute bots!", ephemeral: true });
-        if (!GuildUser.moderatable || GuildUser.roles.highest.position >= interaction.member.roles.highest.position)
-            return interaction.reply({ content: "You can't moderate this user.", ephemeral: true });
+        if (!GuildUser || !GuildUser.moderatable || GuildUser.roles.highest.position >= interaction.member.roles.highest.position)
+            return interaction.reply({ content: "You (or the bot) can't moderate this user due to lack of permission/hierachy.", ephemeral: true });
 
         const CaseResult = await client.Database.moderationCase.create({
             data: {
