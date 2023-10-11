@@ -32,4 +32,5 @@ model ModerationCase {
     ModeratorUserId String
     Reason          String
     AttachmentProof String
+    MuteDuration    String           @default("0")
 }
