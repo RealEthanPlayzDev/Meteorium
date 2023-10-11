@@ -37,7 +37,7 @@ export const Command: MeteoriumCommand = {
             },
         });
         await interaction.guild.members.ban(User, {
-            reason: `Case ${CaseResult.CaseId} by ${interaction.user.id}: ${Reason}`,
+            reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
         });
 
         return await interaction.reply({

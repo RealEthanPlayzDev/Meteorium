@@ -21,6 +21,8 @@ export const Command: MeteoriumCommand = {
         const Case = await client.Database.moderationCase.findUnique({ where: { CaseId: CaseId } });
         if (Case == null) return await interaction.reply({ content: `Case ${CaseId} does not exist.` });
 
+        const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
+
         const ActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("yes").setLabel("Yes").setStyle(ButtonStyle.Success),
             new ButtonBuilder().setCustomId("no").setLabel("No").setStyle(ButtonStyle.Danger),
@@ -28,7 +30,8 @@ export const Command: MeteoriumCommand = {
 
         const ConfirmationEmbed = new MeteoriumEmbedBuilder()
             .setAuthor({
-                name: `Case: #${Case.CaseId} | ${Case.Action} | ${Case.TargetUserId}`,
+                name: `Case: #${CaseId} | ${Case.Action} | ${TargetUser != null ? TargetUser.username : Case.TargetUserId}`,
+                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined
             })
             .addFields(
                 { name: "User", value: `<@${Case.TargetUserId}>` },
@@ -69,11 +72,11 @@ export const Command: MeteoriumCommand = {
                     await client.Database.moderationCase.delete({ where: { CaseId: Case.CaseId } });
                     if (Case.Action == ModerationAction.Mute) {
                         const GuildUser = await interaction.guild.members.fetch(Case.TargetUserId).catch(() => null);
-                        if (GuildUser) await GuildUser.timeout(null, `Case ${CaseId} removed by ${interaction.user.id}`);
+                        if (GuildUser) await GuildUser.timeout(null, `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`);
                     } else if (Case.Action == ModerationAction.Ban)
                         await interaction.guild.members.unban(
                             Case.TargetUserId,
-                            `Case ${CaseId} removed by ${interaction.user.id}`,
+                            `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`,
                         );
 
                     await interaction.editReply({ content: "", embeds: [SuccessDeleteEmbed], components: [] });

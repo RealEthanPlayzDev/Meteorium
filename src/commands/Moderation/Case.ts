@@ -24,12 +24,15 @@ export const Command: MeteoriumCommand = {
                 content: `Case ${CaseId} does not exist.`,
             });
 
+        const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
+
         return await interaction.reply({
             embeds: [
                 new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setAuthor({
-                        name: `Case: #${CaseId} | kick | ${Case.TargetUserId}`,
-                    }) //, iconURL: User.displayAvatarURL({ extension: "png" }) })
+                        name: `Case: #${CaseId} | ${Case.Action} | ${TargetUser != null ? TargetUser.username : Case.TargetUserId}`,
+                        iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined
+                    })
                     .addFields(
                         { name: "User", value: `<@${Case.TargetUserId}>` },
                         {

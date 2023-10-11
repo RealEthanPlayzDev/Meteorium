@@ -57,7 +57,7 @@ export const Command: MeteoriumCommand = {
                 MuteDuration: Duration
             },
         });
-        await GuildUser.timeout(Timeout, `Case ${CaseResult.CaseId} by ${interaction.user.id}: ${Reason}`);
+        await GuildUser.timeout(Timeout, `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`);
 
         return await interaction.reply({
             embeds: [
