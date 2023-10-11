@@ -25,7 +25,6 @@ export const Command: MeteoriumCommand = {
         const Punishments = await client.Database.moderationCase.findMany({
             where: { TargetUserId: User.id },
             orderBy: [{ CaseId: "asc" }],
-            take: 200
         });
 
         let TotalKick = 0,
@@ -48,11 +47,11 @@ export const Command: MeteoriumCommand = {
             });
         } else {
             const PunishmentPages: ModerationCase[][] = [[]];
-            for (let i = 1; i < Punishments.length; i++) {
-                const Case = Punishments[i]!
+            for (let i = 0; i < Punishments.length; i++) {
+                const Case = Punishments[i]!;
                 if ((i + 1) % 10 == 0) PunishmentPages.push([]);
                 PunishmentPages.at(-1)!.push(Case);
-                switch(Case.Action) {
+                switch (Case.Action) {
                     case ModerationAction.Ban: {
                         TotalBan++;
                         break;
@@ -69,10 +68,10 @@ export const Command: MeteoriumCommand = {
                         TotalWarn++;
                         break;
                     }
-                    default: break;
+                    default:
+                        break;
                 }
             }
-            console.log(Punishments, PunishmentPages);
 
             const GeneratePageEmbed = (index: number) => {
                 if (PunishmentPages[index] == undefined) throw Error("invalid page index");
