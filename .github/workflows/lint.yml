@@ -1,10 +1,10 @@
-name: Build test
+name: Lint check
 on:
-  - push
+  - pull_request
 
 jobs:
   build:
-    name: Build bot
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,5 +19,5 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
 
-      - name: Compile
-        run: yarn compile
+      - name: Lint
+        run: yarn prettier . --check

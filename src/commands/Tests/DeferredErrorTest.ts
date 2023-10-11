@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from "discord.js";
 import type { MeteoriumCommand } from "..";
 
 export const Command: MeteoriumCommand = {
@@ -8,5 +8,5 @@ export const Command: MeteoriumCommand = {
     async Callback(interaction) {
         await interaction.deferReply();
         throw new Error("This is a error test command, it throws a error obviously.");
-    }
-}
+    },
+};

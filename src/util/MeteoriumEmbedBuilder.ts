@@ -7,12 +7,19 @@ export class MeteoriumEmbedBuilder extends EmbedBuilder {
             this.setTitle("MeteoriumEmbed")
                 .setDescription("This is a embed")
                 .setColor([0, 153, 255])
-                .setFooter({ text: "Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)" })
+                .setFooter({
+                    text: "Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)",
+                })
                 .setTimestamp();
             if (user) {
                 this.setFooter({
-                    text: "Requested by " + user.tag + " (" + user.id + ") | Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)",
-                    iconURL: user.avatarURL() || user.defaultAvatarURL
+                    text:
+                        "Requested by " +
+                        user.tag +
+                        " (" +
+                        user.id +
+                        ") | Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)",
+                    iconURL: user.avatarURL() || user.defaultAvatarURL,
                 });
             }
         }

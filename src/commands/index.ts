@@ -1,5 +1,5 @@
-import type { Awaitable, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import type { MeteoriumClient } from '../util/MeteoriumClient';
+import type { Awaitable, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import type { MeteoriumClient } from "../util/MeteoriumClient";
 
 // Category - Tests
 export * as test from "./Tests/Test";
@@ -31,6 +31,6 @@ export * as case from "./Moderation/Case";
 export * as removecase from "./Moderation/RemoveCase";
 
 export type MeteoriumCommand = {
-    InteractionData: Pick<SlashCommandBuilder, 'toJSON'>,
-    Callback(interaction: ChatInputCommandInteraction<'cached'>, client: MeteoriumClient): Awaitable<any>
-}
+    InteractionData: Pick<SlashCommandBuilder, "toJSON">;
+    Callback(interaction: ChatInputCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
+};
