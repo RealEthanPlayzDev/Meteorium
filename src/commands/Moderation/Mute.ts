@@ -55,6 +55,7 @@ export const Command: MeteoriumCommand = {
                 ModeratorUserId: interaction.user.id,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
+                MuteDuration: Duration
             },
         });
 
