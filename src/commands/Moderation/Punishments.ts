@@ -1,4 +1,4 @@
-import { ModerationCase } from "@prisma/client";
+import { ModerationAction, ModerationCase } from "@prisma/client";
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
@@ -47,10 +47,34 @@ export const Command: MeteoriumCommand = {
             });
         } else {
             const PunishmentPages: ModerationCase[][] = [[]];
-            for (let i = 1; i < Punishments.length; i++)
-                (i + 1) % 10 == 0
-                    ? PunishmentPages.push([Punishments[i]!])
-                    : PunishmentPages.at(-1)!.push(Punishments[i]!);
+            for (let i = 1; i < Punishments.length; i++) {
+                const Case = Punishments[i]!
+                if ((i + 1) % 10 == 0) {
+                    PunishmentPages.push([Case])
+                } else {
+                    PunishmentPages.at(-1)!.push(Case);
+                }
+                switch(Case.Action) {
+                    case ModerationAction.Ban: {
+                        TotalBan++;
+                        break;
+                    }
+                    case ModerationAction.Kick: {
+                        TotalKick++;
+                        break;
+                    }
+                    case ModerationAction.Mute: {
+                        TotalMute++;
+                        break;
+                    }
+                    case ModerationAction.Warn: {
+                        TotalWarn++;
+                        break;
+                    }
+                    default: break;
+                }
+            }
+            console.log(PunishmentPages);
 
             const GeneratePageEmbed = (index: number) => {
                 if (PunishmentPages[index] == undefined) throw Error("invalid page index");
