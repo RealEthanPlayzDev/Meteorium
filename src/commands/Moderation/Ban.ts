@@ -27,6 +27,7 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
+        const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
         if (User.id == interaction.user.id)
             return await interaction.reply({ content: "You can't ban yourself!", ephemeral: true });
@@ -55,26 +56,31 @@ export const Command: MeteoriumCommand = {
             reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
         });
 
+        const LogEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
+            .setAuthor({
+                name: `Case: #${CaseResult.CaseId} | ban | ${User.username}`,
+                iconURL: User.displayAvatarURL({ extension: "png" }),
+            })
+            .addFields(
+                { name: "User", value: `<@${User.id}>` },
+                {
+                    name: "Moderator",
+                    value: `<@${interaction.user.id}>`,
+                },
+                { name: "Reason", value: Reason },
+            )
+            .setImage(AttachmentProof ? AttachmentProof.url : null)
+            .setFooter({ text: `Id: ${User.id}` })
+            .setTimestamp()
+            .setColor("Red");
+
+        const PublicModLogChannel = await interaction.guild.channels.fetch(GuildSchema.PublicModLogChannelId).catch(() => null);
+        if (PublicModLogChannel != null && PublicModLogChannel.isTextBased()) await PublicModLogChannel.send({ embeds: [ LogEmbed ] });
+
         return await interaction.reply({
-            embeds: [
-                new MeteoriumEmbedBuilder(undefined, interaction.user)
-                    .setAuthor({
-                        name: `Case: #${CaseResult.CaseId} | ban | ${User.username}`,
-                        iconURL: User.displayAvatarURL({ extension: "png" }),
-                    })
-                    .addFields(
-                        { name: "User", value: `<@${User.id}>` },
-                        {
-                            name: "Moderator",
-                            value: `<@${interaction.user.id}>`,
-                        },
-                        { name: "Reason", value: Reason },
-                    )
-                    .setImage(AttachmentProof ? AttachmentProof.url : null)
-                    .setFooter({ text: `Id: ${User.id}` })
-                    .setTimestamp()
-                    .setColor("Red"),
-            ],
+            content: (PublicModLogChannel != null && PublicModLogChannel.isTextBased()) ? undefined : "(Warning: could not send log message to the public mod log channel)",
+            embeds: [ LogEmbed ],
+            ephemeral: GuildSchema?.PublicModLogChannelId != ""
         });
     },
 };

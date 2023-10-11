@@ -22,10 +22,18 @@ export const Command: MeteoriumCommand = {
                 )
                 .addSubcommand((subcommand) =>
                     subcommand
-                        .setName("muterole")
-                        .setDescription("The role to give when running /mute")
-                        .addRoleOption((option) =>
-                            option.setName("role").setDescription("The muted user role").setRequired(true),
+                        .setName("logchannel")
+                        .setDescription("The channel where command verbose logging will be sent at")
+                        .addChannelOption((option) =>
+                            option.setName("channel").setDescription("The channel where verbose logging will be sent at").setRequired(true),
+                        ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName("publicmodlogchannel")
+                        .setDescription("The channel where moderation logs will be sent at (instead of the current chat)")
+                        .addChannelOption((option) =>
+                            option.setName("channel").setDescription("The channel where moderation logs will be sent at").setRequired(true),
                         ),
                 ),
         )
@@ -100,7 +108,7 @@ export const Command: MeteoriumCommand = {
                             })
                             .then(async () => {
                                 return await interaction.editReply({
-                                    content: `Successfully configured the \`\`EnforceSayinExecutor\`\` setting (new value is ${Enabled})`,
+                                    content: `Successfully configured \`\`EnforceSayinExecutor\`\` setting (new value is ${Enabled})`,
                                 });
                             })
                             .catch(async (err) => {
@@ -112,16 +120,17 @@ export const Command: MeteoriumCommand = {
                             });
                         break;
                     }
-                    case "muterole": {
-                        const Role = interaction.options.getRole("role", true);
+                    case "logchannel": {
+                        const Channel = interaction.options.getChannel("channel", true);
+                        if (!Channel.isTextBased()) return await interaction.editReply({ content: "The channel has to be a text-based channel!" });
                         client.Database.guild
                             .update({
                                 where: { GuildId: GuildSchema.GuildId },
-                                data: { MuteRoleId: Role.id },
+                                data: { LoggingChannelId: Channel.id },
                             })
                             .then(async () => {
                                 return await interaction.editReply({
-                                    content: `Successfully configured the \`\`MuteRoleId\`\` setting (new value is ${Role.id})`,
+                                    content: `Successfully configured \`\`logchannel\`\` setting (new value is ${Channel.id})`,
                                 });
                             })
                             .catch(async (err) => {
@@ -133,6 +142,29 @@ export const Command: MeteoriumCommand = {
                             });
                         break;
                     }
+                    case "publicmodlogchannel": {
+                        const Channel = interaction.options.getChannel("channel", true);
+                        if (!Channel.isTextBased()) return await interaction.editReply({ content: "The channel has to be a text-based channel!" });
+                        client.Database.guild
+                            .update({
+                                where: { GuildId: GuildSchema.GuildId },
+                                data: { PublicModLogChannelId: Channel.id },
+                            })
+                            .then(async () => {
+                                return await interaction.editReply({
+                                    content: `Successfully configured \`\`publicmodlogchannel\`\` setting (new value is ${Channel.id})`,
+                                });
+                            })
+                            .catch(async (err) => {
+                                console.error(`Error while update guild configuration:\n${err}`);
+                                return await interaction.editReply({
+                                    content:
+                                        "An error occured while updating the guild configuration. Please try again later.",
+                                });
+                            });
+                        break;
+                    }
+                    default: break;
                 }
                 break;
             }

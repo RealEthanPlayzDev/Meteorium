@@ -15,7 +15,8 @@ model Guild {
     EnforceSayInExecutor      Boolean  @default(false)
     DisabledCommands          String[] @default([])
     DisabledCommandCategories String[] @default([])
-    MuteRoleId                String   @default("")
+    PublicModLogChannelId     String   @default("")
+    LoggingChannelId          String   @default("")
 }
 
 enum ModerationAction {
