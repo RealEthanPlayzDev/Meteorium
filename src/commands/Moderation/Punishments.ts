@@ -24,7 +24,7 @@ export const Command: MeteoriumCommand = {
 
         const Punishments = await client.Database.moderationCase.findMany({
             where: { TargetUserId: User.id },
-            orderBy: [{ CaseId: "asc" }],
+            orderBy: [{ CaseId: "desc" }],
         });
 
         let TotalKick = 0,
