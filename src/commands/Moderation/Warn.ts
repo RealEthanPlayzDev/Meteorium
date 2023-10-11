@@ -28,8 +28,19 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
-        if (!GuildUser || !GuildUser.moderatable || GuildUser.roles.highest.position >= interaction.member.roles.highest.position)
-            return interaction.reply({ content: "You (or the bot) can't moderate this user due to lack of permission/hierachy.", ephemeral: true });
+
+        if (User.id == interaction.user.id)
+            return await interaction.reply({ content: "You can't warn yourself!", ephemeral: true });
+        if (User.bot) return await interaction.reply({ content: "You can't warn bots!", ephemeral: true });
+        if (
+            !GuildUser ||
+            !GuildUser.moderatable ||
+            GuildUser.roles.highest.position >= interaction.member.roles.highest.position
+        )
+            return interaction.reply({
+                content: "You (or the bot) can't moderate this user due to lack of permission/hierachy.",
+                ephemeral: true,
+            });
 
         const CaseResult = await client.Database.moderationCase.create({
             data: {

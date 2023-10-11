@@ -14,17 +14,24 @@ export const Command: MeteoriumCommand = {
                 content: "You do not have permission to view user punishments.",
             });
 
+        const User = interaction.options.getUser("user", true);
+        if (User.bot)
+            return await interaction.reply({
+                content: "Bots cannot be moderated, they can't have any moderation records.",
+            });
+
         await interaction.deferReply();
 
-        const User = interaction.options.getUser("user", true);
         const Punishments = await client.Database.moderationCase.findMany({
             where: { TargetUserId: User.id },
             orderBy: { CaseId: "desc" },
         });
+
         let TotalKick = 0,
             TotalWarn = 0,
             TotalBan = 0,
             TotalMute = 0;
+
         if (Punishments.length == 0) {
             return await interaction.editReply({
                 embeds: [
