@@ -14,7 +14,7 @@ export const Command: MeteoriumCommand = {
                 new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Error version")
                     .setDescription("bruh")
-                    .SetErrorColor(),
+                    .setErrorColor(),
             ],
         });
     },

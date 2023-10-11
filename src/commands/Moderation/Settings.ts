@@ -70,7 +70,7 @@ export const Command: MeteoriumCommand = {
                     new MeteoriumEmbedBuilder(undefined, interaction.user)
                         .setTitle("Cannot configure the bot")
                         .setDescription("You do not have the administrator permissions to configure the bot.")
-                        .SetErrorColor(),
+                        .setErrorColor(),
                 ],
             });
         }

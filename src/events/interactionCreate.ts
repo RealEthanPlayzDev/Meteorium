@@ -23,7 +23,7 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                 const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Error occurred while the command callback was running")
                     .setDescription(String(err))
-                    .SetErrorColor();
+                    .setErrorColor();
                 if (interaction.deferred) {
                     await interaction.editReply({
                         content: "Error occurred (if you don't see anything below, you have embeds disabled)",

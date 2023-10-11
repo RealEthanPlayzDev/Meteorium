@@ -22,7 +22,7 @@ export const Command: MeteoriumCommand = {
                 iconURL: User.displayAvatarURL({ extension: "png" }),
             })
             .setTimestamp()
-            .SetNormalColor();
+            .setNormalColor();
 
         const Punishments = await client.Database.moderationCase.findMany({
             where: { TargetUserId: User.id },

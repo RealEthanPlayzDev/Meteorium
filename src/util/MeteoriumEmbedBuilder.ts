@@ -4,9 +4,7 @@ export class MeteoriumEmbedBuilder extends EmbedBuilder {
     constructor(data?: EmbedData | APIEmbed | undefined, user?: User, dontsetinitialdata?: boolean) {
         super(data);
         if (!dontsetinitialdata) {
-            this.setTitle("MeteoriumEmbed")
-                .setDescription("This is a embed")
-                .setColor([0, 153, 255])
+            this.setColor([0, 153, 255])
                 .setFooter({
                     text: "Meteorium | Developed by RadiatedExodus (RealEthanPlayzDev)",
                 })
@@ -24,11 +22,11 @@ export class MeteoriumEmbedBuilder extends EmbedBuilder {
             }
         }
     }
-    public SetNormalColor() {
+    public setNormalColor() {
         this.setColor([0, 153, 255]);
         return this;
     }
-    public SetErrorColor() {
+    public setErrorColor() {
         this.setColor([255, 0, 0]);
         return this;
     }
