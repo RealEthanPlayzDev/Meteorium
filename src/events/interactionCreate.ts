@@ -14,20 +14,30 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                 );
 
             let GuildExistInDb = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
-            if (GuildExistInDb == null) GuildExistInDb = await client.Database.guild.create({ data: { GuildId: interaction.guildId } });
+            if (GuildExistInDb == null)
+                GuildExistInDb = await client.Database.guild.create({ data: { GuildId: interaction.guildId } });
 
             if (GuildExistInDb && GuildExistInDb.LoggingChannelId != "") {
-                client.channels.fetch(GuildExistInDb.LoggingChannelId).then(async(channel) => {
-                    if (channel != null && channel.isTextBased()) await channel.send({ embeds: [
-                        new MeteoriumEmbedBuilder(undefined, interaction.user)
-                            .setTitle("Command executed")
-                            .setFields([
-                                { name: "Command name", value: interaction.commandName },
-                                { name: "Executor", value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)` }
-                            ])
-                            .setNormalColor()
-                    ] });
-                }).catch(() => null)
+                client.channels
+                    .fetch(GuildExistInDb.LoggingChannelId)
+                    .then(async (channel) => {
+                        if (channel != null && channel.isTextBased())
+                            await channel.send({
+                                embeds: [
+                                    new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                        .setTitle("Command executed")
+                                        .setFields([
+                                            { name: "Command name", value: interaction.commandName },
+                                            {
+                                                name: "Executor",
+                                                value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
+                                            },
+                                        ])
+                                        .setNormalColor(),
+                                ],
+                            });
+                    })
+                    .catch(() => null);
             }
 
             try {

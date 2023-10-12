@@ -86,6 +86,36 @@ export const Command: MeteoriumCommand = {
         if (PublicModLogChannel && PublicModLogChannel.isTextBased())
             await PublicModLogChannel.send({ embeds: [LogEmbed] });
 
+        const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
+        if (GuildSetting && GuildSetting.LoggingChannelId != "")
+            client.channels
+                .fetch(GuildSetting.LoggingChannelId)
+                .then(async (channel) => {
+                    if (channel && channel.isTextBased())
+                        await channel.send({
+                            embeds: [
+                                new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle("Moderation action")
+                                    .setFields([
+                                        { name: "Case id", value: String(CaseResult.CaseId) },
+                                        {
+                                            name: "Moderator",
+                                            value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
+                                        },
+                                        {
+                                            name: "Offending user",
+                                            value: `${User.username} (${User.id}) (<@${User.id}>)`,
+                                        },
+                                        { name: "Action", value: "Ban" },
+                                        { name: "Reason", value: Reason },
+                                        { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
+                                    ])
+                                    .setImage(AttachmentProof ? AttachmentProof.url : null),
+                            ],
+                        });
+                })
+                .catch(() => null);
+
         return await interaction.reply({
             content:
                 PublicModLogChannel != null && PublicModLogChannel.isTextBased()

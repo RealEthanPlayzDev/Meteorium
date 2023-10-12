@@ -26,6 +26,44 @@ export const Command: MeteoriumCommand = {
 
         const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
 
+        const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
+        if (GuildSetting && GuildSetting.LoggingChannelId != "")
+            client.channels
+                .fetch(GuildSetting.LoggingChannelId)
+                .then(async (channel) => {
+                    const ModUser = await interaction.client.users.fetch(Case.ModeratorUserId).catch(() => null);
+                    if (channel && channel.isTextBased())
+                        await channel.send({
+                            embeds: [
+                                new MeteoriumEmbedBuilder(undefined, interaction.user)
+                                    .setTitle("View case")
+                                    .setFields([
+                                        {
+                                            name: "Detail requester (viewer)",
+                                            value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
+                                        },
+                                        {
+                                            name: "Case moderator",
+                                            value: ModUser
+                                                ? `${ModUser.username} (${ModUser.id}) (<@${ModUser.id}>)`
+                                                : `<@${Case.ModeratorUserId}> (${Case.ModeratorUserId})`,
+                                        },
+                                        {
+                                            name: "Offending user",
+                                            value: TargetUser
+                                                ? `${TargetUser.username} (${TargetUser.id}) (<@${TargetUser.id}>)`
+                                                : `<@${Case.TargetUserId}> (${Case.TargetUserId})`,
+                                        },
+                                        { name: "Action", value: String(Case.Action) },
+                                        { name: "Reason", value: Case.Reason },
+                                        { name: "Proof", value: Case.AttachmentProof ? Case.AttachmentProof : "N/A" },
+                                    ])
+                                    .setImage(Case.AttachmentProof ? Case.AttachmentProof : null),
+                            ],
+                        });
+                })
+                .catch(() => null);
+
         return await interaction.reply({
             embeds: [
                 new MeteoriumEmbedBuilder(undefined, interaction.user)
