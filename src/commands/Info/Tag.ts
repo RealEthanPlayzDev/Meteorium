@@ -37,7 +37,7 @@ export const Command: MeteoriumCommand = {
                     option.setName("name").setDescription("The name of the tag to be edited").setRequired(true),
                 )
                 .addStringOption((option) =>
-                    option.setName("content").setDescription("The new content of this tag").setRequired(true),
+                    option.setName("content").setDescription("The new content of this tag").setRequired(false),
                 )
                 .addAttachmentOption((option) =>
                     option
@@ -222,14 +222,14 @@ export const Command: MeteoriumCommand = {
                         ephemeral: true,
                     });
 
-                const Content = interaction.options.getString("content", true);
+                const Content = interaction.options.getString("content", false);
                 const Image = interaction.options.getAttachment("image", false);
                 const RemoveImage = interaction.options.getBoolean("removeimage", false);
 
                 await client.Database.tag.update({
                     where: { GlobalTagId: ExistingTagExist.GlobalTagId },
                     data: {
-                        Content: Content,
+                        Content: Content ? Content : ExistingTagExist.Content,
                         Image: RemoveImage ? "" : Image ? Image.url : ExistingTagExist.Image,
                     },
                 });
@@ -265,7 +265,7 @@ export const Command: MeteoriumCommand = {
                                                     name: "Editor",
                                                     value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
                                                 },
-                                                { name: "Content", value: Content },
+                                                { name: "Content", value: Content ? Content : ExistingTagExist.Content },
                                             ])
                                             .setImage(
                                                 RemoveImage
