@@ -14,6 +14,7 @@ export * as ping from "./Info/Ping";
 export * as userinfo from "./Info/UserInfo";
 export * as holodexapi from "./Info/HolodexAPI";
 export * as rbxapi from "./Info/RbxAPI";
+export * as tag from "./Info/Tag";
 
 // Category - Fun
 export * as music from "./Fun/Music";

@@ -5,7 +5,7 @@ import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
         .setName("tag")
-        .setDescription("Tag system")
+        .setDescription("Tag suggestion system")
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("create")
