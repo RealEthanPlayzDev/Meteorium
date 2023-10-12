@@ -61,7 +61,7 @@ export const Command: MeteoriumCommand = {
             : interaction.channel;
         const ReplyTarget = interaction.options.getString("replyto", false);
 
-        if (!ShowExecutorName && interaction.member.permissions.has("Administrator"))
+        if (!ShowExecutorName && !interaction.member.permissions.has("Administrator"))
             return await interaction.editReply({
                 content:
                     "You do not have permission to not show the executor's name. (Requires Administrator permission to be imnune)",
