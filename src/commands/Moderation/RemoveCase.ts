@@ -128,7 +128,7 @@ export const Command: MeteoriumCommand = {
                                                         value: Case.AttachmentProof ? Case.AttachmentProof : "N/A",
                                                     },
                                                 ])
-                                                .setImage(Case.AttachmentProof ? Case.AttachmentProof : null)
+                                                .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
                                                 .setColor("Red"),
                                         ],
                                     });

@@ -38,3 +38,11 @@ model ModerationCase {
     AttachmentProof String
     MuteDuration    String           @default("0")
 }
+
+model Tag {
+    GlobalTagId Int    @id @default(autoincrement())
+    TagName     String
+    GuildId     String
+    Content     String
+    Image       String
+}
