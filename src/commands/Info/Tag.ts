@@ -152,6 +152,8 @@ export const Command: MeteoriumCommand = {
                     content: `Are you sure you want to remove the following tag? (${TagName})`,
                     embeds: [TagEmbed],
                     components: [ActionRow],
+                    ephemeral: true,
+                    fetchReply: true,
                 });
 
                 const ResultCollector = ConfirmationReplyResult.createMessageComponentCollector({
@@ -159,6 +161,13 @@ export const Command: MeteoriumCommand = {
                     max: 1,
                 });
                 ResultCollector.on("collect", async (result) => {
+                    if (result.user.id != interaction.user.id) {
+                        await result.reply({
+                            content: "You can't interact with this interaction as you were not the original executer!",
+                            ephemeral: true,
+                        });
+                        return;
+                    }
                     switch (result.customId) {
                         case "yes": {
                             await client.Database.tag.delete({ where: { GlobalTagId: Tag.GlobalTagId } });
@@ -265,7 +274,10 @@ export const Command: MeteoriumCommand = {
                                                     name: "Editor",
                                                     value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
                                                 },
-                                                { name: "Content", value: Content ? Content : ExistingTagExist.Content },
+                                                {
+                                                    name: "Content",
+                                                    value: Content ? Content : ExistingTagExist.Content,
+                                                },
                                             ])
                                             .setImage(
                                                 RemoveImage
