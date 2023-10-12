@@ -298,7 +298,9 @@ export const Command: MeteoriumCommand = {
 
                 const TagEmbed = new MeteoriumEmbedBuilder()
                     .setAuthor({
-                        name: SuggestToUser ? `Tag suggestion for <@${SuggestToUser.id}>` : "Tag suggestion",
+                        name: SuggestToUser
+                            ? `Tag suggestion for @${SuggestToUser.username} (${SuggestToUser.id})`
+                            : "Tag suggestion",
                         iconURL: SuggestToUser ? SuggestToUser.displayAvatarURL({ extension: "png" }) : undefined,
                     })
                     .setDescription(Tag.Content)
@@ -308,11 +310,18 @@ export const Command: MeteoriumCommand = {
                 if (DetachMessage) {
                     if (!interaction.channel)
                         return await interaction.reply({ content: "interaction.channel not set", ephemeral: true });
-                    await interaction.channel!.send({ embeds: [TagEmbed] });
+                    await interaction.channel!.send({
+                        content: SuggestToUser ? `<@${SuggestToUser.id}>` : undefined,
+                        embeds: [TagEmbed],
+                    });
                 }
 
                 return await interaction.reply({
-                    content: DetachMessage ? "Sent tag suggestion" : undefined,
+                    content: DetachMessage
+                        ? "Sent tag suggestion"
+                        : SuggestToUser
+                        ? `<@${SuggestToUser.id}>`
+                        : undefined,
                     embeds: DetachMessage ? undefined : [TagEmbed],
                     ephemeral: DetachMessage ? true : false,
                 });
