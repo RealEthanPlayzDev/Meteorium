@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { MeteoriumCommand } from "..";
+import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
@@ -78,6 +79,25 @@ export const Command: MeteoriumCommand = {
             content: Message,
             reply: ReplyTarget ? { messageReference: ReplyTarget } : undefined,
         });
+
+        client.channels.fetch(GuildSetting.LoggingChannelId).then(async(channel) => {
+            if (channel != null && channel.isTextBased()) await channel.send({
+                embeds: [
+                    new MeteoriumEmbedBuilder(undefined, interaction.user)
+                        .setTitle("SayIn execution info")
+                        .setFields([
+                            { name: "Executor", value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)` },
+                            { name: "Executor name shown", value: ShowExecutorName ? "Yes" : "No" },
+                            { name: "SayIn executor name shown enforcement", value: GuildSetting.EnforceSayInExecutor ? "Enforcing" : "Permissive" },
+                            { name: "Message", value: interaction.options.getString("message", true) },
+                            { name: "Channel", value: `<#${Channel.id} (${Channel.id})>` },
+                            { name: "Reply target", value: ReplyTarget ? ReplyTarget : "N/A" }
+                        ])
+                        .setColor("Yellow")
+                ]
+            });
+        }).catch(() => null)
+
         return await interaction.editReply({
             content: "Successfully sent message.",
         });
