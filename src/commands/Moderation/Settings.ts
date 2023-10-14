@@ -43,6 +43,19 @@ export const Command: MeteoriumCommand = {
                                 .setDescription("The channel where moderation logs will be sent at")
                                 .setRequired(true),
                         ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName("joinleavelogchannel")
+                        .setDescription(
+                            "The channel where join and leave logs will be sent at",
+                        )
+                        .addChannelOption((option) =>
+                            option
+                                .setName("channel")
+                                .setDescription("The channel where moderation logs will be sent at")
+                                .setRequired(true),
+                        ),
                 ),
         )
         .addSubcommandGroup((subcommandgroup) =>
@@ -169,6 +182,31 @@ export const Command: MeteoriumCommand = {
                             .then(async () => {
                                 return await interaction.editReply({
                                     content: `Successfully configured \`\`publicmodlogchannel\`\` setting (new value is ${Channel.id})`,
+                                });
+                            })
+                            .catch(async (err) => {
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
+                                return await interaction.editReply({
+                                    content:
+                                        "An error occured while updating the guild configuration. Please try again later.",
+                                });
+                            });
+                        break;
+                    }
+                    case "joinleavelogchannel": {
+                        const Channel = interaction.options.getChannel("channel", true);
+                        if (!Channel.isTextBased())
+                            return await interaction.editReply({
+                                content: "The channel has to be a text-based channel!",
+                            });
+                        client.Database.guild
+                            .update({
+                                where: { GuildId: GuildSchema.GuildId },
+                                data: { JoinLeaveLogChannelId: Channel.id },
+                            })
+                            .then(async () => {
+                                return await interaction.editReply({
+                                    content: `Successfully configured \`\`joinleavelogchannel\`\` setting (new value is ${Channel.id})`,
                                 });
                             })
                             .catch(async (err) => {

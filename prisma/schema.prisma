@@ -17,6 +17,7 @@ model Guild {
     DisabledCommandCategories String[] @default([])
     PublicModLogChannelId     String   @default("")
     LoggingChannelId          String   @default("")
+    JoinLeaveLogChannelId     String   @default("")
     CurrentCaseId             Int      @default(0)
 }
 
