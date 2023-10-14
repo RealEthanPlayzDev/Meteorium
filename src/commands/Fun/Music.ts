@@ -67,6 +67,8 @@ export const Command: MeteoriumCommand = {
         )
         .addSubcommand((subcommand) => subcommand.setName("clearqueue").setDescription("Clears the queue")),
     async Callback(interaction, client) {
+        const musicNS = client.Logging.GetNamespace("Command/Music");
+
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
 
@@ -116,7 +118,7 @@ export const Command: MeteoriumCommand = {
                         },
                     });
                 } catch (e) {
-                    console.error(`Error occured while trying to play on discord-player: ${e}`);
+                    musicNS.error(`Error occured while trying to play on discord-player: ${e}`);
                     return await interaction.editReply({
                         content: "An error has occured while trying to play your query.",
                     });

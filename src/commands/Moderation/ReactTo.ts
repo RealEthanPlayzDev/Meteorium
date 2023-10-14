@@ -27,7 +27,9 @@ export const Command: MeteoriumCommand = {
                 .setName("channel")
                 .setDescription("The text/thread channel where the message you want to react to is located"),
         ),
-    async Callback(interaction) {
+    async Callback(interaction, client) {
+        const reactToNS = client.Logging.GetNamespace("Commands/ReactTo");
+
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
 
@@ -54,7 +56,7 @@ export const Command: MeteoriumCommand = {
         try {
             TargetMessage = await Channel.messages.fetch(MessageId);
         } catch (e) {
-            console.error(`Error while getting message: ${e}`);
+            reactToNS.error(`Error while getting message: ${e}`);
         }
         try {
             if (interaction.guild.emojis.cache.get(Emoji)) {
@@ -65,7 +67,7 @@ export const Command: MeteoriumCommand = {
                 TargetEmoji = undefined;
             }
         } catch (e) {
-            console.error(`Error while getting emoji: ${e}`);
+            reactToNS.error(`Error while getting emoji: ${e}`);
         }
 
         if (!TargetMessage)

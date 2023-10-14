@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 
 import * as Commands from "../commands";
 import * as Events from "../events";
+import { MeteoriumLogging } from "./MeteoriumLogging";
 
 const ParseDotEnvConfig = () => {
     if (!process.env.METEORIUMBOTTOKEN) {
@@ -34,20 +35,23 @@ export class MeteoriumClient extends Client<true> {
     public HolodexClient = new HolodexApiClient({
         apiKey: this.Config.HolodexAPIKey,
     });
+    public Logging = new MeteoriumLogging("Meteorium");
     public override async login() {
-        console.log("Loading discord-player default extractors");
+        const loginNS = this.Logging.RegisterNamespace("init", true);
+
+        loginNS.info("Loading discord-player default extractors");
         this.DiscordPlayer.extractors.loadDefault();
 
-        console.log("Registering commands");
+        loginNS.info("Registering commands");
         this.Commands.clear();
         for (const [Name, { Command }] of Object.entries(Commands)) {
-            console.log("Registering command -> ", Name, Command);
+            loginNS.debug(`Registering command -> ${Name} ${Command}`);
             this.Commands.set(Name, Command);
         }
 
-        console.log("Registering events");
+        loginNS.info("Registering events");
         for (const [Name, { Event }] of Object.entries(Events)) {
-            console.log("Registering event ->", Name, Event);
+            loginNS.debug(`Registering event -> ${Name} ${Event}`);
             if (Event.Once) {
                 // @ts-ignore
                 this.once(Name, (...args) => Event.Callback(this, ...args));
@@ -58,12 +62,13 @@ export class MeteoriumClient extends Client<true> {
         }
 
         // Shard logging
-        super.on("shardDisconnect", (event, id) => console.log(`Disconnected from shard ${id} (${event.code}), reconnecting.`));
-        super.on("shardError", (err, id) => console.log(`Shard ${id} websocket error occured:\n${err}`));
-        super.on("shardResume", (id, re) => console.log(`Shard ${id} reconnected successfully. (ReplayEvents ${re})`));
-        super.on("shardReconnecting", (id) => console.log(`Attempting to reconnect to shard ${id}.`))
+        const shardNS = this.Logging.RegisterNamespace("Sharding", true)
+        super.on("shardDisconnect", (event, id) => shardNS.warn(`Disconnected from shard ${id} (code ${event.code}).`));
+        super.on("shardError", (err, id) => shardNS.error(`Shard ${id} websocket error occured:\n${err}`));
+        super.on("shardResume", (id, re) => shardNS.info(`Shard ${id} reconnected successfully. (ReplayEvents ${re})`));
+        super.on("shardReconnecting", (id) => shardNS.info(`Attempting to reconnect to shard ${id}.`))
 
-        console.log("Logging into Discord");
+        loginNS.info("Logging into Discord");
         return super.login(this.Config.DiscordToken);
     }
 }

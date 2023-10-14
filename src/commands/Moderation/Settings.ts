@@ -76,6 +76,8 @@ export const Command: MeteoriumCommand = {
                 ),
         ),
     async Callback(interaction, client) {
+        const settingsNS = client.Logging.GetNamespace("Commands/Settings");
+
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
 
@@ -120,7 +122,7 @@ export const Command: MeteoriumCommand = {
                                 });
                             })
                             .catch(async (err) => {
-                                console.error(`Error while update guild configuration:\n${err}`);
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
                                 return await interaction.editReply({
                                     content:
                                         "An error occured while updating the guild configuration. Please try again later.",
@@ -145,7 +147,7 @@ export const Command: MeteoriumCommand = {
                                 });
                             })
                             .catch(async (err) => {
-                                console.error(`Error while update guild configuration:\n${err}`);
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
                                 return await interaction.editReply({
                                     content:
                                         "An error occured while updating the guild configuration. Please try again later.",
@@ -170,7 +172,7 @@ export const Command: MeteoriumCommand = {
                                 });
                             })
                             .catch(async (err) => {
-                                console.error(`Error while update guild configuration:\n${err}`);
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
                                 return await interaction.editReply({
                                     content:
                                         "An error occured while updating the guild configuration. Please try again later.",
@@ -220,7 +222,7 @@ export const Command: MeteoriumCommand = {
                                 });
                             })
                             .catch(async (err) => {
-                                console.error(`Error while update guild configuration:\n${err}`);
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
                                 return await interaction.editReply({
                                     content:
                                         "An error occured while updating the guild configuration. Please try again later.",
@@ -251,7 +253,7 @@ export const Command: MeteoriumCommand = {
                                 });
                             })
                             .catch(async (err) => {
-                                console.error(`Error while update guild configuration:\n${err}`);
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
                                 return await interaction.editReply({
                                     content:
                                         "An error occured while updating the guild configuration. Please try again later.",

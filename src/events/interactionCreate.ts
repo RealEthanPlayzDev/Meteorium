@@ -5,9 +5,11 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
     async Callback(client, interaction) {
         if (!interaction.inCachedGuild()) return;
         if (interaction.isChatInputCommand()) {
+            const commandHandlerNS = client.Logging.GetNamespace("Events/interactionCreate/SlashCommandHandler");
+
             const Command = client.Commands.get(interaction.commandName);
             if (Command == undefined)
-                return console.error(
+                return commandHandlerNS.error(
                     "Unexpected behavior when handling slash command interaction: " +
                         interaction.commandName +
                         " doesn't exist on client.Commands.",
@@ -43,22 +45,26 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
             try {
                 await Command.Callback(interaction, client);
             } catch (err) {
-                console.error("Slash command callback error:\n" + err);
+                commandHandlerNS.error("Slash command callback error:\n" + err);
                 const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Error occurred while the command callback was running")
                     .setDescription(String(err))
                     .setErrorColor();
-                if (interaction.deferred) {
-                    await interaction.editReply({
-                        content: "Error occurred (if you don't see anything below, you have embeds disabled)",
-                        embeds: [ErrorEmbed],
-                    });
-                } else {
-                    await interaction.reply({
-                        content: "Error occurred (if you don't see anything below, you have embeds disabled)",
-                        embeds: [ErrorEmbed],
-                        ephemeral: true,
-                    });
+                try {
+                    if (interaction.deferred) {
+                        await interaction.editReply({
+                            content: "Error occurred (if you don't see anything below, you have embeds disabled)",
+                            embeds: [ErrorEmbed],
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: "Error occurred (if you don't see anything below, you have embeds disabled)",
+                            embeds: [ErrorEmbed],
+                            ephemeral: true,
+                        });
+                    }
+                } catch(err) {
+                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`)
                 }
             }
         }
