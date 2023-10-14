@@ -57,6 +57,12 @@ export class MeteoriumClient extends Client<true> {
             }
         }
 
+        // Shard logging
+        super.on("shardDisconnect", (event, id) => console.log(`Disconnected from shard ${id} (${event.code}), reconnecting.`));
+        super.on("shardError", (err, id) => console.log(`Shard ${id} websocket error occured:\n${err}`));
+        super.on("shardResume", (id, re) => console.log(`Shard ${id} reconnected successfully. (ReplayEvents ${re})`));
+        super.on("shardReconnecting", (id) => console.log(`Attempting to reconnect to shard ${id}.`))
+
         console.log("Logging into Discord");
         return super.login(this.Config.DiscordToken);
     }
