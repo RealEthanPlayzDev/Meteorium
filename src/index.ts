@@ -1,18 +1,21 @@
 import { MeteoriumClient } from "./util/MeteoriumClient";
-import { GatewayIntentBits } from "discord.js";
+import { IntentsBitField } from "discord.js";
+
+const Intents = new IntentsBitField()
+Intents.add(
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildVoiceStates,
+    IntentsBitField.Flags.GuildInvites,
+    IntentsBitField.Flags.GuildEmojisAndStickers,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildMessageReactions,
+    IntentsBitField.Flags.GuildPresences,
+    IntentsBitField.Flags.GuildModeration
+)
 
 const Client = new MeteoriumClient({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.GuildEmojisAndStickers,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildModeration
-    ],
+    intents: Intents
 });
 
 Client.login();
