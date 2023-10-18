@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
+import { Tag } from "@prisma/client";
 
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
@@ -70,12 +71,24 @@ export const Command: MeteoriumCommand = {
                         )
                         .setRequired(false),
                 ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("list")
+                .setDescription("List tags made in this server")
+                .addBooleanOption((option) =>
+                    option
+                        .setName("ephemeral")
+                        .setDescription("If true, list will be shown only to you")
+                        .setRequired(false),
+                ),
         ),
     async Callback(interaction, client) {
         const Subcommand = interaction.options.getSubcommand(true);
-        const TagName = interaction.options.getString("name", true); // All subcommands require the name field
         switch (Subcommand) {
             case "create": {
+                const TagName = interaction.options.getString("name", true); // All subcommands require the name field
+
                 if (!interaction.member.permissions.has("ManageMessages"))
                     return await interaction.reply({ content: "You do not have permission to manage tags." });
 
@@ -135,6 +148,8 @@ export const Command: MeteoriumCommand = {
                 return await interaction.reply({ content: `Created tag with name ${TagName}`, embeds: [TagEmbed] });
             }
             case "delete": {
+                const TagName = interaction.options.getString("name", true); // All subcommands require the name field
+
                 if (!interaction.member.permissions.has("ManageMessages"))
                     return await interaction.reply({ content: "You do not have permission to manage tags." });
 
@@ -228,6 +243,8 @@ export const Command: MeteoriumCommand = {
                 break;
             }
             case "edit": {
+                const TagName = interaction.options.getString("name", true); // All subcommands require the name field
+
                 if (!interaction.member.permissions.has("ManageMessages"))
                     return await interaction.reply({ content: "You do not have permission to manage tags." });
 
@@ -309,6 +326,8 @@ export const Command: MeteoriumCommand = {
                 });
             }
             case "show": {
+                const TagName = interaction.options.getString("name", true); // All subcommands require the name field
+
                 const SuggestToUser = interaction.options.getUser("suggestto", false);
                 const DetachMessage = interaction.options.getBoolean("detach", false);
 
@@ -347,8 +366,111 @@ export const Command: MeteoriumCommand = {
                     ephemeral: DetachMessage ? true : false,
                 });
             }
+            case "list": {
+                const Ephemeral = interaction.options.getBoolean("ephemeral", false);
+                await interaction.deferReply({ ephemeral: Ephemeral ? true : false });
+
+                const Tags = await client.Database.tag.findMany({
+                    where: { GuildId: interaction.guildId },
+                    orderBy: [{ TagName: "asc" }],
+                });
+
+                if (Tags.length == 0)
+                    return await interaction.editReply({ content: "This server does not have any tags." });
+
+                const TagPages: Tag[][] = [[]];
+                for (let i = 0; i < Tags.length; i++) {
+                    if ((i + 1) % 10 == 0) TagPages.push([]);
+                    TagPages.at(-1)!.push(Tags[i]!);
+                }
+
+                const GeneratePageEmbed = (index: number) => {
+                    if (TagPages[index] == undefined) throw Error("invalid page index");
+                    return new MeteoriumEmbedBuilder()
+                        .setAuthor({
+                            name: `Available server tags - ${interaction.guild.name}`,
+                            iconURL: interaction.guild.iconURL()!,
+                        })
+                        .setFields([
+                            ...TagPages[index]!.map((Tag) => ({
+                                name: Tag.TagName,
+                                value: Tag.Content,
+                            })),
+                        ])
+                        .setFooter({
+                            text: TagPages.length > 1 ? `Page ${index + 1}/${TagPages.length}` : "",
+                        })
+                        .setTimestamp()
+                        .setNormalColor();
+                };
+
+                const GenerateActionRow = (index: number) => {
+                    return new ActionRowBuilder<ButtonBuilder>().addComponents([
+                        new ButtonBuilder()
+                            .setCustomId(String(index - 1))
+                            .setLabel("Previous page")
+                            .setEmoji({ name: "◀️" })
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(index <= 0),
+                        new ButtonBuilder()
+                            .setCustomId(String(index + 1))
+                            .setLabel("Next page")
+                            .setEmoji({ name: "▶️" })
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(index < 0 || index == TagPages.length - 1),
+                    ]);
+                };
+
+                const GenerateMessageOptions = (index: number) => ({
+                    embeds: [GeneratePageEmbed(index)],
+                    components: TagPages.length > 1 ? [GenerateActionRow(index)] : undefined,
+                    fetchReply: true,
+                });
+
+                const InitialSendResult = await interaction.editReply(GenerateMessageOptions(0));
+                if (TagPages.length <= 1) return;
+
+                const ResultCollector = InitialSendResult.createMessageComponentCollector({ idle: 150000 });
+                ResultCollector.on("collect", async (result) => {
+                    if (result.user.id != interaction.user.id) {
+                        await interaction.reply({
+                            content: "You're not the one who requested this command!",
+                            ephemeral: true,
+                        });
+                        return;
+                    }
+
+                    let Index = -1;
+                    try {
+                        Index = Number(result.customId);
+                    } catch {}
+                    if (Index == -1) {
+                        await interaction.reply({ content: "Invalid page index", ephemeral: true });
+                        return;
+                    }
+
+                    await InitialSendResult.edit(GenerateMessageOptions(+Index));
+                });
+                ResultCollector.on("end", async () => {
+                    await interaction.editReply({ components: [GenerateActionRow(-1)] });
+                });
+
+                break;
+            }
             default:
                 break;
+        }
+    },
+    async Autocomplete(interaction, client) {
+        const Subcommand = interaction.options.getSubcommand(true);
+        if (Subcommand != "create") {
+            const Focus = interaction.options.getFocused(true);
+            if (Focus.name != "name") return;
+            const Tags = await client.Database.tag.findMany({
+                where: { GuildId: interaction.guildId, TagName: { startsWith: Focus.value } },
+                take: 25,
+            });
+            return await interaction.respond(Tags.map((choice) => ({ name: choice.TagName, value: choice.TagName })));
         }
     },
 };

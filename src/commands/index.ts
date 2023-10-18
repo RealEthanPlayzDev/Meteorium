@@ -1,4 +1,4 @@
-import type { Awaitable, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import type { AutocompleteInteraction, Awaitable, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import type { MeteoriumClient } from "../util/MeteoriumClient";
 
 // Category - Tests
@@ -34,4 +34,5 @@ export * as removecase from "./Moderation/RemoveCase";
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, "toJSON">;
     Callback(interaction: ChatInputCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
+    Autocomplete?(interaction: AutocompleteInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
 };

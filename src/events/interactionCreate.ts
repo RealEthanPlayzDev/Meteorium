@@ -4,15 +4,15 @@ import { MeteoriumEmbedBuilder } from "../util/MeteoriumEmbedBuilder";
 export const Event: MeteoriumEvent<"interactionCreate"> = {
     async Callback(client, interaction) {
         if (!interaction.inCachedGuild()) return;
+
+        // Slash command interaction handling
         if (interaction.isChatInputCommand()) {
             const commandHandlerNS = client.Logging.GetNamespace("Events/interactionCreate/SlashCommandHandler");
 
             const Command = client.Commands.get(interaction.commandName);
             if (Command == undefined)
                 return commandHandlerNS.error(
-                    "Unexpected behavior when handling slash command interaction: " +
-                        interaction.commandName +
-                        " doesn't exist on client.Commands.",
+                    `Unexpected behavior when handling slash command interaction: ${interaction.commandName} doesn't exist on client.Commands.`,
                 );
 
             let GuildExistInDb = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
@@ -67,6 +67,33 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                     commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
                 }
             }
+            return;
+        }
+
+        // Autocomplete interaction handling
+        if (interaction.isAutocomplete()) {
+            const autocompleteHandlerNS = client.Logging.GetNamespace("Events/interactionCreate/AutocompleteHandler");
+
+            const Command = client.Commands.get(interaction.commandName);
+            if (Command == undefined)
+                return autocompleteHandlerNS.error(
+                    `Unexpected behavior when handling autocomplete interaction: ${interaction.commandName}  doesn't exist on client.Commands.`,
+                );
+            if (!Command.Autocomplete) return;
+
+            let GuildExistInDb = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
+            if (GuildExistInDb == null)
+                GuildExistInDb = await client.Database.guild.create({ data: { GuildId: interaction.guildId } });
+
+            try {
+                Command.Autocomplete!(interaction, client);
+            } catch (err) {
+                autocompleteHandlerNS.error(
+                    `Caught error while handling autocomplete for ${interaction.commandName} in ${interaction.guildId}:\n${err}`,
+                );
+            }
+
+            return;
         }
 
         return;
