@@ -1,7 +1,7 @@
 import { MeteoriumClient } from "./util/MeteoriumClient";
 import { IntentsBitField } from "discord.js";
 
-const Intents = new IntentsBitField()
+const Intents = new IntentsBitField();
 Intents.add(
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
@@ -11,11 +11,11 @@ Intents.add(
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
     IntentsBitField.Flags.GuildPresences,
-    IntentsBitField.Flags.GuildModeration
-)
+    IntentsBitField.Flags.GuildModeration,
+);
 
 const Client = new MeteoriumClient({
-    intents: Intents
+    intents: Intents,
 });
 
 Client.login();

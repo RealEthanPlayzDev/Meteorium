@@ -47,9 +47,7 @@ export const Command: MeteoriumCommand = {
                 .addSubcommand((subcommand) =>
                     subcommand
                         .setName("joinleavelogchannel")
-                        .setDescription(
-                            "The channel where join and leave logs will be sent at",
-                        )
+                        .setDescription("The channel where join and leave logs will be sent at")
                         .addChannelOption((option) =>
                             option
                                 .setName("channel")

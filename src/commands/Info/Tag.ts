@@ -76,6 +76,9 @@ export const Command: MeteoriumCommand = {
         const TagName = interaction.options.getString("name", true); // All subcommands require the name field
         switch (Subcommand) {
             case "create": {
+                if (!interaction.member.permissions.has("ManageMessages"))
+                    return await interaction.reply({ content: "You do not have permission to manage tags." });
+
                 const ExistingTagExist =
                     (await client.Database.tag.count({ where: { TagName: TagName, GuildId: interaction.guildId } })) !=
                     0;
@@ -132,6 +135,9 @@ export const Command: MeteoriumCommand = {
                 return await interaction.reply({ content: `Created tag with name ${TagName}`, embeds: [TagEmbed] });
             }
             case "delete": {
+                if (!interaction.member.permissions.has("ManageMessages"))
+                    return await interaction.reply({ content: "You do not have permission to manage tags." });
+
                 const Tag = await client.Database.tag.findFirst({
                     where: { TagName: TagName, GuildId: interaction.guildId },
                 });
@@ -222,6 +228,9 @@ export const Command: MeteoriumCommand = {
                 break;
             }
             case "edit": {
+                if (!interaction.member.permissions.has("ManageMessages"))
+                    return await interaction.reply({ content: "You do not have permission to manage tags." });
+
                 const ExistingTagExist = await client.Database.tag.findFirst({
                     where: { TagName: TagName, GuildId: interaction.guildId },
                 });

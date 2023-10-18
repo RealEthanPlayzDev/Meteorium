@@ -11,21 +11,21 @@ export const Event: MeteoriumEvent<"guildMemberAdd"> = {
         const LogEmbed = new MeteoriumEmbedBuilder()
             .setAuthor({
                 name: member.user.username,
-                iconURL: member.user.displayAvatarURL({ extension: "png" })
+                iconURL: member.user.displayAvatarURL({ extension: "png" }),
             })
             .setTitle("Welcome!")
             .setDescription(`<@${member.user.id}> \`\`${member.user.username}\`\` (${member.user.id})`)
             .setFields([
                 { name: "Created the account at", value: GenerateFormattedTime(member.user.createdAt) },
-                { name: "Joined the server at", value: GenerateFormattedTime(member.joinedAt!) }
+                { name: "Joined the server at", value: GenerateFormattedTime(member.joinedAt!) },
             ])
-            .setColor("Green")
+            .setColor("Green");
 
         const JLLChannel = await member.guild.channels.fetch(GuildSchema.JoinLeaveLogChannelId);
-        if (JLLChannel && JLLChannel.isTextBased()) await JLLChannel.send({ embeds: [ LogEmbed ] });
+        if (JLLChannel && JLLChannel.isTextBased()) await JLLChannel.send({ embeds: [LogEmbed] });
 
         const VLChannel = await member.guild.channels.fetch(GuildSchema.LoggingChannelId);
-        if (VLChannel && VLChannel.isTextBased()) await VLChannel.send({ embeds: [ LogEmbed ] });
+        if (VLChannel && VLChannel.isTextBased()) await VLChannel.send({ embeds: [LogEmbed] });
 
         return;
     },

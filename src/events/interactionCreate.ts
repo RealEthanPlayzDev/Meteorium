@@ -63,8 +63,8 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                             ephemeral: true,
                         });
                     }
-                } catch(err) {
-                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`)
+                } catch (err) {
+                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
                 }
             }
         }

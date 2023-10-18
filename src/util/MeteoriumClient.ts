@@ -62,11 +62,11 @@ export class MeteoriumClient extends Client<true> {
         }
 
         // Shard logging
-        const shardNS = this.Logging.RegisterNamespace("Sharding", true)
+        const shardNS = this.Logging.RegisterNamespace("Sharding", true);
         super.on("shardDisconnect", (event, id) => shardNS.warn(`Disconnected from shard ${id} (code ${event.code}).`));
         super.on("shardError", (err, id) => shardNS.error(`Shard ${id} websocket error occured:\n${err}`));
         super.on("shardResume", (id, re) => shardNS.info(`Shard ${id} reconnected successfully. (ReplayEvents ${re})`));
-        super.on("shardReconnecting", (id) => shardNS.info(`Attempting to reconnect to shard ${id}.`))
+        super.on("shardReconnecting", (id) => shardNS.info(`Attempting to reconnect to shard ${id}.`));
 
         loginNS.info("Logging into Discord");
         return super.login(this.Config.DiscordToken);

@@ -37,6 +37,9 @@ export const Command: MeteoriumCommand = {
         const Ephemeral = interaction.options.getBoolean("ephemeral", false) ? true : false;
         await interaction.deferReply({ ephemeral: Ephemeral });
 
+        if (!interaction.member.permissions.has("ManageMessages"))
+            return await interaction.editReply({ content: "You do not have permission to use SayIn." });
+
         const GuildSetting = await client.Database.guild.findUnique({
             where: { GuildId: String(interaction.guildId) },
         });
