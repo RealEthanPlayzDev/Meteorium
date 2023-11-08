@@ -34,8 +34,8 @@ export const Command: MeteoriumCommand = {
         if (User.bot)
             return await interaction.reply({ content: "You can't ban bots! (do it manually)", ephemeral: true });
         if (
-            !GuildUser ||
-            !GuildUser.moderatable ||
+            GuildUser &&
+            GuildUser.moderatable &&
             GuildUser.roles.highest.position >= interaction.member.roles.highest.position
         )
             return interaction.reply({
