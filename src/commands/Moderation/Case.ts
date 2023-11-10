@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, userMention } from "discord.js";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 import type { MeteoriumCommand } from "..";
 
@@ -40,19 +40,19 @@ export const Command: MeteoriumCommand = {
                                     .setFields([
                                         {
                                             name: "Detail requester (viewer)",
-                                            value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
+                                            value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
                                         },
                                         {
                                             name: "Case moderator",
                                             value: ModUser
-                                                ? `${ModUser.username} (${ModUser.id}) (<@${ModUser.id}>)`
+                                                ? `${ModUser.username} (${ModUser.id}) (${userMention(ModUser.id)})`
                                                 : `<@${Case.ModeratorUserId}> (${Case.ModeratorUserId})`,
                                         },
                                         {
                                             name: "Offending user",
                                             value: TargetUser
-                                                ? `${TargetUser.username} (${TargetUser.id}) (<@${TargetUser.id}>)`
-                                                : `<@${Case.TargetUserId}> (${Case.TargetUserId})`,
+                                                ? `${TargetUser.username} (${TargetUser.id}) (${userMention(TargetUser.id)})`
+                                                : `${userMention(Case.TargetUserId)} (${Case.TargetUserId})`,
                                         },
                                         { name: "Action", value: String(Case.Action) },
                                         { name: "Reason", value: Case.Reason },
@@ -74,10 +74,10 @@ export const Command: MeteoriumCommand = {
                         iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
                     })
                     .addFields(
-                        { name: "User", value: `<@${Case.TargetUserId}>` },
+                        { name: "User", value: userMention(Case.TargetUserId) },
                         {
                             name: "Moderator",
-                            value: `<@${Case.ModeratorUserId}>`,
+                            value: userMention(Case.ModeratorUserId),
                         },
                         { name: "Reason", value: Case.Reason },
                     )

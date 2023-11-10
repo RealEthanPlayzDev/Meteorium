@@ -1,5 +1,5 @@
 import { ModerationAction } from "@prisma/client";
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, userMention } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
@@ -69,10 +69,10 @@ export const Command: MeteoriumCommand = {
                 iconURL: User.displayAvatarURL({ extension: "png" }),
             })
             .addFields(
-                { name: "User", value: `<@${User.id}>` },
+                { name: "User", value: userMention(User.id) },
                 {
                     name: "Moderator",
-                    value: `<@${interaction.user.id}>`,
+                    value: userMention(interaction.user.id),
                 },
                 { name: "Reason", value: Reason },
             )
@@ -101,11 +101,11 @@ export const Command: MeteoriumCommand = {
                                         { name: "Case id", value: String(CaseResult.CaseId) },
                                         {
                                             name: "Moderator",
-                                            value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
+                                            value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
                                         },
                                         {
                                             name: "Offending user",
-                                            value: `${User.username} (${User.id}) (<@${User.id}>)`,
+                                            value: `${User.username} (${User.id}) (${userMention(User.id)})`,
                                         },
                                         { name: "Action", value: "Kick" },
                                         { name: "Reason", value: Reason },
