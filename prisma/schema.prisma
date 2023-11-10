@@ -26,6 +26,7 @@ enum ModerationAction {
     Kick
     Mute
     Warn
+    Unban
 }
 
 model ModerationCase {
