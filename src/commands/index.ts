@@ -30,6 +30,7 @@ export * as warn from "./Moderation/Warn";
 export * as punishments from "./Moderation/Punishments";
 export * as case from "./Moderation/Case";
 export * as removecase from "./Moderation/RemoveCase";
+export * as unban from "./Moderation/Unban";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, "toJSON">;
