@@ -40,7 +40,7 @@ export const Command: MeteoriumCommand = {
         )
         .addBooleanOption((option) =>
             option
-                .setName("sendinpubliclog")
+                .setName("publog")
                 .setDescription("Send the case details to the public moderation log channel")
                 .setRequired(false),
         ),
@@ -55,7 +55,7 @@ export const Command: MeteoriumCommand = {
         const ActionStr = interaction.options.getString("action", true);
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
-        const SendInPublicModLog = interaction.options.getBoolean("sendinpubliclog", false) || false;
+        const SendInPublicModLog = interaction.options.getBoolean("publog", false) || false;
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
         if (Moderator.bot) return await interaction.reply({ content: "Moderator can't be a bot!", ephemeral: true });
