@@ -101,7 +101,9 @@ export const Command: MeteoriumCommand = {
                                         { name: "Case id", value: String(CaseResult.CaseId) },
                                         {
                                             name: "Moderator",
-                                            value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
+                                            value: `${interaction.user.username} (${
+                                                interaction.user.id
+                                            }) (${userMention(interaction.user.id)})`,
                                         },
                                         {
                                             name: "Offending user",

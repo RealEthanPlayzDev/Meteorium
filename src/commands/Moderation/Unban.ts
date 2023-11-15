@@ -28,10 +28,12 @@ export const Command: MeteoriumCommand = {
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
-        if (User.id == interaction.user.id)
-            return await interaction.reply({ content: "the what", ephemeral: true });
+        if (User.id == interaction.user.id) return await interaction.reply({ content: "the what", ephemeral: true });
         if (User.bot)
-            return await interaction.reply({ content: "You can't ban bots so unban the bot manually", ephemeral: true });
+            return await interaction.reply({
+                content: "You can't ban bots so unban the bot manually",
+                ephemeral: true,
+            });
 
         await client.Database.guild.update({
             where: { GuildId: interaction.guildId },
@@ -48,7 +50,10 @@ export const Command: MeteoriumCommand = {
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
             },
         });
-        await interaction.guild.members.unban(User, `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`);
+        await interaction.guild.members.unban(
+            User,
+            `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
+        );
 
         const LogEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
@@ -88,7 +93,9 @@ export const Command: MeteoriumCommand = {
                                         { name: "Case id", value: String(CaseResult.CaseId) },
                                         {
                                             name: "Moderator",
-                                            value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
+                                            value: `${interaction.user.username} (${
+                                                interaction.user.id
+                                            }) (${userMention(interaction.user.id)})`,
                                         },
                                         {
                                             name: "Offending user",

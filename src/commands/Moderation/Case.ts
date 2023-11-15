@@ -40,7 +40,9 @@ export const Command: MeteoriumCommand = {
                                     .setFields([
                                         {
                                             name: "Detail requester (viewer)",
-                                            value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
+                                            value: `${interaction.user.username} (${
+                                                interaction.user.id
+                                            }) (${userMention(interaction.user.id)})`,
                                         },
                                         {
                                             name: "Case moderator",
@@ -51,7 +53,9 @@ export const Command: MeteoriumCommand = {
                                         {
                                             name: "Offending user",
                                             value: TargetUser
-                                                ? `${TargetUser.username} (${TargetUser.id}) (${userMention(TargetUser.id)})`
+                                                ? `${TargetUser.username} (${TargetUser.id}) (${userMention(
+                                                      TargetUser.id,
+                                                  )})`
                                                 : `${userMention(Case.TargetUserId)} (${Case.TargetUserId})`,
                                         },
                                         { name: "Action", value: String(Case.Action) },

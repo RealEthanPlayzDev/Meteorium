@@ -107,19 +107,29 @@ export const Command: MeteoriumCommand = {
                                                 .setFields([
                                                     {
                                                         name: "Remover",
-                                                        value: `${interaction.user.username} (${interaction.user.id}) (${userMention(interaction.user.id)})`,
+                                                        value: `${interaction.user.username} (${
+                                                            interaction.user.id
+                                                        }) (${userMention(interaction.user.id)})`,
                                                     },
                                                     {
                                                         name: "Case moderator",
                                                         value: ModUser
-                                                            ? `${ModUser.username} (${ModUser.id}) (${userMention(ModUser.id)})`
-                                                            : `${userMention(Case.ModeratorUserId)} (${Case.ModeratorUserId})`,
+                                                            ? `${ModUser.username} (${ModUser.id}) (${userMention(
+                                                                  ModUser.id,
+                                                              )})`
+                                                            : `${userMention(Case.ModeratorUserId)} (${
+                                                                  Case.ModeratorUserId
+                                                              })`,
                                                     },
                                                     {
                                                         name: "Offending user",
                                                         value: TargetUser
-                                                            ? `${TargetUser.username} (${TargetUser.id}) (${userMention(TargetUser.id)})`
-                                                            : `${userMention(Case.TargetUserId)} (${Case.TargetUserId})`,
+                                                            ? `${TargetUser.username} (${TargetUser.id}) (${userMention(
+                                                                  TargetUser.id,
+                                                              )})`
+                                                            : `${userMention(Case.TargetUserId)} (${
+                                                                  Case.TargetUserId
+                                                              })`,
                                                     },
                                                     { name: "Action", value: String(Case.Action) },
                                                     { name: "Reason", value: Case.Reason },
