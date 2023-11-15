@@ -23,14 +23,14 @@ export const Command: MeteoriumCommand = {
         .addUserOption((option) =>
             option.setName("user").setDescription("The user that caused this case").setRequired(true),
         )
+        .addStringOption((option) =>
+            option.setName("reason").setDescription("The reason on why this case exists").setRequired(true),
+        )
         .addUserOption((option) =>
             option
                 .setName("moderator")
                 .setDescription("The moderator who took action against user, if empty defaults to you")
                 .setRequired(false),
-        )
-        .addStringOption((option) =>
-            option.setName("reason").setDescription("The reason on why this case exists").setRequired(true),
         )
         .addAttachmentOption((option) =>
             option
