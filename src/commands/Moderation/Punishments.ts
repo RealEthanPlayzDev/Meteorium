@@ -56,6 +56,10 @@ export const Command: MeteoriumCommand = {
                         TotalBan++;
                         break;
                     }
+                    case ModerationAction.TempBan: {
+                        TotalBan++;
+                        break;
+                    }
                     case ModerationAction.Kick: {
                         TotalKick++;
                         break;

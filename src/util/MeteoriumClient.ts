@@ -46,6 +46,10 @@ export class MeteoriumClient extends Client<true> {
         this.Commands.clear();
         for (const [Name, { Command }] of Object.entries(Commands)) {
             loginNS.debug(`Registering command -> ${Name} ${Command}`);
+            if (Command.Init) {
+                loginNS.debug(`Running command init -> ${Name} ${Command}`);
+                await Command.Init(this);
+            }
             this.Commands.set(Name, Command);
         }
 

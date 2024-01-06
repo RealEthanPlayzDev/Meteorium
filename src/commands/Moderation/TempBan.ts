@@ -2,14 +2,23 @@ import { ModerationAction } from "@prisma/client";
 import { SlashCommandBuilder, userMention } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
+import ms from "ms";
 
 export const Command: MeteoriumCommand = {
     InteractionData: new SlashCommandBuilder()
-        .setName("ban")
-        .setDescription("Bans someone inside this server and create a new case regarding it")
-        .addUserOption((option) => option.setName("user").setDescription("The user to be banned").setRequired(true))
+        .setName("tempban")
+        .setDescription("Temporarily bans someone inside this server and create a new case regarding it")
+        .addUserOption((option) =>
+            option.setName("user").setDescription("The user to be temporarily banned").setRequired(true),
+        )
         .addStringOption((option) =>
-            option.setName("reason").setDescription("The reason on why the user was banned").setRequired(true),
+            option
+                .setName("reason")
+                .setDescription("The reason on why the user was temporarily banned")
+                .setRequired(true),
+        )
+        .addStringOption((option) =>
+            option.setName("duration").setDescription("The duration of the temporary ban").setRequired(true),
         )
         .addAttachmentOption((option) =>
             option
@@ -20,11 +29,12 @@ export const Command: MeteoriumCommand = {
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("BanMembers"))
             return await interaction.editReply({
-                content: "You do not have permission to ban users from this server.",
+                content: "You do not have permission to temporarily ban users from this server.",
             });
 
         const User = interaction.options.getUser("user", true);
         const Reason = interaction.options.getString("reason", true);
+        const Duration = await interaction.options.getString("duration", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
@@ -50,13 +60,19 @@ export const Command: MeteoriumCommand = {
         const CaseResult = await client.Database.moderationCase.create({
             data: {
                 CaseId: GuildSchema.CurrentCaseId + 1,
-                Action: ModerationAction.Ban,
+                Action: ModerationAction.TempBan,
                 TargetUserId: User.id,
                 ModeratorUserId: interaction.user.id,
                 GuildId: interaction.guildId,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
+                Duration: Duration,
                 CreatedAt: new Date(),
+            },
+        });
+        await client.Database.activeTempBans.create({
+            data: {
+                GlobalCaseId: CaseResult.GlobalCaseId,
             },
         });
         await interaction.guild.members.ban(User, {
@@ -65,7 +81,7 @@ export const Command: MeteoriumCommand = {
 
         const LogEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
-                name: `Case: #${CaseResult.CaseId} | ban | ${User.username}`,
+                name: `Case: #${CaseResult.CaseId} | tempban | ${User.username}`,
                 iconURL: User.displayAvatarURL({ extension: "png" }),
             })
             .addFields(
@@ -75,6 +91,7 @@ export const Command: MeteoriumCommand = {
                     value: userMention(interaction.user.id),
                 },
                 { name: "Reason", value: Reason },
+                { name: "Duration", value: Duration },
             )
             .setImage(AttachmentProof ? AttachmentProof.url : null)
             .setFooter({ text: `Id: ${User.id}` })
@@ -109,8 +126,9 @@ export const Command: MeteoriumCommand = {
                                             name: "Offending user",
                                             value: `${User.username} (${User.id}) (${userMention(User.id)})`,
                                         },
-                                        { name: "Action", value: "Ban" },
+                                        { name: "Action", value: "Temp Ban" },
                                         { name: "Reason", value: Reason },
+                                        { name: "Duration", value: Duration },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
                                     ])
                                     .setImage(AttachmentProof ? AttachmentProof.url : null),
@@ -127,5 +145,27 @@ export const Command: MeteoriumCommand = {
             embeds: [LogEmbed],
             ephemeral: GuildSchema?.PublicModLogChannelId != "",
         });
+    },
+    Init(client) {
+        setInterval(async () => {
+            await client.Database.$transaction(async (tx) => {
+                const ActiveTBs = await tx.activeTempBans.findMany({ include: { Case: true } });
+                const Promises = [
+                    ActiveTBs.map(async (active) => {
+                        const CreatedAt = active.Case.CreatedAt;
+                        const ExpiresAt = new Date(Number(active.Case.CreatedAt) + ms(active.Case.Duration));
+                        if (ExpiresAt <= CreatedAt) {
+                            const Guild = await client.guilds.fetch(active.Case.GuildId);
+                            const User = await client.users.fetch(active.Case.TargetUserId);
+                            await Guild.members.unban(User);
+                            return tx.activeTempBans.delete({ where: { ActiveTempBanId: active.ActiveTempBanId } });
+                        }
+                        return;
+                    }),
+                ];
+                await Promise.all(Promises);
+                return;
+            });
+        }, 10000);
     },
 };

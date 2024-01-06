@@ -68,7 +68,8 @@ export const Command: MeteoriumCommand = {
                 GuildId: interaction.guildId,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
-                MuteDuration: Duration,
+                Duration: Duration,
+                CreatedAt: new Date(),
             },
         });
         await GuildUser.timeout(

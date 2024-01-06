@@ -48,6 +48,7 @@ export const Command: MeteoriumCommand = {
                 GuildId: interaction.guildId,
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
+                CreatedAt: new Date(),
             },
         });
         await interaction.guild.members.unban(

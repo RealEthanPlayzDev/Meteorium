@@ -51,7 +51,7 @@ export const Command: MeteoriumCommand = {
             .setColor("Red");
 
         if (Case.Action == ModerationAction.Mute)
-            ConfirmationEmbed.addFields([{ name: "Duration", value: Case.MuteDuration }]);
+            ConfirmationEmbed.addFields([{ name: "Duration", value: Case.Duration }]);
 
         const ConfirmationInteractionResult = await interaction.reply({
             content: "Are you sure you want to remove this punishment?",
@@ -86,6 +86,19 @@ export const Command: MeteoriumCommand = {
                             Case.TargetUserId,
                             `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`,
                         );
+                    else if (Case.Action == ModerationAction.TempBan) {
+                        await interaction.guild.members.unban(
+                            Case.TargetUserId,
+                            `Case ${CaseId} removed by ${interaction.user.username} (${interaction.user.id})`,
+                        );
+                        const ATB = await client.Database.activeTempBans.findFirst({
+                            where: { GlobalCaseId: Case.GlobalCaseId },
+                        });
+                        if (ATB)
+                            await client.Database.activeTempBans.delete({
+                                where: { ActiveTempBanId: ATB.ActiveTempBanId },
+                            });
+                    }
 
                     await interaction.editReply({ content: "", embeds: [SuccessDeleteEmbed], components: [] });
 

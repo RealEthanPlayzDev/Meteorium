@@ -32,9 +32,11 @@ export * as case from "./Moderation/Case";
 export * as removecase from "./Moderation/RemoveCase";
 export * as unban from "./Moderation/Unban";
 export * as createcase from "./Moderation/CreateCase";
+export * as tempban from "./Moderation/TempBan";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, "toJSON">;
     Callback(interaction: ChatInputCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     Autocomplete?(interaction: AutocompleteInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
+    Init?(client: MeteoriumClient): Awaitable<void>;
 };

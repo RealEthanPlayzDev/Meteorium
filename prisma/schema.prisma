@@ -23,6 +23,7 @@ model Guild {
 
 enum ModerationAction {
     Ban
+    TempBan
     Kick
     Mute
     Warn
@@ -38,7 +39,9 @@ model ModerationCase {
     GuildId         String
     Reason          String
     AttachmentProof String
-    MuteDuration    String           @default("0")
+    Duration        String           @default("0")
+    CreatedAt       DateTime         @default(dbgenerated("0"))
+    ActiveTempBans  ActiveTempBans[]
 }
 
 model Tag {
@@ -47,4 +50,10 @@ model Tag {
     GuildId     String
     Content     String
     Image       String
+}
+
+model ActiveTempBans {
+    ActiveTempBanId Int            @id @default(autoincrement())
+    GlobalCaseId    Int
+    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId])
 }
