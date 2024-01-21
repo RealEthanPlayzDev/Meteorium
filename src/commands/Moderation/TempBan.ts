@@ -43,6 +43,8 @@ export const Command: MeteoriumCommand = {
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
+        await interaction.deferReply({ ephemeral: GuildSchema?.PublicModLogChannelId != "" });
+
         if (User.id == interaction.user.id)
             return await interaction.reply({ content: "You can't ban yourself!", ephemeral: true });
         if (User.bot)
@@ -75,14 +77,6 @@ export const Command: MeteoriumCommand = {
                 ModeratorNote: ModeratorNote,
             },
         });
-        await client.Database.activeTempBans.create({
-            data: {
-                GlobalCaseId: CaseResult.GlobalCaseId,
-            },
-        });
-        await interaction.guild.members.ban(User, {
-            reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
-        });
 
         const LogEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
@@ -102,6 +96,23 @@ export const Command: MeteoriumCommand = {
             .setFooter({ text: `Id: ${User.id}` })
             .setTimestamp()
             .setColor("Red");
+
+        try {
+            const DirectMessageChannnel = await User.createDM();
+            await DirectMessageChannnel.send({ embeds: [LogEmbed] });
+        } catch (err) {
+            client.Logging.GetNamespace("Moderation/TempBan").warn(`Could not dm ${User.id}\n${err}`);
+        }
+
+        await interaction.guild.members.ban(User, {
+            reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
+        });
+
+        await client.Database.activeTempBans.create({
+            data: {
+                GlobalCaseId: CaseResult.GlobalCaseId,
+            },
+        });
 
         const PublicModLogChannel = await interaction.guild.channels
             .fetch(GuildSchema.PublicModLogChannelId)
@@ -143,13 +154,12 @@ export const Command: MeteoriumCommand = {
                 })
                 .catch(() => null);
 
-        return await interaction.reply({
+        return await interaction.editReply({
             content:
                 PublicModLogChannel != null && PublicModLogChannel.isTextBased()
                     ? undefined
                     : "(Warning: could not send log message to the public mod log channel)",
             embeds: [LogEmbed],
-            ephemeral: GuildSchema?.PublicModLogChannelId != "",
         });
     },
     Init(client) {
