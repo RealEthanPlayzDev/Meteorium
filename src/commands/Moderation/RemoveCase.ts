@@ -44,6 +44,7 @@ export const Command: MeteoriumCommand = {
                     value: userMention(Case.ModeratorUserId),
                 },
                 { name: "Reason", value: Case.Reason },
+                { name: "Moderator note", value: Case.ModeratorNote },
             )
             .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
             .setFooter({ text: `Id: ${Case.TargetUserId}` })
@@ -150,6 +151,7 @@ export const Command: MeteoriumCommand = {
                                                         name: "Proof",
                                                         value: Case.AttachmentProof ? Case.AttachmentProof : "N/A",
                                                     },
+                                                    { name: "Moderator note", value: Case.ModeratorNote },
                                                 ])
                                                 .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
                                                 .setColor("Red"),

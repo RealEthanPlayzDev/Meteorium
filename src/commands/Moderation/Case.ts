@@ -84,6 +84,7 @@ export const Command: MeteoriumCommand = {
                             value: userMention(Case.ModeratorUserId),
                         },
                         { name: "Reason", value: Case.Reason },
+                        { name: "Moderator note", value: Case.ModeratorNote },
                     )
                     .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
                     .setFooter({ text: `Id: ${Case.TargetUserId}` })

@@ -41,6 +41,7 @@ model ModerationCase {
     AttachmentProof String
     Duration        String           @default("0")
     CreatedAt       DateTime         @default(now())
+    ModeratorNote   String           @default("")
     ActiveTempBans  ActiveTempBans[]
 }
 

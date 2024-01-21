@@ -16,6 +16,9 @@ export const Command: MeteoriumCommand = {
                 .setName("proof")
                 .setDescription("An media containing proof to prove the reason valid")
                 .setRequired(false),
+        )
+        .addStringOption((option) =>
+            option.setName("modnote").setDescription("Interal moderator notes").setRequired(false),
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("KickMembers"))
@@ -26,6 +29,7 @@ export const Command: MeteoriumCommand = {
         const User = interaction.options.getUser("user", true);
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
+        const ModeratorNote = interaction.options.getString("modnote", false) || "";
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
@@ -57,6 +61,7 @@ export const Command: MeteoriumCommand = {
                 Reason: Reason,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
                 CreatedAt: new Date(),
+                ModeratorNote: ModeratorNote,
             },
         });
         await interaction.guild.members.kick(
@@ -113,6 +118,7 @@ export const Command: MeteoriumCommand = {
                                         { name: "Action", value: "Kick" },
                                         { name: "Reason", value: Reason },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
+                                        { name: "Moderator note", value: ModeratorNote },
                                     ])
                                     .setImage(AttachmentProof ? AttachmentProof.url : null),
                             ],
