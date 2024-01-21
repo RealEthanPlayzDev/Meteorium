@@ -54,6 +54,9 @@ export const Command: MeteoriumCommand = {
         if (Case.Action == ModerationAction.Mute)
             ConfirmationEmbed.addFields([{ name: "Duration", value: Case.Duration }]);
 
+        if (Case.Action == ModerationAction.Ban)
+            ConfirmationEmbed.addFields({ name: "Appealable", value: Case.NotAppealable ? "No" : "Yes" });
+
         const ConfirmationInteractionResult = await interaction.reply({
             content: "Are you sure you want to remove this punishment?",
             components: [ActionRow],
@@ -150,6 +153,15 @@ export const Command: MeteoriumCommand = {
                                                     {
                                                         name: "Proof",
                                                         value: Case.AttachmentProof ? Case.AttachmentProof : "N/A",
+                                                    },
+                                                    {
+                                                        name: "Appealable",
+                                                        value:
+                                                            Case.Action == ModerationAction.Ban
+                                                                ? Case.NotAppealable
+                                                                    ? "No"
+                                                                    : "Yes"
+                                                                : "Not applicable",
                                                     },
                                                     { name: "Moderator note", value: Case.ModeratorNote },
                                                 ])

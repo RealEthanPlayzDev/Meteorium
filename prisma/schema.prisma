@@ -42,6 +42,7 @@ model ModerationCase {
     Duration        String           @default("0")
     CreatedAt       DateTime         @default(now())
     ModeratorNote   String           @default("")
+    NotAppealable   Boolean          @default(false)
     ActiveTempBans  ActiveTempBans[]
 }
 

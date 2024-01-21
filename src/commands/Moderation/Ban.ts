@@ -17,6 +17,9 @@ export const Command: MeteoriumCommand = {
                 .setDescription("An media containing proof to prove the reason valid")
                 .setRequired(false),
         )
+        .addBooleanOption((option) =>
+            option.setName("notappealable").setDescription("If true, this case cannot be appealed").setRequired(false),
+        )
         .addStringOption((option) =>
             option.setName("modnote").setDescription("Interal moderator notes").setRequired(false),
         ),
@@ -29,6 +32,7 @@ export const Command: MeteoriumCommand = {
         const User = interaction.options.getUser("user", true);
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
+        const NotAppealable = interaction.options.getBoolean("notappealable", false) || false;
         const ModeratorNote = interaction.options.getString("modnote", false) || "";
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
@@ -62,6 +66,7 @@ export const Command: MeteoriumCommand = {
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
                 CreatedAt: new Date(),
                 ModeratorNote: ModeratorNote,
+                NotAppealable: NotAppealable,
             },
         });
         await interaction.guild.members.ban(User, {
@@ -80,6 +85,7 @@ export const Command: MeteoriumCommand = {
                     value: userMention(interaction.user.id),
                 },
                 { name: "Reason", value: Reason },
+                { name: "Appealable", value: NotAppealable ? "No" : "Yes" },
             )
             .setImage(AttachmentProof ? AttachmentProof.url : null)
             .setFooter({ text: `Id: ${User.id}` })
@@ -117,6 +123,7 @@ export const Command: MeteoriumCommand = {
                                         { name: "Action", value: "Ban" },
                                         { name: "Reason", value: Reason },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
+                                        { name: "Appealable", value: NotAppealable ? "No" : "Yes" },
                                         { name: "Moderator note", value: ModeratorNote },
                                     ])
                                     .setImage(AttachmentProof ? AttachmentProof.url : null),

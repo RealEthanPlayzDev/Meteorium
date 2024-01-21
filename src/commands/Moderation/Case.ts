@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, userMention } from "discord.js";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
+import { ModerationAction } from "@prisma/client";
 import type { MeteoriumCommand } from "..";
 
 export const Command: MeteoriumCommand = {
@@ -61,6 +62,16 @@ export const Command: MeteoriumCommand = {
                                         { name: "Action", value: String(Case.Action) },
                                         { name: "Reason", value: Case.Reason },
                                         { name: "Proof", value: Case.AttachmentProof ? Case.AttachmentProof : "N/A" },
+                                        {
+                                            name: "Appealable",
+                                            value:
+                                                Case.Action == ModerationAction.Ban
+                                                    ? Case.NotAppealable
+                                                        ? "No"
+                                                        : "Yes"
+                                                    : "Not applicable",
+                                        },
+                                        { name: "Moderator note", value: Case.ModeratorNote },
                                     ])
                                     .setImage(Case.AttachmentProof ? Case.AttachmentProof : null),
                             ],
@@ -68,29 +79,32 @@ export const Command: MeteoriumCommand = {
                 })
                 .catch(() => null);
 
+        const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
+            .setAuthor({
+                name: `Case: #${CaseId} | ${Case.Action} | ${
+                    TargetUser != null ? TargetUser.username : Case.TargetUserId
+                }`,
+                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
+            })
+            .addFields(
+                { name: "User", value: userMention(Case.TargetUserId) },
+                {
+                    name: "Moderator",
+                    value: userMention(Case.ModeratorUserId),
+                },
+                { name: "Reason", value: Case.Reason },
+                { name: "Moderator note", value: Case.ModeratorNote },
+            )
+            .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
+            .setFooter({ text: `Id: ${Case.TargetUserId}` })
+            .setTimestamp()
+            .setColor("Red");
+
+        if (Case.Action == ModerationAction.Ban)
+            Embed.addFields({ name: "Appealable", value: Case.NotAppealable ? "No" : "Yes" });
+
         return await interaction.reply({
-            embeds: [
-                new MeteoriumEmbedBuilder(undefined, interaction.user)
-                    .setAuthor({
-                        name: `Case: #${CaseId} | ${Case.Action} | ${
-                            TargetUser != null ? TargetUser.username : Case.TargetUserId
-                        }`,
-                        iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
-                    })
-                    .addFields(
-                        { name: "User", value: userMention(Case.TargetUserId) },
-                        {
-                            name: "Moderator",
-                            value: userMention(Case.ModeratorUserId),
-                        },
-                        { name: "Reason", value: Case.Reason },
-                        { name: "Moderator note", value: Case.ModeratorNote },
-                    )
-                    .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
-                    .setFooter({ text: `Id: ${Case.TargetUserId}` })
-                    .setTimestamp()
-                    .setColor("Red"),
-            ],
+            embeds: [Embed],
         });
     },
 };
