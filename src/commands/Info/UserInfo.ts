@@ -78,10 +78,16 @@ export const Command: MeteoriumCommand = {
                 // User status and is client device parsing
                 let UserStatus = "Unknown";
                 if (ParsedUser.presence && ParsedUser.presence["status"]) {
+                    const ClientStatus = String(
+                        ParsedUser.presence.clientStatus?.desktop ||
+                            ParsedUser.presence.clientStatus?.mobile ||
+                            ParsedUser.presence.clientStatus?.web ||
+                            "N/A",
+                    );
                     if (ParsedUser.presence.status === "dnd") {
-                        UserStatus = `do not disturb - ${ParsedUser.presence.clientStatus}`;
+                        UserStatus = `do not disturb - ${ClientStatus}`;
                     } else {
-                        UserStatus = `${ParsedUser.presence.status} - ${ParsedUser.presence.clientStatus}`;
+                        UserStatus = `${ParsedUser.presence.status} - ${ClientStatus}`;
                     }
                 }
 
