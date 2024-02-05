@@ -19,6 +19,12 @@ export const Command: MeteoriumCommand = {
         )
         .addStringOption((option) =>
             option.setName("modnote").setDescription("Interal moderator notes").setRequired(false),
+        )
+        .addAttachmentOption((option) =>
+            option
+                .setName("modattach")
+                .setDescription("Internal media attachment only visible to moderators")
+                .setRequired(false),
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("KickMembers"))
@@ -30,6 +36,7 @@ export const Command: MeteoriumCommand = {
         const Reason = interaction.options.getString("reason", true);
         const AttachmentProof = interaction.options.getAttachment("proof", false);
         const ModeratorNote = interaction.options.getString("modnote", false) || "";
+        const ModeratorAttachment = interaction.options.getAttachment("modattach", false);
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
@@ -62,6 +69,7 @@ export const Command: MeteoriumCommand = {
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
                 CreatedAt: new Date(),
                 ModeratorNote: ModeratorNote,
+                ModeratorAttachment: ModeratorAttachment ? ModeratorAttachment.url : "",
             },
         });
         await interaction.guild.members.kick(
@@ -120,7 +128,8 @@ export const Command: MeteoriumCommand = {
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
                                         { name: "Moderator note", value: ModeratorNote },
                                     ])
-                                    .setImage(AttachmentProof ? AttachmentProof.url : null),
+                                    .setImage(AttachmentProof ? AttachmentProof.url : null)
+                                    .setThumbnail(ModeratorAttachment ? ModeratorAttachment.url : null),
                             ],
                         });
                 })

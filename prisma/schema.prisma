@@ -31,19 +31,20 @@ enum ModerationAction {
 }
 
 model ModerationCase {
-    GlobalCaseId    Int              @id @default(autoincrement())
-    CaseId          Int
-    Action          ModerationAction
-    TargetUserId    String
-    ModeratorUserId String
-    GuildId         String
-    Reason          String
-    AttachmentProof String
-    Duration        String           @default("0")
-    CreatedAt       DateTime         @default(now())
-    ModeratorNote   String           @default("")
-    NotAppealable   Boolean          @default(false)
-    ActiveTempBans  ActiveTempBans[]
+    GlobalCaseId        Int              @id @default(autoincrement())
+    CaseId              Int
+    Action              ModerationAction
+    TargetUserId        String
+    ModeratorUserId     String
+    GuildId             String
+    Reason              String
+    AttachmentProof     String
+    Duration            String           @default("0")
+    CreatedAt           DateTime         @default(now())
+    ModeratorNote       String           @default("")
+    ModeratorAttachment String           @default("")
+    NotAppealable       Boolean          @default(false)
+    ActiveTempBans      ActiveTempBans[]
 }
 
 model Tag {
