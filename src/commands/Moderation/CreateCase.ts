@@ -18,6 +18,7 @@ export const Command: MeteoriumCommand = {
                     { name: "kick", value: "kick" },
                     { name: "mute", value: "mute" },
                     { name: "warn", value: "warn" },
+                    { name: "tempban", value: "tempban" },
                 ),
         )
         .addUserOption((option) =>
@@ -32,10 +33,19 @@ export const Command: MeteoriumCommand = {
                 .setDescription("The moderator who took action against user, if empty defaults to you")
                 .setRequired(false),
         )
+        .addStringOption((option) =>
+            option.setName("duration").setDescription("The duration of the temporary ban/mute").setRequired(false),
+        )
         .addAttachmentOption((option) =>
             option
                 .setName("proof")
                 .setDescription("An media containing proof to prove the reason valid")
+                .setRequired(false),
+        )
+        .addBooleanOption((option) =>
+            option
+                .setName("notappealable")
+                .setDescription("If true, this case cannot be appealed (bans only)")
                 .setRequired(false),
         )
         .addStringOption((option) =>
@@ -49,7 +59,7 @@ export const Command: MeteoriumCommand = {
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("ViewAuditLog"))
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: "You do not have permission to manually add cases in this server.",
             });
 
@@ -57,7 +67,9 @@ export const Command: MeteoriumCommand = {
         const User = interaction.options.getUser("user", true);
         const ActionStr = interaction.options.getString("action", true);
         const Reason = interaction.options.getString("reason", true);
+        const Duration = (await interaction.options.getString("duration", false)) || undefined;
         const AttachmentProof = interaction.options.getAttachment("proof", false);
+        const NotAppealable = interaction.options.getBoolean("notappealable", false) || false;
         const ModeratorNote = interaction.options.getString("modnote", false) || "";
         const SendInPublicModLog = interaction.options.getBoolean("publog", false) || false;
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
@@ -88,10 +100,17 @@ export const Command: MeteoriumCommand = {
                 Action = ModerationAction.Warn;
                 break;
             }
+            case "tempban": {
+                Action = ModerationAction.TempBan;
+                break;
+            }
             default: {
                 throw new Error("CreateCase switch statement reached impossible conclusion");
             }
         }
+
+        if ((Action == ModerationAction.Mute || Action == ModerationAction.TempBan) && !Duration)
+            interaction.reply({ content: "You need to specify the duration.", ephemeral: true });
 
         await client.Database.guild.update({
             where: { GuildId: interaction.guildId },
@@ -105,7 +124,9 @@ export const Command: MeteoriumCommand = {
                 ModeratorUserId: Moderator.id,
                 GuildId: interaction.guildId,
                 Reason: Reason,
+                Duration: Action == ModerationAction.Mute || Action == ModerationAction.TempBan ? Duration : undefined,
                 AttachmentProof: AttachmentProof ? AttachmentProof.url : "",
+                NotAppealable: Action == ModerationAction.Ban ? NotAppealable : undefined,
                 ModeratorNote: ModeratorNote,
             },
         });
