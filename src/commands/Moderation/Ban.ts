@@ -31,7 +31,7 @@ export const Command: MeteoriumCommand = {
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("BanMembers"))
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: "You do not have permission to ban users from this server.",
             });
 
@@ -43,8 +43,6 @@ export const Command: MeteoriumCommand = {
         const ModeratorAttachment = interaction.options.getAttachment("modattach", false);
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
-
-        await interaction.deferReply({ ephemeral: GuildSchema?.PublicModLogChannelId != "" });
 
         if (User.id == interaction.user.id)
             return await interaction.reply({ content: "You can't ban yourself!", ephemeral: true });
@@ -59,6 +57,8 @@ export const Command: MeteoriumCommand = {
                 content: "You (or the bot) can't moderate this user due to lack of permission/hierachy.",
                 ephemeral: true,
             });
+
+        await interaction.deferReply({ ephemeral: GuildSchema?.PublicModLogChannelId != "" });
 
         await client.Database.guild.update({
             where: { GuildId: interaction.guildId },
@@ -113,8 +113,15 @@ export const Command: MeteoriumCommand = {
         const PublicModLogChannel = await interaction.guild.channels
             .fetch(GuildSchema.PublicModLogChannelId)
             .catch(() => null);
+        let PublicModLogMsgId = "";
         if (PublicModLogChannel && PublicModLogChannel.isTextBased())
-            await PublicModLogChannel.send({ embeds: [LogEmbed] });
+            PublicModLogMsgId = (await PublicModLogChannel.send({ embeds: [LogEmbed] })).id;
+
+        if (PublicModLogMsgId != "")
+            await client.Database.moderationCase.update({
+                where: { GlobalCaseId: CaseResult.GlobalCaseId },
+                data: { PublicModLogMsgId: PublicModLogMsgId },
+            });
 
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
         if (GuildSetting && GuildSetting.LoggingChannelId != "")

@@ -44,6 +44,7 @@ model ModerationCase {
     ModeratorNote       String           @default("")
     ModeratorAttachment String           @default("")
     NotAppealable       Boolean          @default(false)
+    PublicModLogMsgId   String           @default("")
     ActiveTempBans      ActiveTempBans[]
 }
 

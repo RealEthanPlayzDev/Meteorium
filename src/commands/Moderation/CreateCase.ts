@@ -160,8 +160,15 @@ export const Command: MeteoriumCommand = {
         const PublicModLogChannel = await interaction.guild.channels
             .fetch(GuildSchema.PublicModLogChannelId)
             .catch(() => null);
-        if (SendInPublicModLog && PublicModLogChannel && PublicModLogChannel.isTextBased())
-            await PublicModLogChannel.send({ embeds: [LogEmbed] });
+        let PublicModLogMsgId = "";
+        if (PublicModLogChannel && PublicModLogChannel.isTextBased())
+            PublicModLogMsgId = (await PublicModLogChannel.send({ embeds: [LogEmbed] })).id;
+
+        if (PublicModLogMsgId != "")
+            await client.Database.moderationCase.update({
+                where: { GlobalCaseId: CaseResult.GlobalCaseId },
+                data: { PublicModLogMsgId: PublicModLogMsgId },
+            });
 
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
         if (GuildSetting && GuildSetting.LoggingChannelId != "")

@@ -104,11 +104,24 @@ export const Command: MeteoriumCommand = {
                             });
                     }
 
-                    await interaction.editReply({ content: "", embeds: [SuccessDeleteEmbed], components: [] });
-
                     const GuildSetting = await client.Database.guild.findUnique({
                         where: { GuildId: interaction.guild.id },
                     });
+
+                    let Content = "";
+                    if (Case.PublicModLogMsgId != "" && GuildSetting && GuildSetting.PublicModLogChannelId != "") {
+                        const Channel =
+                            (await interaction.guild.channels.fetch(GuildSetting.PublicModLogChannelId)) || undefined;
+                        const Message =
+                            Channel && Channel.isTextBased()
+                                ? await Channel.messages.fetch(Case.PublicModLogMsgId)
+                                : undefined;
+                        if (Message && Message.deletable) await Message.delete();
+                        else Content = "(Warning: could not delete public mod log message)";
+                    }
+
+                    await interaction.editReply({ content: Content, embeds: [SuccessDeleteEmbed], components: [] });
+
                     if (GuildSetting && GuildSetting.LoggingChannelId != "")
                         client.channels
                             .fetch(GuildSetting.LoggingChannelId)
