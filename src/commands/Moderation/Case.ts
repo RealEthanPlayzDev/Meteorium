@@ -12,7 +12,7 @@ export const Command: MeteoriumCommand = {
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("ViewAuditLog"))
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: "You do not have permission to view a user's punishment/case.",
             });
 
@@ -27,6 +27,7 @@ export const Command: MeteoriumCommand = {
 
         const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
 
+        /*
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
         if (GuildSetting && GuildSetting.LoggingChannelId != "")
             client.channels
@@ -83,6 +84,7 @@ export const Command: MeteoriumCommand = {
                         });
                 })
                 .catch(() => null);
+        */
 
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
