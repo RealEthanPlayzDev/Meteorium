@@ -45,8 +45,13 @@ export const Command: MeteoriumCommand = {
                 },
                 { name: "Reason", value: Case.Reason },
                 { name: "Moderator note", value: Case.ModeratorNote },
+                {
+                    name: "Moderator attachment",
+                    value: Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : "N/A",
+                },
             )
             .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
+            .setThumbnail(Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : null)
             .setFooter({ text: `Id: ${Case.TargetUserId}` })
             .setTimestamp()
             .setColor("Red");
@@ -165,7 +170,8 @@ export const Command: MeteoriumCommand = {
                                                     { name: "Reason", value: Case.Reason },
                                                     {
                                                         name: "Proof",
-                                                        value: Case.AttachmentProof ? Case.AttachmentProof : "N/A",
+                                                        value:
+                                                            Case.AttachmentProof != "" ? Case.AttachmentProof : "N/A",
                                                     },
                                                     {
                                                         name: "Appealable",
@@ -177,8 +183,18 @@ export const Command: MeteoriumCommand = {
                                                                 : "Not applicable",
                                                     },
                                                     { name: "Moderator note", value: Case.ModeratorNote },
+                                                    {
+                                                        name: "Moderator attachment",
+                                                        value:
+                                                            Case.ModeratorAttachment != ""
+                                                                ? Case.ModeratorAttachment
+                                                                : "N/A",
+                                                    },
                                                 ])
                                                 .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
+                                                .setThumbnail(
+                                                    Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : null,
+                                                )
                                                 .setColor("Red"),
                                         ],
                                     });

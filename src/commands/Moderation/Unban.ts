@@ -126,6 +126,10 @@ export const Command: MeteoriumCommand = {
                                         { name: "Reason", value: Reason },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
                                         { name: "Moderator note", value: ModeratorNote },
+                                        {
+                                            name: "Moderator attachment",
+                                            value: ModeratorAttachment ? ModeratorAttachment.url : "N/A",
+                                        },
                                     ])
                                     .setImage(AttachmentProof ? AttachmentProof.url : null)
                                     .setThumbnail(ModeratorAttachment ? ModeratorAttachment.url : null),
