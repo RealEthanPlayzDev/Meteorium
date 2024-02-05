@@ -99,9 +99,26 @@ export const Command: MeteoriumCommand = {
             .setTimestamp()
             .setColor("Red");
 
+        const AppealEmbed = new MeteoriumEmbedBuilder(undefined, User)
+            .setTitle(NotAppealable ? "You cannot appeal your ban." : "Your ban is appealable.")
+            .setDescription(
+                NotAppealable
+                    ? "Your ban was marked unappealable, you have been permanently banned."
+                    : GuildSchema.BanAppealLink != ""
+                    ? "You can appeal your ban, use the following link below to appeal."
+                    : "You can appeal your ban, contact a server moderator.",
+            );
+
+        if (NotAppealable) AppealEmbed.setErrorColor();
+        else {
+            AppealEmbed.setColor("Yellow");
+            if (GuildSchema.BanAppealLink != "")
+                AppealEmbed.addFields([{ name: "Ban appeal link", value: GuildSchema.BanAppealLink }]);
+        }
+
         try {
             const DirectMessageChannnel = await User.createDM();
-            await DirectMessageChannnel.send({ embeds: [LogEmbed] });
+            await DirectMessageChannnel.send({ embeds: [LogEmbed, AppealEmbed] });
         } catch (err) {
             client.Logging.GetNamespace("Moderation/Ban").warn(`Could not dm ${User.id}\n${err}`);
         }

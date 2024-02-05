@@ -54,6 +54,19 @@ export const Command: MeteoriumCommand = {
                                 .setDescription("The channel where moderation logs will be sent at")
                                 .setRequired(true),
                         ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName("banappeallink")
+                        .setDescription(
+                            "The ban appeals link, sent to people who got banned in dms if they can appeal.",
+                        )
+                        .addStringOption((option) =>
+                            option
+                                .setName("link")
+                                .setDescription("The link for the ban appeal form. Don't specify to unset.")
+                                .setRequired(false),
+                        ),
                 ),
         )
         .addSubcommandGroup((subcommandgroup) =>
@@ -205,6 +218,27 @@ export const Command: MeteoriumCommand = {
                             .then(async () => {
                                 return await interaction.editReply({
                                     content: `Successfully configured \`\`joinleavelogchannel\`\` setting (new value is ${Channel.id})`,
+                                });
+                            })
+                            .catch(async (err) => {
+                                settingsNS.error(`Error while update guild configuration:\n${err}`);
+                                return await interaction.editReply({
+                                    content:
+                                        "An error occured while updating the guild configuration. Please try again later.",
+                                });
+                            });
+                        break;
+                    }
+                    case "banappeallink": {
+                        const Link = interaction.options.getString("link", false) || "";
+                        client.Database.guild
+                            .update({
+                                where: { GuildId: GuildSchema.GuildId },
+                                data: { BanAppealLink: Link },
+                            })
+                            .then(async () => {
+                                return await interaction.editReply({
+                                    content: `Successfully configured \`\`banappeallink\`\` setting (new value is ${Link})`,
                                 });
                             })
                             .catch(async (err) => {

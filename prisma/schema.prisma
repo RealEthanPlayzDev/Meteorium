@@ -19,6 +19,7 @@ model Guild {
     LoggingChannelId          String   @default("")
     JoinLeaveLogChannelId     String   @default("")
     CurrentCaseId             Int      @default(0)
+    BanAppealLink             String   @default("")
 }
 
 enum ModerationAction {
