@@ -91,7 +91,7 @@ export const Command: MeteoriumCommand = {
                 name: `Case: #${CaseId} | ${Case.Action} | ${
                     TargetUser != null ? TargetUser.username : Case.TargetUserId
                 }`,
-                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
+                // iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
             })
             .addFields(
                 { name: "User", value: userMention(Case.TargetUserId) },
@@ -101,15 +101,9 @@ export const Command: MeteoriumCommand = {
                 },
                 { name: "Reason", value: Case.Reason },
                 { name: "Moderator note", value: Case.ModeratorNote },
-                {
-                    name: "Moderator attachment",
-                    value: Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : "N/A",
-                },
             )
             .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
             .setThumbnail(Case.ModeratorAttachment == "" ? null : Case.ModeratorAttachment)
-            .setFooter({ text: `Id: ${Case.TargetUserId}` })
-            .setTimestamp()
             .setColor("Red");
 
         if (Case.Action == ModerationAction.Ban)
