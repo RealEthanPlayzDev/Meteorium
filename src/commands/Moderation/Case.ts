@@ -86,6 +86,8 @@ export const Command: MeteoriumCommand = {
                 .catch(() => null);
         */
 
+        console.log("yes");
+
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
                 name: `Case: #${CaseId} | ${Case.Action} | ${Case.TargetUserId}`,
@@ -104,8 +106,12 @@ export const Command: MeteoriumCommand = {
             .setThumbnail(Case.ModeratorAttachment == "" ? null : Case.ModeratorAttachment)
             .setColor("Red");
 
+        console.log("yes1");
+
         if (Case.Action == ModerationAction.Ban)
             Embed.addFields({ name: "Appealable", value: Case.NotAppealable ? "No" : "Yes" });
+
+        console.log("yes2");
 
         return await interaction.reply({
             embeds: [Embed],
