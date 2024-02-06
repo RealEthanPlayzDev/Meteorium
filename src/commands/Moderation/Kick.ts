@@ -133,7 +133,7 @@ export const Command: MeteoriumCommand = {
                                         { name: "Action", value: "Kick" },
                                         { name: "Reason", value: Reason },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
-                                        { name: "Moderator note", value: ModeratorNote },
+                                        { name: "Moderator note", value: ModeratorNote != "" ? ModeratorNote : "N/A" },
                                         {
                                             name: "Moderator attachment",
                                             value: ModeratorAttachment ? ModeratorAttachment.url : "N/A",

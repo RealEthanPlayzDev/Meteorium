@@ -148,7 +148,7 @@ export const Command: MeteoriumCommand = {
                                         { name: "Reason", value: Reason },
                                         { name: "Duration", value: `${Duration} (${Timeout})` },
                                         { name: "Proof", value: AttachmentProof ? AttachmentProof.url : "N/A" },
-                                        { name: "Moderator note", value: ModeratorNote },
+                                        { name: "Moderator note", value: ModeratorNote != "" ? ModeratorNote : "N/A" },
                                         {
                                             name: "Moderator attachment",
                                             value: ModeratorAttachment ? ModeratorAttachment.url : "N/A",
