@@ -25,7 +25,7 @@ export const Command: MeteoriumCommand = {
                 content: `Case ${CaseId} does not exist.`,
             });
 
-        const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
+        //const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
 
         /*
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
@@ -88,9 +88,7 @@ export const Command: MeteoriumCommand = {
 
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
-                name: `Case: #${CaseId} | ${Case.Action} | ${
-                    TargetUser != null ? TargetUser.username : Case.TargetUserId
-                }`,
+                name: `Case: #${CaseId} | ${Case.Action} | ${Case.TargetUserId}`,
                 // iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
             })
             .addFields(
