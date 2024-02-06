@@ -100,7 +100,7 @@ export const Command: MeteoriumCommand = {
                     value: userMention(Case.ModeratorUserId),
                 },
                 { name: "Reason", value: Case.Reason },
-                { name: "Moderator note", value: Case.ModeratorNote },
+                { name: "Moderator note", value: Case.ModeratorNote != "" ? Case.ModeratorNote : "" },
             )
             .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
             .setThumbnail(Case.ModeratorAttachment == "" ? null : Case.ModeratorAttachment)
