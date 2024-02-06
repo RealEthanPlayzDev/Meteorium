@@ -25,9 +25,8 @@ export const Command: MeteoriumCommand = {
                 content: `Case ${CaseId} does not exist.`,
             });
 
-        //const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
+        const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
 
-        /*
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
         if (GuildSetting && GuildSetting.LoggingChannelId != "")
             client.channels
@@ -84,14 +83,13 @@ export const Command: MeteoriumCommand = {
                         });
                 })
                 .catch(() => null);
-        */
-
-        console.log("yes");
 
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user)
             .setAuthor({
-                name: `Case: #${CaseId} | ${Case.Action} | ${Case.TargetUserId}`,
-                // iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
+                name: `Case: #${CaseId} | ${Case.Action} | ${
+                    TargetUser != null ? TargetUser.username : Case.TargetUserId
+                }`,
+                iconURL: TargetUser != null ? TargetUser.displayAvatarURL({ extension: "png" }) : undefined,
             })
             .addFields(
                 { name: "User", value: userMention(Case.TargetUserId) },
@@ -106,12 +104,8 @@ export const Command: MeteoriumCommand = {
             .setThumbnail(Case.ModeratorAttachment == "" ? null : Case.ModeratorAttachment)
             .setColor("Red");
 
-        console.log("yes1");
-
         if (Case.Action == ModerationAction.Ban)
             Embed.addFields({ name: "Appealable", value: Case.NotAppealable ? "No" : "Yes" });
-
-        console.log("yes2");
 
         return await interaction.reply({
             embeds: [Embed],
