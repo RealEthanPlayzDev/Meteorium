@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { ChannelType, SlashCommandBuilder } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
@@ -14,7 +14,8 @@ export const Command: MeteoriumCommand = {
                 .setName("channel")
                 .setDescription(
                     "Optional channel where message will be sent (if not specified it will be sent to the current channel",
-                ),
+                )
+                .addChannelTypes(ChannelType.GuildText),
         )
         .addBooleanOption((option) =>
             option

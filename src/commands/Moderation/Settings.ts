@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { ChannelType, SlashCommandBuilder } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
@@ -28,7 +28,8 @@ export const Command: MeteoriumCommand = {
                             option
                                 .setName("channel")
                                 .setDescription("The channel where verbose logging will be sent at")
-                                .setRequired(true),
+                                .setRequired(true)
+                                .addChannelTypes(ChannelType.GuildText),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -41,7 +42,8 @@ export const Command: MeteoriumCommand = {
                             option
                                 .setName("channel")
                                 .setDescription("The channel where moderation logs will be sent at")
-                                .setRequired(true),
+                                .setRequired(true)
+                                .addChannelTypes(ChannelType.GuildText),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -52,7 +54,8 @@ export const Command: MeteoriumCommand = {
                             option
                                 .setName("channel")
                                 .setDescription("The channel where moderation logs will be sent at")
-                                .setRequired(true),
+                                .setRequired(true)
+                                .addChannelTypes(ChannelType.GuildText),
                         ),
                 )
                 .addSubcommand((subcommand) =>

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { ChannelType, SlashCommandBuilder } from "discord.js";
 import type { MeteoriumCommand } from "..";
 
 export const Command: MeteoriumCommand = {
@@ -25,7 +25,8 @@ export const Command: MeteoriumCommand = {
         .addChannelOption((option) =>
             option
                 .setName("channel")
-                .setDescription("The text/thread channel where the message you want to react to is located"),
+                .setDescription("The text/thread channel where the message you want to react to is located")
+                .addChannelTypes(ChannelType.GuildText),
         ),
     async Callback(interaction, client) {
         const reactToNS = client.Logging.GetNamespace("Commands/ReactTo");
