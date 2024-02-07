@@ -14,6 +14,7 @@ const ParseDotEnvConfig = () => {
         config({ path: "./.ENV" });
     }
     const InteractionFirstDeployGuildIds = String(process.env.DEPLOYGUILDIDS).split(",");
+    const RuntimeLogChannelIds = String(process.env.RUNTIMELOGCHANNELID).split(",");
     return {
         MongoDB_URI: String(process.env.METEORIUMMONGODBURI),
         DiscordToken: String(process.env.METEORIUMBOTTOKEN),
@@ -23,6 +24,7 @@ const ParseDotEnvConfig = () => {
         RatelimitMaxLimit: Number(process.env.RATELIMITMAXLIMIT),
         RatelimitMaxLimitTime: Number(process.env.RATELIMITMAXLIMITTIME),
         GeniusAPIKey: String(process.env.GENIUSAPIKEY),
+        RuntimeLogChannelIds: RuntimeLogChannelIds,
     };
 };
 
