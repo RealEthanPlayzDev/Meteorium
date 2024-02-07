@@ -35,7 +35,11 @@ export const Command: MeteoriumCommand = {
                 .setName("edit")
                 .setDescription("Edit a existing tag")
                 .addStringOption((option) =>
-                    option.setName("name").setDescription("The name of the tag to be edited").setRequired(true),
+                    option
+                        .setName("name")
+                        .setDescription("The name of the tag to be edited")
+                        .setRequired(true)
+                        .setAutocomplete(true),
                 )
                 .addStringOption((option) =>
                     option.setName("content").setDescription("The new content of this tag").setRequired(false),
@@ -58,7 +62,11 @@ export const Command: MeteoriumCommand = {
                 .setName("show")
                 .setDescription("Show a tag")
                 .addStringOption((option) =>
-                    option.setName("name").setDescription("The name of the tag to be shown").setRequired(true),
+                    option
+                        .setName("name")
+                        .setDescription("The name of the tag to be shown")
+                        .setRequired(true)
+                        .setAutocomplete(true),
                 )
                 .addUserOption((option) =>
                     option.setName("suggestto").setDescription("Suggest this tag to someone").setRequired(false),
