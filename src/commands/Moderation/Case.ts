@@ -19,6 +19,7 @@ export const Command: MeteoriumCommand = {
         const CaseId = interaction.options.getInteger("case", true);
         const Case = await client.Database.moderationCase.findFirst({
             where: { CaseId: CaseId, GuildId: interaction.guildId },
+            include: { ModerationCaseHistory: { orderBy: { ModerationCaseHistoryId: "asc" } } },
         });
         if (Case == null)
             return await interaction.reply({
@@ -26,6 +27,26 @@ export const Command: MeteoriumCommand = {
             });
 
         const TargetUser = await client.users.fetch(Case.TargetUserId).catch(() => null);
+
+        const ParsedCase = {
+            Reason: Case.Reason,
+            AttachmentProof: Case.AttachmentProof,
+            Duration: Case.Duration,
+            ModeratorNote: Case.ModeratorNote,
+            ModeratorAttachment: Case.ModeratorAttachment,
+            NotAppealable: Case.NotAppealable,
+        };
+
+        for (const edit of Case.ModerationCaseHistory) {
+            ParsedCase.Reason = edit.Reason != null ? edit.Reason : ParsedCase.Reason;
+            ParsedCase.AttachmentProof =
+                edit.AttachmentProof != null ? edit.AttachmentProof : ParsedCase.AttachmentProof;
+            ParsedCase.Duration = edit.Duration != null ? edit.Duration : ParsedCase.Duration;
+            ParsedCase.ModeratorNote = edit.ModeratorNote != null ? edit.ModeratorNote : ParsedCase.ModeratorNote;
+            ParsedCase.ModeratorAttachment =
+                edit.ModeratorAttachment != null ? edit.ModeratorAttachment : ParsedCase.ModeratorAttachment;
+            ParsedCase.NotAppealable = edit.NotAppealable != null ? edit.NotAppealable : ParsedCase.NotAppealable;
+        }
 
         const GuildSetting = await client.Database.guild.findUnique({ where: { GuildId: interaction.guild.id } });
         if (GuildSetting && GuildSetting.LoggingChannelId != "")
@@ -60,28 +81,36 @@ export const Command: MeteoriumCommand = {
                                                 : `${userMention(Case.TargetUserId)} (${Case.TargetUserId})`,
                                         },
                                         { name: "Action", value: String(Case.Action) },
-                                        { name: "Reason", value: Case.Reason },
-                                        { name: "Proof", value: Case.AttachmentProof ? Case.AttachmentProof : "N/A" },
+                                        { name: "Reason", value: ParsedCase.Reason },
+                                        {
+                                            name: "Proof",
+                                            value: ParsedCase.AttachmentProof ? Case.AttachmentProof : "N/A",
+                                        },
                                         {
                                             name: "Appealable",
                                             value:
                                                 Case.Action == ModerationAction.Ban
-                                                    ? Case.NotAppealable
+                                                    ? ParsedCase.NotAppealable
                                                         ? "No"
                                                         : "Yes"
                                                     : "Not applicable",
                                         },
                                         {
                                             name: "Moderator note",
-                                            value: Case.ModeratorNote != "" ? Case.ModeratorNote : "N/A",
+                                            value: ParsedCase.ModeratorNote != "" ? ParsedCase.ModeratorNote : "N/A",
                                         },
                                         {
                                             name: "Moderator attachment",
-                                            value: Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : "N/A",
+                                            value:
+                                                ParsedCase.ModeratorAttachment != ""
+                                                    ? ParsedCase.ModeratorAttachment
+                                                    : "N/A",
                                         },
                                     ])
-                                    .setImage(Case.AttachmentProof != "" ? Case.AttachmentProof : null)
-                                    .setThumbnail(Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : null),
+                                    .setImage(ParsedCase.AttachmentProof != "" ? ParsedCase.AttachmentProof : null)
+                                    .setThumbnail(
+                                        ParsedCase.ModeratorAttachment != "" ? ParsedCase.ModeratorAttachment : null,
+                                    ),
                             ],
                         });
                 })
@@ -100,15 +129,15 @@ export const Command: MeteoriumCommand = {
                     name: "Moderator",
                     value: userMention(Case.ModeratorUserId),
                 },
-                { name: "Reason", value: Case.Reason },
-                { name: "Moderator note", value: Case.ModeratorNote != "" ? Case.ModeratorNote : "N/A" },
+                { name: "Reason", value: ParsedCase.Reason },
+                { name: "Moderator note", value: ParsedCase.ModeratorNote != "" ? ParsedCase.ModeratorNote : "N/A" },
             )
-            .setImage(Case.AttachmentProof == "" ? null : Case.AttachmentProof)
-            .setThumbnail(Case.ModeratorAttachment == "" ? null : Case.ModeratorAttachment)
+            .setImage(ParsedCase.AttachmentProof == "" ? null : ParsedCase.AttachmentProof)
+            .setThumbnail(ParsedCase.ModeratorAttachment == "" ? null : ParsedCase.ModeratorAttachment)
             .setColor("Red");
 
         if (Case.Action == ModerationAction.Ban)
-            Embed.addFields({ name: "Appealable", value: Case.NotAppealable ? "No" : "Yes" });
+            Embed.addFields({ name: "Appealable", value: ParsedCase.NotAppealable ? "No" : "Yes" });
 
         return await interaction.reply({
             embeds: [Embed],

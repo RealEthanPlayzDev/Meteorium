@@ -33,6 +33,7 @@ export * as removecase from "./Moderation/RemoveCase";
 export * as unban from "./Moderation/Unban";
 export * as createcase from "./Moderation/CreateCase";
 export * as tempban from "./Moderation/TempBan";
+export * as editcase from "./Moderation/EditCase";
 
 export type MeteoriumCommand = {
     InteractionData: Pick<SlashCommandBuilder, "toJSON">;
