@@ -61,12 +61,12 @@ model Tag {
 model ActiveTempBans {
     ActiveTempBanId Int            @id @default(autoincrement())
     GlobalCaseId    Int
-    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId])
+    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
 }
 
 model ModerationCaseHistory {
     ModerationCaseHistoryId Int            @id @default(autoincrement())
-    ModerationCase          ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId])
+    ModerationCase          ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
     GlobalCaseId            Int
     EditedAt                DateTime       @default(now())
     Editor                  String
