@@ -1,4 +1,5 @@
 import { ModerationAction } from "@prisma/client";
+import ms from "ms";
 import { SlashCommandBuilder, userMention } from "discord.js";
 import type { MeteoriumCommand } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
@@ -28,6 +29,13 @@ export const Command: MeteoriumCommand = {
                 .setName("modattach")
                 .setDescription("Internal media attachment only visible to moderators")
                 .setRequired(false),
+        )
+        .addStringOption((option) =>
+            option
+                .setName("delmsghistory")
+                .setDescription("Delete message history time")
+                .setRequired(false)
+                .setAutocomplete(true),
         ),
     async Callback(interaction, client) {
         if (!interaction.member.permissions.has("BanMembers"))
@@ -41,6 +49,7 @@ export const Command: MeteoriumCommand = {
         const NotAppealable = interaction.options.getBoolean("notappealable", false) || false;
         const ModeratorNote = interaction.options.getString("modnote", false) || "";
         const ModeratorAttachment = interaction.options.getAttachment("modattach", false);
+        const DeleteMessageHistory = interaction.options.getString("delmsghistory", false) || undefined;
         const GuildUser = await interaction.guild.members.fetch(User).catch(() => null);
         const GuildSchema = (await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } }))!;
 
@@ -123,8 +132,10 @@ export const Command: MeteoriumCommand = {
             client.Logging.GetNamespace("Moderation/Ban").warn(`Could not dm ${User.id}\n${err}`);
         }
 
+        const DelMsgHistoryParsed = DeleteMessageHistory ? ms(DeleteMessageHistory) * 1000 : undefined;
         await interaction.guild.members.ban(User, {
             reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
+            deleteMessageSeconds: DelMsgHistoryParsed,
         });
 
         const PublicModLogChannel = await interaction.guild.channels
@@ -186,5 +197,19 @@ export const Command: MeteoriumCommand = {
                     : "(Warning: could not send log message to the public mod log channel)",
             embeds: [LogEmbed],
         });
+    },
+    async Autocomplete(interaction) {
+        const Focus = interaction.options.getFocused(true);
+        if (Focus.name == "delmsghistory")
+            return await interaction.respond([
+                { name: "1 day", value: "1d" },
+                { name: "2 days", value: "2d" },
+                { name: "3 days", value: "3d" },
+                { name: "4 days", value: "4d" },
+                { name: "5 days", value: "5d" },
+                { name: "6 days", value: "6d" },
+                { name: "7 days", value: "7d" },
+            ]);
+        return await interaction.respond([]);
     },
 };

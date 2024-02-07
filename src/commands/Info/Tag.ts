@@ -27,7 +27,11 @@ export const Command: MeteoriumCommand = {
                 .setName("delete")
                 .setDescription("Delete a existing tag")
                 .addStringOption((option) =>
-                    option.setName("name").setDescription("The name of the tag to be deleted").setRequired(true),
+                    option
+                        .setName("name")
+                        .setDescription("The name of the tag to be deleted")
+                        .setRequired(true)
+                        .setAutocomplete(true),
                 ),
         )
         .addSubcommand((subcommand) =>
