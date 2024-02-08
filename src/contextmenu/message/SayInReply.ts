@@ -54,15 +54,15 @@ export const ContextMenuAction: MeteoriumMessageContextMenuAction = {
         const ShowExecutorName =
             GuildSetting.EnforceSayInExecutor && !interaction.member.permissions.has("Administrator", true)
                 ? true
-                : modalSubmitInteraction.fields.getTextInputValue("showexecutorname").toLowerCase() == "no"
+                : modalSubmitInteraction.fields.getTextInputValue("ShowExecutorName").toLowerCase() == "no"
                 ? false
                 : true;
 
         const Message = ShowExecutorName
-            ? `${modalSubmitInteraction.fields.getTextInputValue("message")}\n\n(Sayin command executed by ${
+            ? `${modalSubmitInteraction.fields.getTextInputValue("Message")}\n\n(Sayin command executed by ${
                   interaction.user.tag
               } (${interaction.user.id}))`
-            : modalSubmitInteraction.fields.getTextInputValue("message");
+            : modalSubmitInteraction.fields.getTextInputValue("Message");
 
         await interaction.targetMessage.channel.send({
             content: Message,
