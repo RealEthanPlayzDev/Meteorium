@@ -1,5 +1,12 @@
 import type { MeteoriumEvent } from ".";
-import { ActivityType, REST, Routes, codeBlock } from "discord.js";
+import {
+    ActivityType,
+    REST,
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    RESTPostAPIContextMenuApplicationCommandsJSONBody,
+    Routes,
+    codeBlock,
+} from "discord.js";
 import moment from "moment";
 import { inspect } from "util";
 import { MeteoriumEmbedBuilder } from "../util/MeteoriumEmbedBuilder";
@@ -8,20 +15,27 @@ export const Event: MeteoriumEvent<"ready"> = {
     async Callback(client) {
         const readyNS = client.Logging.GetNamespace("Events/ready");
         const StartTime = moment().format("DD-MM-YYYY hh:mm:ss:SSS A Z");
-        const CommandsMapped = client.Commands.map((Command) => Command.InteractionData.toJSON());
 
-        readyNS.info("Registering global slash commands at Discord");
-        await client.application.commands.set(CommandsMapped); // Global slash commands
+        const MergedApplicationCommands: Array<
+            RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
+        > = [];
+        client.Commands.forEach((command) => MergedApplicationCommands.push(command.InteractionData.toJSON()));
+        client.ContextMenuActions.forEach((contextMenuAction) =>
+            MergedApplicationCommands.push(contextMenuAction.InteractionData.toJSON()),
+        );
 
-        readyNS.info("Registering guild slash commands at Discord");
+        readyNS.info("Registering global application commands at Discord");
+        await client.application.commands.set(MergedApplicationCommands); // Global application commands
+
+        readyNS.info("Registering guild application commands at Discord");
         const Rest = new REST({ version: "10" });
         Rest.setToken(client.token);
         client.Config.InteractionFirstDeployGuildIds.forEach(async (guildId) => {
-            readyNS.info(`Registering guild slash commands -> ${guildId}`);
+            readyNS.info(`Registering guild application commands -> ${guildId}`);
             await Rest.put(Routes.applicationGuildCommands(client.Config.DiscordApplicationId, guildId), {
-                body: CommandsMapped,
+                body: MergedApplicationCommands,
             }).catch((e) => {
-                readyNS.error(`Failed while registering guild slash commands for guild ${guildId}:\n${e}`);
+                readyNS.error(`Failed while registering guild application commands for guild ${guildId}:\n${e}`);
             });
         });
 

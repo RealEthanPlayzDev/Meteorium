@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 
 import * as Commands from "../commands";
 import * as Events from "../events";
+import * as ContextMenuActions from "../contextmenu";
 import { MeteoriumLogging } from "./MeteoriumLogging";
 
 const ParseDotEnvConfig = () => {
@@ -31,6 +32,10 @@ const ParseDotEnvConfig = () => {
 export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>();
+    public ContextMenuActions = new Collection<
+        string,
+        ContextMenuActions.MeteoriumUserContextMenuAction | ContextMenuActions.MeteoriumMessageContextMenuAction
+    >();
     public Database = new PrismaClient();
     public DiscordPlayer = new Player(this);
     public LyricsExtractor = lyricsExtractor(this.Config.GeniusAPIKey);
@@ -44,6 +49,18 @@ export class MeteoriumClient extends Client<true> {
         loginNS.info("Loading discord-player default extractors");
         this.DiscordPlayer.extractors.loadDefault();
 
+        loginNS.info("Registering events");
+        for (const [Name, { Event }] of Object.entries(Events)) {
+            loginNS.debug(`Registering event -> ${Name} ${Event}`);
+            if (Event.Once) {
+                // @ts-ignore
+                this.once(Name, (...args) => Event.Callback(this, ...args));
+            } else {
+                // @ts-ignore
+                this.on(Name, (...args) => Event.Callback(this, ...args));
+            }
+        }
+
         loginNS.info("Registering commands");
         this.Commands.clear();
         for (const [Name, { Command }] of Object.entries(Commands)) {
@@ -55,16 +72,15 @@ export class MeteoriumClient extends Client<true> {
             this.Commands.set(Name, Command);
         }
 
-        loginNS.info("Registering events");
-        for (const [Name, { Event }] of Object.entries(Events)) {
-            loginNS.debug(`Registering event -> ${Name} ${Event}`);
-            if (Event.Once) {
-                // @ts-ignore
-                this.once(Name, (...args) => Event.Callback(this, ...args));
-            } else {
-                // @ts-ignore
-                this.on(Name, (...args) => Event.Callback(this, ...args));
+        loginNS.info("Registering context menu actions");
+        this.ContextMenuActions.clear();
+        for (const [Name, { ContextMenuAction }] of Object.entries(ContextMenuActions)) {
+            loginNS.debug(`Registering context menu action -> ${Name} ${ContextMenuAction}`);
+            if (ContextMenuAction.Init) {
+                loginNS.debug(`Running command init -> ${Name} ${ContextMenuAction}`);
+                await ContextMenuAction.Init(this);
             }
+            this.ContextMenuActions.set(Name, ContextMenuAction);
         }
 
         // Shard logging
