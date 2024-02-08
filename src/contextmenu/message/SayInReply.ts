@@ -39,8 +39,7 @@ export const ContextMenuAction: MeteoriumMessageContextMenuAction = {
 
         await interaction.showModal(modal);
         const modalSubmitInteraction = await interaction.awaitModalSubmit({
-            filter: (interaction) =>
-                interaction.customId == "SayInReplyModal" && interaction.isMessageContextMenuCommand(),
+            filter: (interaction) => interaction.customId == "SayInReplyModal",
             time: 60000,
         });
 
@@ -55,9 +54,9 @@ export const ContextMenuAction: MeteoriumMessageContextMenuAction = {
         const ShowExecutorName =
             GuildSetting.EnforceSayInExecutor && !interaction.member.permissions.has("Administrator", true)
                 ? true
-                : modalSubmitInteraction.fields.getTextInputValue("showexecutorname").toLowerCase() == "yes"
-                ? true
-                : false;
+                : modalSubmitInteraction.fields.getTextInputValue("showexecutorname").toLowerCase() == "no"
+                ? false
+                : true;
 
         const Message = ShowExecutorName
             ? `${modalSubmitInteraction.fields.getTextInputValue("message")}\n\n(Sayin command executed by ${

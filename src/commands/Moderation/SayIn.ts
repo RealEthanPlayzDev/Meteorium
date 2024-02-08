@@ -52,9 +52,9 @@ export const Command: MeteoriumCommand = {
         const ShowExecutorName =
             GuildSetting.EnforceSayInExecutor && !interaction.member.permissions.has("Administrator", true)
                 ? true
-                : interaction.options.getBoolean("showexecutorname", false)
-                ? true
-                : false;
+                : interaction.options.getBoolean("showexecutorname", false) == false
+                ? false
+                : true;
         const Message = ShowExecutorName
             ? `${interaction.options.getString("message", true)}\n\n(Sayin command executed by ${
                   interaction.user.tag
