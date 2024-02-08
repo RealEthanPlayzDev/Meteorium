@@ -3,7 +3,7 @@ import type { MeteoriumUserContextMenuAction } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
 export const ContextMenuAction: MeteoriumUserContextMenuAction = {
-    Name: "UserInfo",
+    Name: "Get user info",
     Type: ApplicationCommandType.User,
     InteractionData: new ContextMenuCommandBuilder().setName("Get user info").setType(ApplicationCommandType.User),
     async Callback(interaction) {
