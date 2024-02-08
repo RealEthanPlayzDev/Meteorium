@@ -1,4 +1,5 @@
-import { ApplicationCommandType } from "discord.js";
+import { inspect } from "util";
+import { ApplicationCommandType, codeBlock } from "discord.js";
 import type { MeteoriumEvent } from ".";
 import { MeteoriumEmbedBuilder } from "../util/MeteoriumEmbedBuilder";
 
@@ -49,7 +50,7 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                 commandHandlerNS.error("Slash command callback error:\n" + err);
                 const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Error occurred while the command callback was running")
-                    .setDescription(String(err))
+                    .setDescription(codeBlock(inspect(err)))
                     .setErrorColor();
                 try {
                     if (interaction.deferred) {
@@ -65,7 +66,7 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                         });
                     }
                 } catch (err) {
-                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
+                    commandHandlerNS.error(`Could not send interaction error reply!\n${codeBlock(inspect(err))}`);
                 }
             }
             return;
@@ -120,7 +121,7 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                 commandHandlerNS.error("Slash command callback error:\n" + err);
                 const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
                     .setTitle("Error occurred while the context menu callback was running")
-                    .setDescription(String(err))
+                    .setDescription(codeBlock(inspect(err)))
                     .setErrorColor();
                 try {
                     if (interaction.deferred) {
@@ -136,7 +137,7 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                         });
                     }
                 } catch (err) {
-                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
+                    commandHandlerNS.error(`Could not send interaction error reply!\n${codeBlock(inspect(err))}`);
                 }
             }
         }
@@ -160,7 +161,9 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                 Command.Autocomplete!(interaction, client);
             } catch (err) {
                 autocompleteHandlerNS.error(
-                    `Caught error while handling autocomplete for ${interaction.commandName} in ${interaction.guildId}:\n${err}`,
+                    `Caught error while handling autocomplete for ${interaction.commandName} in ${
+                        interaction.guildId
+                    }:\n${codeBlock(inspect(err))}`,
                 );
             }
 
