@@ -135,7 +135,11 @@ export const Command: MeteoriumCommand = {
         const DelMsgHistoryParsed = DeleteMessageHistory ? ms(DeleteMessageHistory) * 1000 : undefined;
         await interaction.guild.members.ban(User, {
             reason: `Case ${CaseResult.CaseId} by ${interaction.user.username} (${interaction.user.id}): ${Reason}`,
-            deleteMessageSeconds: DelMsgHistoryParsed,
+            deleteMessageSeconds: DelMsgHistoryParsed
+                ? DelMsgHistoryParsed >= 604800
+                    ? 604800
+                    : DelMsgHistoryParsed
+                : undefined,
         });
 
         const PublicModLogChannel = await interaction.guild.channels
