@@ -31,7 +31,7 @@ export const Command: MeteoriumCommand = {
             .setDescription(Guild.description != "" ? Guild.description : null)
             .setThumbnail(Guild.iconURL({ extension: "png", size: 1024 }))
             .setImage(Guild.bannerURL({ extension: "png" }))
-            .setURL("https://discord.com")
+            .setURL(Guild.vanityURLCode ? `https://discord.gg/${Guild.vanityURLCode}` : "https://discord.com")
             .addFields([
                 { name: "Server id", value: Guild.id },
                 {
@@ -53,7 +53,10 @@ export const Command: MeteoriumCommand = {
                 { name: "Server boost tier", value: Guild.premiumTier ? Guild.premiumTier.toString() : "N/A" },
                 { name: "Partner server", value: Guild.partnered ? "Yes" : "No" },
                 { name: "Verified server", value: Guild.verified ? "Yes" : "No" },
-                { name: "Vanity URL", value: Guild.vanityURLCode ? Guild.vanityURLCode : "N/A" },
+                {
+                    name: "Vanity URL",
+                    value: Guild.vanityURLCode ? `https://discord.gg/${Guild.vanityURLCode}` : "N/A",
+                },
                 { name: "Recorded punishments/cases", value: TotalModCases.toString() },
                 {
                     name: "Ban appeal link",
@@ -62,7 +65,7 @@ export const Command: MeteoriumCommand = {
             ]);
 
         const SplashDiscoveryUrl = new MeteoriumEmbedBuilder()
-            .setURL("https://discord.com")
+            .setURL(Guild.vanityURLCode ? `https://discord.gg/${Guild.vanityURLCode}` : "https://discord.com")
             .setImage(Guild.discoverySplashURL({ extension: "png" }));
 
         return await interaction.editReply({ embeds: [MainEmbed, SplashDiscoveryUrl] });
