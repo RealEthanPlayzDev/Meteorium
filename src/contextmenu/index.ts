@@ -14,6 +14,7 @@ export * as userinfo from "./user/UserInfo";
 export * as sayinreply from "./message/SayInReply";
 
 export type MeteoriumUserContextMenuAction = {
+    Name: string;
     Type: ApplicationCommandType.User;
     InteractionData: Pick<ContextMenuCommandBuilder, "toJSON">;
     Callback(interaction: UserContextMenuCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
@@ -21,6 +22,7 @@ export type MeteoriumUserContextMenuAction = {
 };
 
 export type MeteoriumMessageContextMenuAction = {
+    Name: string;
     Type: ApplicationCommandType.Message;
     InteractionData: Pick<ContextMenuCommandBuilder, "toJSON">;
     Callback(interaction: MessageContextMenuCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;

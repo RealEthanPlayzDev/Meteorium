@@ -74,15 +74,17 @@ export class MeteoriumClient extends Client<true> {
         this.UserContextMenuActions.clear();
         this.MessageContextMenuActions.clear();
         for (const [Name, { ContextMenuAction }] of Object.entries(ContextMenuActions)) {
-            loginNS.debug(`Registering context menu action -> ${Name} ${ContextMenuAction}`);
+            loginNS.debug(
+                `Registering context menu action -> ${Name} (${ContextMenuAction.Name}) ${ContextMenuAction}`,
+            );
             if (ContextMenuAction.Init) {
-                loginNS.debug(`Running command init -> ${Name} ${ContextMenuAction}`);
+                loginNS.debug(`Running command init -> ${Name} (${ContextMenuAction.Name}) ${ContextMenuAction}`);
                 await ContextMenuAction.Init(this);
             }
             if (ContextMenuAction.Type == ApplicationCommandType.User) {
-                this.UserContextMenuActions.set(Name, ContextMenuAction);
+                this.UserContextMenuActions.set(ContextMenuAction.Name, ContextMenuAction);
             } else {
-                this.MessageContextMenuActions.set(Name, ContextMenuAction);
+                this.MessageContextMenuActions.set(ContextMenuAction.Name, ContextMenuAction);
             }
         }
 

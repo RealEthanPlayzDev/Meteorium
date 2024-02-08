@@ -1,3 +1,4 @@
+import { ApplicationCommandType } from "discord.js";
 import type { MeteoriumEvent } from ".";
 import { MeteoriumEmbedBuilder } from "../util/MeteoriumEmbedBuilder";
 
@@ -71,12 +72,12 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
         }
 
         // Context menu command interaction handling
-        if (interaction.isUserContextMenuCommand()) {
-            const commandHandlerNS = client.Logging.GetNamespace(
-                "Events/interactionCreate/ContextMenuActionHandler/User",
-            );
+        if (interaction.isContextMenuCommand()) {
+            const commandHandlerNS = client.Logging.GetNamespace("Events/interactionCreate/ContextMenuActionHandler");
 
-            const Command = client.UserContextMenuActions.get(interaction.commandName);
+            const Command =
+                client.UserContextMenuActions.get(interaction.commandName) ||
+                client.MessageContextMenuActions.get(interaction.commandName);
             if (Command == undefined)
                 return commandHandlerNS.error(
                     `Unexpected behavior when handling context menu interaction: ${interaction.commandName} doesn't exist on client.ContextMenuActions.`,
@@ -110,7 +111,11 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
             }
 
             try {
-                await Command.Callback(interaction, client);
+                if (interaction.isUserContextMenuCommand() && Command.Type == ApplicationCommandType.User)
+                    await Command.Callback(interaction, client);
+                else if (interaction.isMessageContextMenuCommand() && Command.Type == ApplicationCommandType.Message)
+                    await Command.Callback(interaction, client);
+                else throw "Invalid command object/interaction data";
             } catch (err) {
                 commandHandlerNS.error("Slash command callback error:\n" + err);
                 const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
@@ -134,73 +139,6 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
                     commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
                 }
             }
-            return;
-        }
-
-        if (interaction.isMessageContextMenuCommand()) {
-            const commandHandlerNS = client.Logging.GetNamespace(
-                "Events/interactionCreate/ContextMenuActionHandler/Message",
-            );
-
-            const Command = client.MessageContextMenuActions.get(interaction.commandName);
-            if (Command == undefined)
-                return commandHandlerNS.error(
-                    `Unexpected behavior when handling context menu interaction: ${interaction.commandName} doesn't exist on client.ContextMenuActions.`,
-                );
-
-            let GuildExistInDb = await client.Database.guild.findUnique({ where: { GuildId: interaction.guildId } });
-            if (GuildExistInDb == null)
-                GuildExistInDb = await client.Database.guild.create({ data: { GuildId: interaction.guildId } });
-
-            if (GuildExistInDb && GuildExistInDb.LoggingChannelId != "") {
-                client.channels
-                    .fetch(GuildExistInDb.LoggingChannelId)
-                    .then(async (channel) => {
-                        if (channel != null && channel.isTextBased())
-                            await channel.send({
-                                embeds: [
-                                    new MeteoriumEmbedBuilder(undefined, interaction.user)
-                                        .setTitle("Context menu command executed")
-                                        .setFields([
-                                            { name: "Command name", value: interaction.commandName },
-                                            {
-                                                name: "Executor",
-                                                value: `${interaction.user.username} (${interaction.user.id}) (<@${interaction.user.id}>)`,
-                                            },
-                                        ])
-                                        .setNormalColor(),
-                                ],
-                            });
-                    })
-                    .catch(() => null);
-            }
-
-            try {
-                await Command.Callback(interaction, client);
-            } catch (err) {
-                commandHandlerNS.error("Slash command callback error:\n" + err);
-                const ErrorEmbed = new MeteoriumEmbedBuilder(undefined, interaction.user)
-                    .setTitle("Error occurred while the context menu callback was running")
-                    .setDescription(String(err))
-                    .setErrorColor();
-                try {
-                    if (interaction.deferred) {
-                        await interaction.editReply({
-                            content: "Error occurred (if you don't see anything below, you have embeds disabled)",
-                            embeds: [ErrorEmbed],
-                        });
-                    } else {
-                        await interaction.reply({
-                            content: "Error occurred (if you don't see anything below, you have embeds disabled)",
-                            embeds: [ErrorEmbed],
-                            ephemeral: true,
-                        });
-                    }
-                } catch (err) {
-                    commandHandlerNS.error(`Could not send interaction error reply!\n${err}`);
-                }
-            }
-            return;
         }
 
         // Autocomplete interaction handling
