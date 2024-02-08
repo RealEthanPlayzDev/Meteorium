@@ -5,7 +5,7 @@ import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 export const ContextMenuAction: MeteoriumUserContextMenuAction = {
     Name: "UserInfo",
     Type: ApplicationCommandType.User,
-    InteractionData: new ContextMenuCommandBuilder().setName("UserInfo").setType(ApplicationCommandType.User),
+    InteractionData: new ContextMenuCommandBuilder().setName("Get user info").setType(ApplicationCommandType.User),
     async Callback(interaction) {
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user);
         const ParsedUser = await interaction.guild.members
