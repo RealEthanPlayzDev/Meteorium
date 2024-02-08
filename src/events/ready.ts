@@ -20,7 +20,10 @@ export const Event: MeteoriumEvent<"ready"> = {
             RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
         > = [];
         client.Commands.forEach((command) => MergedApplicationCommands.push(command.InteractionData.toJSON()));
-        client.ContextMenuActions.forEach((contextMenuAction) =>
+        client.UserContextMenuActions.forEach((contextMenuAction) =>
+            MergedApplicationCommands.push(contextMenuAction.InteractionData.toJSON()),
+        );
+        client.MessageContextMenuActions.forEach((contextMenuAction) =>
             MergedApplicationCommands.push(contextMenuAction.InteractionData.toJSON()),
         );
 

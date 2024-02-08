@@ -3,6 +3,7 @@ import type { MeteoriumUserContextMenuAction } from "..";
 import { MeteoriumEmbedBuilder } from "../../util/MeteoriumEmbedBuilder";
 
 export const ContextMenuAction: MeteoriumUserContextMenuAction = {
+    Type: ApplicationCommandType.User,
     InteractionData: new ContextMenuCommandBuilder().setName("UserInfo").setType(ApplicationCommandType.User),
     async Callback(interaction) {
         const Embed = new MeteoriumEmbedBuilder(undefined, interaction.user);
@@ -103,6 +104,6 @@ export const ContextMenuAction: MeteoriumUserContextMenuAction = {
                 ]);
         }
 
-        return await interaction.reply({ embeds: [Embed] });
+        return await interaction.reply({ embeds: [Embed], ephemeral: true });
     },
 };

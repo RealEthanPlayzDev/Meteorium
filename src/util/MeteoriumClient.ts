@@ -1,4 +1,4 @@
-import { Client, Collection } from "discord.js";
+import { ApplicationCommandType, Client, Collection } from "discord.js";
 import { config } from "dotenv";
 import { Player } from "discord-player";
 import { HolodexApiClient } from "holodex.js";
@@ -32,10 +32,8 @@ const ParseDotEnvConfig = () => {
 export class MeteoriumClient extends Client<true> {
     public Config = ParseDotEnvConfig();
     public Commands = new Collection<string, Commands.MeteoriumCommand>();
-    public ContextMenuActions = new Collection<
-        string,
-        ContextMenuActions.MeteoriumUserContextMenuAction | ContextMenuActions.MeteoriumMessageContextMenuAction
-    >();
+    public UserContextMenuActions = new Collection<string, ContextMenuActions.MeteoriumUserContextMenuAction>();
+    public MessageContextMenuActions = new Collection<string, ContextMenuActions.MeteoriumMessageContextMenuAction>();
     public Database = new PrismaClient();
     public DiscordPlayer = new Player(this);
     public LyricsExtractor = lyricsExtractor(this.Config.GeniusAPIKey);
@@ -73,14 +71,19 @@ export class MeteoriumClient extends Client<true> {
         }
 
         loginNS.info("Registering context menu actions");
-        this.ContextMenuActions.clear();
+        this.UserContextMenuActions.clear();
+        this.MessageContextMenuActions.clear();
         for (const [Name, { ContextMenuAction }] of Object.entries(ContextMenuActions)) {
             loginNS.debug(`Registering context menu action -> ${Name} ${ContextMenuAction}`);
             if (ContextMenuAction.Init) {
                 loginNS.debug(`Running command init -> ${Name} ${ContextMenuAction}`);
                 await ContextMenuAction.Init(this);
             }
-            this.ContextMenuActions.set(Name, ContextMenuAction);
+            if (ContextMenuAction.Type == ApplicationCommandType.User) {
+                this.UserContextMenuActions.set(Name, ContextMenuAction);
+            } else {
+                this.MessageContextMenuActions.set(Name, ContextMenuAction);
+            }
         }
 
         // Shard logging
