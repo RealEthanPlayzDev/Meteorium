@@ -1,10 +1,8 @@
 import type { MeteoriumEvent } from ".";
 import {
     ActivityType,
-    REST,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
-    Routes,
     codeBlock,
 } from "discord.js";
 import moment from "moment";
@@ -31,15 +29,11 @@ export const Event: MeteoriumEvent<"ready"> = {
         await client.application.commands.set(MergedApplicationCommands); // Global application commands
 
         readyNS.info("Registering guild application commands at Discord");
-        const Rest = new REST({ version: "10" });
-        Rest.setToken(client.token);
         client.Config.InteractionFirstDeployGuildIds.forEach(async (guildId) => {
-            readyNS.info(`Registering guild application commands -> ${guildId}`);
-            await Rest.put(Routes.applicationGuildCommands(client.Config.DiscordApplicationId, guildId), {
-                body: MergedApplicationCommands,
-            }).catch((e) => {
-                readyNS.error(`Failed while registering guild application commands for guild ${guildId}:\n${e}`);
-            });
+            const Guild = await client.guilds.fetch(guildId).catch(() => null);
+            if (!Guild) return readyNS.error(`Cannot register guild application command for ${guildId}`);
+            readyNS.info(`Registering guild application commands -> ${Guild.name} (${guildId})`);
+            await Guild.commands.set(MergedApplicationCommands);
         });
 
         readyNS.verbose("Setting user presence");
