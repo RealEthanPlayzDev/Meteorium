@@ -15,6 +15,7 @@ export * as userinfo from "./Info/UserInfo";
 export * as holodexapi from "./Info/HolodexAPI";
 export * as rbxapi from "./Info/RbxAPI";
 export * as tag from "./Info/Tag";
+export * as serverinfo from "./Info/ServerInfo";
 
 // Category - Fun
 export * as music from "./Fun/Music";
