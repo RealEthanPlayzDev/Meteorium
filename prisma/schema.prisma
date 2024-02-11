@@ -7,19 +7,19 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("METEORIUMPOSTGRESURL")
+    url      = env("METEORIUM_POSTGRES_URL")
 }
 
 model Guild {
-    GuildId                   String   @unique
-    EnforceSayInExecutor      Boolean  @default(false)
-    DisabledCommands          String[] @default([])
-    DisabledCommandCategories String[] @default([])
-    PublicModLogChannelId     String   @default("")
-    LoggingChannelId          String   @default("")
-    JoinLeaveLogChannelId     String   @default("")
-    CurrentCaseId             Int      @default(0)
-    BanAppealLink             String   @default("")
+    GuildId               String           @unique
+    EnforceSayInExecutor  Boolean          @default(false)
+    JoinLeaveLogChannelId String           @default("")
+    PublicModLogChannelId String           @default("")
+    LoggingChannelId      String           @default("")
+    CurrentCaseId         Int              @default(0)
+    BanAppealLink         String           @default("")
+    ModerationCase        ModerationCase[]
+    Tag                   Tag[]
 }
 
 enum ModerationAction {
@@ -33,35 +33,22 @@ enum ModerationAction {
 
 model ModerationCase {
     GlobalCaseId          Int                     @id @default(autoincrement())
+    Guild                 Guild                   @relation(fields: [GuildId], references: [GuildId], onDelete: Cascade)
+    GuildId               String
     CaseId                Int
     Action                ModerationAction
     TargetUserId          String
     ModeratorUserId       String
-    GuildId               String
     Reason                String
-    AttachmentProof       String
+    AttachmentProof       String                  @default("")
     Duration              String                  @default("0")
-    CreatedAt             DateTime                @default(now())
     ModeratorNote         String                  @default("")
     ModeratorAttachment   String                  @default("")
     NotAppealable         Boolean                 @default(false)
     PublicModLogMsgId     String                  @default("")
+    CreatedAt             DateTime                @default(now())
     ActiveTempBans        ActiveTempBans[]
     ModerationCaseHistory ModerationCaseHistory[]
-}
-
-model Tag {
-    GlobalTagId Int    @id @default(autoincrement())
-    TagName     String
-    GuildId     String
-    Content     String
-    Image       String
-}
-
-model ActiveTempBans {
-    ActiveTempBanId Int            @id @default(autoincrement())
-    GlobalCaseId    Int
-    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
 }
 
 model ModerationCaseHistory {
@@ -76,4 +63,19 @@ model ModerationCaseHistory {
     ModeratorNote           String?
     ModeratorAttachment     String?
     NotAppealable           Boolean?
+}
+
+model ActiveTempBans {
+    ActiveTempBanId Int            @id @default(autoincrement())
+    GlobalCaseId    Int
+    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
+}
+
+model Tag {
+    GlobalTagId Int    @id @default(autoincrement())
+    Guild       Guild  @relation(fields: [GuildId], references: [GuildId], onDelete: Cascade)
+    GuildId     String
+    TagName     String
+    Content     String
+    Attachment  String @default("")
 }

@@ -4,7 +4,7 @@ A Discord bot developed by RadiatedExodus (RealEthanPlayzDev) as a side (and per
 
 Since the ts rewrite, some of the source might ressemble [PojavBot](https://github.com/PojavLauncherTeam/PojavBot) as I took several references from there.
 
-## UNSTABLE - THIS IS A FULL REWRITE
+## UNSTABLE - THIS IS A FULL REWRITE (v3)
 
 This branch is a full rewrite, not all features have been implemented!
 
