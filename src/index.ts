@@ -1,5 +1,14 @@
-import Logging from "./classes/logging.js";
+import MeteoriumClient from "./classes/client.js";
+import { IntentsBitField } from "discord.js";
 
-const logging = new Logging("Meteorium");
-const mainNS = logging.registerNamespace("Main");
-mainNS.info("Hello, world!");
+const client = new MeteoriumClient({
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildModeration,
+        IntentsBitField.Flags.GuildVoiceStates,
+    ],
+});
+
+await client.login();

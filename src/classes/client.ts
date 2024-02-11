@@ -1,0 +1,31 @@
+import { Client } from "discord.js";
+import { config } from "dotenv";
+import { PrismaClient } from "@prisma/client";
+import { HolodexApiClient } from "holodex.js";
+
+import Logging from "./logging.js";
+
+function parseDotEnvConfig() {
+    if (!process.env.METEORIUM_BOT_TOKEN) config();
+    return {
+        BotToken: String(process.env.METEORIUM_BOT_TOKEN),
+        ApplicationId: String(process.env.METEORIUM_APPLICATION_ID),
+        HolodexApiKey: String(process.env.METEORIUM_HOLODEX_APIKEY),
+        GeniusApiKey: String(process.env.METEORIUM_GENIUS_APIKEY),
+        ApplicationDeployGuildIds: String(process.env.METEORIUM_APPDEPLOY_GUILDIDS).split(","),
+        RuntimeLogChannelIds: String(process.env.METEORIUM_RUNTIMELOG_CHANNELIDS).split(","),
+    };
+}
+
+export default class MeteoriumClient extends Client<true> {
+    public logging = new Logging("Meteorium");
+    public config = parseDotEnvConfig();
+    public db = new PrismaClient();
+    public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
+
+    public async login() {
+        const loginNS = this.logging.getNamespace("Login");
+        loginNS.info("Logging in to Discord");
+        return super.login(this.config.BotToken);
+    }
+}
