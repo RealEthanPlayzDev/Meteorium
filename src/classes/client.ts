@@ -5,6 +5,7 @@ import { HolodexApiClient } from "holodex.js";
 
 import Logging from "./logging.js";
 import MeteoriumInteractionManager from "../interactions/index.js";
+import MeteoriumEventManager from "../events/index.js";
 
 function parseDotEnvConfig() {
     if (!process.env.METEORIUM_BOT_TOKEN) config();
@@ -23,6 +24,7 @@ export default class MeteoriumClient extends Client<true> {
     public config = parseDotEnvConfig();
     public db = new PrismaClient();
     public interactions = new MeteoriumInteractionManager(this);
+    public events = new MeteoriumEventManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
 
     public async login() {
