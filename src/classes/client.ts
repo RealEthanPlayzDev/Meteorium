@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { HolodexApiClient } from "holodex.js";
 
 import Logging from "./logging.js";
+import MeteoriumInteractionManager from "../interactions/index.js";
 
 function parseDotEnvConfig() {
     if (!process.env.METEORIUM_BOT_TOKEN) config();
@@ -21,10 +22,16 @@ export default class MeteoriumClient extends Client<true> {
     public logging = new Logging("Meteorium");
     public config = parseDotEnvConfig();
     public db = new PrismaClient();
+    public interactions = new MeteoriumInteractionManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
 
     public async login() {
         const loginNS = this.logging.getNamespace("Login");
+
+        // Register all interactions
+        this.interactions.registerAllInteractions();
+
+        // Login
         loginNS.info("Logging in to Discord");
         return super.login(this.config.BotToken);
     }
