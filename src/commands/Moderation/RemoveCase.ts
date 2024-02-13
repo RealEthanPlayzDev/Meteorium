@@ -44,7 +44,7 @@ export const Command: MeteoriumCommand = {
                     value: userMention(Case.ModeratorUserId),
                 },
                 { name: "Reason", value: Case.Reason },
-                { name: "Moderator note", value: Case.ModeratorNote },
+                { name: "Moderator note", value: Case.ModeratorNote != "" ? Case.ModeratorNote : "N/A" },
                 {
                     name: "Moderator attachment",
                     value: Case.ModeratorAttachment != "" ? Case.ModeratorAttachment : "N/A",
