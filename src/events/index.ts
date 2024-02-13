@@ -8,11 +8,13 @@ export default class MeteoriumEventManager {
     public events: Collection<string, events.MeteoriumEvent<any>>;
     public client: MeteoriumClient;
     public logging: LoggingNamespace;
+    public eventNS: LoggingNamespace;
 
     public constructor(client: MeteoriumClient) {
         this.events = new Collection();
         this.client = client;
         this.logging = client.logging.registerNamespace("EventManager");
+        this.eventNS = this.logging.registerNamespace("Event");
     }
 
     public register() {
