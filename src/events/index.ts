@@ -1,4 +1,4 @@
-import { ClientEvents, Collection } from "discord.js";
+import { Collection } from "discord.js";
 import type MeteoriumClient from "../classes/client.js";
 import type { LoggingNamespace } from "../classes/logging.js";
 
