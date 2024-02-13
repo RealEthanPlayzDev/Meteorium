@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, ClientOptions } from "discord.js";
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { HolodexApiClient } from "holodex.js";
@@ -27,11 +27,23 @@ export default class MeteoriumClient extends Client<true> {
     public events = new MeteoriumEventManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
 
-    public async login() {
-        const loginNS = this.logging.getNamespace("Login");
+    public constructor(options: ClientOptions) {
+        super(options);
+
+        // Register all events and hook them
+        this.events.register();
 
         // Register all interactions
         this.interactions.registerAllInteractions();
+
+        return this;
+    }
+
+    public async login() {
+        const loginNS = this.logging.getNamespace("Login");
+
+        // Hook events
+        this.events.hook();
 
         // Login
         loginNS.info("Logging in to Discord");
