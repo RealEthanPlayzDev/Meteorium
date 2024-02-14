@@ -1,3 +1,5 @@
+import util from "node:util";
+
 import {
     ChatInputCommandInteraction,
     AutocompleteInteraction,
@@ -10,6 +12,10 @@ import {
     ApplicationCommandType,
     Awaitable,
     Collection,
+    Interaction,
+    codeBlock,
+    userMention,
+    User,
 } from "discord.js";
 import type MeteoriumClient from "../classes/client.js";
 import type { LoggingNamespace } from "../classes/logging.js";
@@ -17,6 +23,7 @@ import type { LoggingNamespace } from "../classes/logging.js";
 import * as commands from "./commands/index.js";
 import * as userContextMenuActions from "./userContextMenuActions/index.js";
 import * as messageContextMenuActions from "./messageContextMenuActions/index.js";
+import MeteoriumEmbedBuilder from "../classes/embedBuilder.js";
 
 export type MeteoriumChatCommand = {
     interactionData: SlashCommandBuilder;
@@ -113,6 +120,24 @@ export default class MeteoriumInteractionManager {
         return;
     }
 
+    public getInteractionData(type: ApplicationCommandType, name: string) {
+        const collection =
+            type == ApplicationCommandType.ChatInput
+                ? this.chatInputInteractions
+                : type == ApplicationCommandType.User
+                  ? this.userContextMenuActionInteractions
+                  : type == ApplicationCommandType.Message
+                    ? this.messageContextMenuActionInteractions
+                    : undefined;
+        if (!collection) throw new Error(`invalid interaction type ${type}`);
+
+        for (const [_, data] of collection) {
+            if (data.interactionData.name == name) return data;
+        }
+
+        return undefined;
+    }
+
     public generateAppsJsonData() {
         const merged: Array<
             RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
@@ -126,5 +151,127 @@ export default class MeteoriumInteractionManager {
         );
 
         return merged;
+    }
+
+    private async dispatchInteractionOccurredLog(name: string, type: string, guildId: string, dispatcher: User) {
+        const guildDb = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        const channel =
+            guildDb && guildDb.LoggingChannelId != ""
+                ? await this.client.channels.fetch(guildDb.LoggingChannelId).catch(() => null)
+                : null;
+        if (!guildDb) throw new Error(`no guild data for ${guildId}`);
+        if (!channel || !channel.isTextBased()) return;
+
+        const embed = new MeteoriumEmbedBuilder().setTitle("Interaction dispatched").addFields([
+            { name: "Dispatcher", value: `${userMention(dispatcher.id)} (${dispatcher.username} - ${dispatcher.id})` },
+            { name: "Interaction name", value: name },
+            { name: "Interaction type", value: type },
+        ]);
+
+        return await channel.send({ embeds: [embed] });
+    }
+
+    public async dispatchInteraction(interaction: Interaction) {
+        if (!interaction.inCachedGuild()) return;
+
+        // Get logging namespace
+        const dispatchNS = this.loggingNS.getNamespace("Dispatch");
+
+        // Interaction type
+        const interactionType = interaction.isChatInputCommand()
+            ? ApplicationCommandType.ChatInput
+            : interaction.isAutocomplete()
+              ? ApplicationCommandType.ChatInput
+              : interaction.isUserContextMenuCommand()
+                ? ApplicationCommandType.User
+                : interaction.isMessageContextMenuCommand()
+                  ? ApplicationCommandType.Message
+                  : undefined;
+        const interactionName =
+            interaction.isCommand() || interaction.isAutocomplete() ? interaction.commandName : undefined;
+        const isAutocomplete = interaction.isAutocomplete();
+        if (!interactionType || !interactionName) return;
+
+        // Get interaction data
+        const data = this.getInteractionData(interactionType, interactionName);
+        if (!data)
+            return dispatchNS.error(
+                `could not find interaction data for ${interactionName}? ignoring this interaction (${interaction.id})`,
+            );
+
+        // Logging to guild internal logs
+        if (!isAutocomplete)
+            this.dispatchInteractionOccurredLog(
+                interactionName,
+                interactionType == ApplicationCommandType.ChatInput
+                    ? "Chat command"
+                    : `${interactionType == ApplicationCommandType.User ? "User" : "Message"} context menu action`,
+                interaction.guildId,
+                interaction.user,
+            ).catch((e) =>
+                dispatchNS.warn(
+                    `could not send interaction dispatch log for ${interaction.id} (guild ${interaction.guildId}):\n${util.inspect(e)}`,
+                ),
+            );
+
+        // Execute callback
+        try {
+            if (isAutocomplete) {
+                const dataTyped = data as MeteoriumChatCommand;
+                if (!dataTyped.autocomplete)
+                    return dispatchNS.error(
+                        `autocomplete interaction running on a command that doesn't have a autocomplete callback set (${interactionName})`,
+                    );
+                await dataTyped.autocomplete(interaction, this.client);
+            } else {
+                switch (interactionType) {
+                    case ApplicationCommandType.ChatInput: {
+                        const dataTyped = data as MeteoriumChatCommand;
+                        await dataTyped.callback(interaction as ChatInputCommandInteraction<"cached">, this.client);
+                        break;
+                    }
+                    case ApplicationCommandType.User: {
+                        const dataTyped = data as MeteoriumUserContextMenuAction;
+                        await dataTyped.callback(
+                            interaction as UserContextMenuCommandInteraction<"cached">,
+                            this.client,
+                        );
+                        break;
+                    }
+                    case ApplicationCommandType.Message: {
+                        const dataTyped = data as MeteoriumMessageContextMenuAction;
+                        await dataTyped.callback(
+                            interaction as MessageContextMenuCommandInteraction<"cached">,
+                            this.client,
+                        );
+                        break;
+                    }
+                    default: {
+                        throw new Error("invalid interaction type");
+                    }
+                }
+            }
+        } catch (e) {
+            const inspected = util.inspect(e);
+            dispatchNS.error(`error occurred when during interaction dispatch (${interactionName}):\n${inspected}`);
+
+            const errEmbed = new MeteoriumEmbedBuilder(interaction.user)
+                .setTitle("Error occurred during interaction dispatch")
+                .setDescription(codeBlock(inspected.substring(0, 4500)))
+                .setErrorColor();
+
+            try {
+                if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) {
+                    if (interaction.deferred) await interaction.editReply({ embeds: [errEmbed] });
+                    else await interaction.reply({ embeds: [errEmbed] });
+                }
+            } catch (e) {
+                dispatchNS.warn(
+                    `could not send interaction error for ${interaction.id} (${interactionName}):\n${util.inspect(e)}`,
+                );
+            }
+        }
+
+        return;
     }
 }
