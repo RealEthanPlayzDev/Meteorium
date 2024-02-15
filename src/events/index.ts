@@ -35,8 +35,8 @@ export default class MeteoriumEventManager {
         hookNS.info("Hooking events to client");
         for (const [Name, Event] of this.events) {
             hookNS.verbose(`Hooking -> ${Name}`);
-            if (Event.once) this.client.once(Event.event, Event.callback);
-            else this.client.on(Event.event, Event.callback);
+            if (Event.once) this.client.once(Event.event, (...args) => Event.callback(this.client, ...args));
+            else this.client.on(Event.event, (...args) => Event.callback(this.client, ...args));
         }
 
         return;
