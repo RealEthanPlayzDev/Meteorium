@@ -109,7 +109,7 @@ export const Event: MeteoriumEvent<"ready"> = {
         readyNS.info("Bot ready");
         const runtimeLogPromises: Promise<any>[] = [];
         const embed = new MeteoriumEmbedBuilder()
-            .setTitle("Bot is onlie")
+            .setTitle("Bot is online")
             .setDescription("The bot is now online")
             .addFields([{ name: "Started at", value: moment(startTime).format("DD-MM-YYYY hh:mm:ss:SSS A Z") }])
             .setNormalColor();
