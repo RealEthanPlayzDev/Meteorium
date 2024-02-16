@@ -16,6 +16,7 @@ function parseDotEnvConfig() {
         GeniusApiKey: String(process.env.METEORIUM_GENIUS_APIKEY),
         ApplicationDeployGuildIds: String(process.env.METEORIUM_APPDEPLOY_GUILDIDS).split(","),
         RuntimeLogChannelIds: String(process.env.METEORIUM_RUNTIMELOG_CHANNELIDS).split(","),
+        DontRegisterTestInteractions: Boolean(process.env.METEORIUM_NOREG_TESTINTERACTIONS),
     };
 }
 

@@ -66,6 +66,7 @@ export default class MeteoriumInteractionManager {
         regChatInputNS.info("Registering chat input interactions");
 
         for (const [Name, { Command }] of Object.entries(commands)) {
+            if (this.client.config.DontRegisterTestInteractions && Name.toLowerCase().startsWith("test")) continue;
             regChatInputNS.verbose(`Registering -> ${Name} (${Command.interactionData.name})`);
             this.chatInputInteractions.set(Name, Command);
         }
@@ -80,6 +81,7 @@ export default class MeteoriumInteractionManager {
         regUserContextMenuActionNS.info("Registering user context menu actions");
 
         for (const [Name, { UserContextMenuAction }] of Object.entries(userContextMenuActions)) {
+            if (this.client.config.DontRegisterTestInteractions && Name.toLowerCase().startsWith("test")) continue;
             regUserContextMenuActionNS.verbose(
                 `Registering -> ${Name} (${UserContextMenuAction.interactionData.name})`,
             );
@@ -100,6 +102,7 @@ export default class MeteoriumInteractionManager {
         regMessageContextMenuActionNS.info("Registering message context menu actions");
 
         for (const [Name, { MessageContextMenuAction }] of Object.entries(messageContextMenuActions)) {
+            if (this.client.config.DontRegisterTestInteractions && Name.toLowerCase().startsWith("test")) continue;
             regMessageContextMenuActionNS.verbose(
                 `Registering -> ${Name} (${MessageContextMenuAction.interactionData.name})`,
             );
