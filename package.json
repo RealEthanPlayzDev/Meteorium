@@ -6,7 +6,8 @@
     "type": "module",
     "scripts": {
         "compile": "tsc",
-        "start": "node dist"
+        "start": "node dist",
+        "installUtils:fillMissingGuildData": "node ./dist/installUtils/fillMissingGuildData.js"
     },
     "repository": {
         "type": "git",
