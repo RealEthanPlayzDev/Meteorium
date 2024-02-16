@@ -26,7 +26,7 @@ import * as messageContextMenuActions from "./messageContextMenuActions/index.js
 import MeteoriumEmbedBuilder from "../classes/embedBuilder.js";
 
 export type MeteoriumChatCommand = {
-    interactionData: SlashCommandBuilder;
+    interactionData: Pick<SlashCommandBuilder, "toJSON"> & Pick<SlashCommandBuilder, "name">;
     callback(interaction: ChatInputCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     autocomplete?(interaction: AutocompleteInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     initialize?(client: MeteoriumClient): Awaitable<any>;
