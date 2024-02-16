@@ -19,6 +19,7 @@ missingGDNS.info(`Inserting the following guild ids to the Guild table: (${total
 
 const result = await client.db.guild.createMany({
     data: data,
+    skipDuplicates: true,
 });
 
 missingGDNS.info(`Finished, inserted rows: ${result.count}`);
