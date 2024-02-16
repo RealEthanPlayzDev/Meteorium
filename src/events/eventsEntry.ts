@@ -4,6 +4,7 @@ import type MeteoriumClient from "../classes/client.js";
 export * as ReadyInit from "./readyInit.js";
 export * as InteractionHandler from "./interactionHandler.js";
 export * as PresenceResumption from "./presenceResumption.js";
+export * as GuildDataSetup from "./guildDataSetup.js";
 
 export type MeteoriumEvent<EventName extends keyof ClientEvents> = {
     event: EventName;
