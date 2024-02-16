@@ -16,7 +16,6 @@ model Guild {
     JoinLeaveLogChannelId String           @default("")
     PublicModLogChannelId String           @default("")
     LoggingChannelId      String           @default("")
-    CurrentCaseId         Int              @default(0)
     BanAppealLink         String           @default("")
     ModerationCase        ModerationCase[]
     Tag                   Tag[]
@@ -49,6 +48,8 @@ model ModerationCase {
     CreatedAt             DateTime                @default(now())
     ActiveTempBans        ActiveTempBans[]
     ModerationCaseHistory ModerationCaseHistory[]
+
+    @@unique(name: "UniqueCaseIdPerGuild", fields: [GuildId, CaseId])
 }
 
 model ModerationCaseHistory {
@@ -63,6 +64,7 @@ model ModerationCaseHistory {
     ModeratorNote           String?
     ModeratorAttachment     String?
     NotAppealable           Boolean?
+    Removed                 Boolean?
 }
 
 model ActiveTempBans {
