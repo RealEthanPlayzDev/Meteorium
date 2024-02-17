@@ -5,3 +5,4 @@ export * as TestDefferedError from "./tests/deferredError.js";
 
 // Moderation
 export * as case from "./moderation/case.js";
+export * as cases from "./moderation/cases.js";
