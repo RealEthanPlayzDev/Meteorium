@@ -18,17 +18,20 @@ export const Command: MeteoriumChatCommand = {
                 .setRequired(false),
         )
         .addBooleanOption((option) =>
-            option.setName("ephmeral").setDescription("If true, response will be shown only to you").setRequired(false),
+            option
+                .setName("ephemeral")
+                .setDescription("If true, response will be shown only to you")
+                .setRequired(false),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ViewAuditLog)
         .setDMPermission(false),
     async callback(interaction, client) {
         const caseId = interaction.options.getNumber("caseid", true);
         const historyLevel = interaction.options.getNumber("historylevel", false) || undefined;
-        const ephmeral = interaction.options.getBoolean("ephmeral", false) || false;
+        const ephemeral = interaction.options.getBoolean("ephemeral", false) || false;
 
         // Defer the reply
-        await interaction.deferReply({ ephemeral: ephmeral });
+        await interaction.deferReply({ ephemeral: ephemeral });
 
         // Get case data
         const caseDb = await client.dbUtils.getCaseData(interaction.guildId, caseId, historyLevel);
