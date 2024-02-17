@@ -1,8 +1,7 @@
-import { PermissionFlagsBits, SlashCommandBuilder, userMention } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder, userMention, time } from "discord.js";
+import { ModerationAction } from "@prisma/client";
 import type { MeteoriumChatCommand } from "../../index.js";
 import MeteoriumEmbedBuilder from "../../../classes/embedBuilder.js";
-import { ModerationAction } from "@prisma/client";
-import moment from "moment";
 
 export const Command: MeteoriumChatCommand = {
     interactionData: new SlashCommandBuilder()
@@ -77,7 +76,7 @@ export const Command: MeteoriumChatCommand = {
                 value: caseDb.ModeratorAttachment != "" ? caseDb.ModeratorAttachment : "N/A",
             },
             { name: "Removed", value: caseDb.Removed ? "Yes" : "No" },
-            { name: "Created at", value: moment(caseDb.CreatedAt).format("DD-MM-YYYY hh:mm:ss:SSS A Z") },
+            { name: "Created at", value: `${time(caseDb.CreatedAt, "F")} (${time(caseDb.CreatedAt, "R")})` },
         ]);
 
         return await interaction.editReply({ embeds: [embed] });
