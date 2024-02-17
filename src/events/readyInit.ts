@@ -1,6 +1,6 @@
 import process from "node:process";
 import util from "node:util";
-import { ActivityType, codeBlock } from "discord.js";
+import { ActivityType, codeBlock, time } from "discord.js";
 import MeteoriumEmbedBuilder from "../classes/embedBuilder.js";
 import type { MeteoriumEvent } from "./eventsEntry.js";
 import moment from "moment";
@@ -18,10 +18,11 @@ export const Event: MeteoriumEvent<"ready"> = {
         await client.application.commands.set(interJson);
 
         // Register to guild interactions registry
+        readyNS.info("Registering guild interactions registry");
         client.config.ApplicationDeployGuildIds.forEach(async (guildId) => {
             const guild = await client.guilds.fetch(guildId).catch(() => null);
             if (!guild) return readyNS.error(`Cannot get guild ${guildId} for registering guild interactions registry`);
-            readyNS.info(`Registering guild interactions registry -> ${guildId}`);
+            readyNS.verbose(`Registering guild interactions registry -> ${guildId}`);
             await guild.commands.set(interJson);
         });
 
@@ -83,12 +84,13 @@ export const Event: MeteoriumEvent<"ready"> = {
         async function exitHandler() {
             exitNS.info("Bot shutting down!");
             const runtimeLogPromises: Promise<any>[] = [];
+            const currentTime = new Date();
             const embed = new MeteoriumEmbedBuilder()
                 .setTitle("Bot is shutting down")
                 .setDescription("The bot is now shutting down... (SIGTERM/SIGINT)")
                 .addFields([
-                    { name: "Started at", value: moment(startTime).format("DD-MM-YYYY hh:mm:ss:SSS A Z") },
-                    { name: "Shutted down at", value: moment().format("DD-MM-YYYY hh:mm:ss:SSS A Z") },
+                    { name: "Started at", value: `${time(startTime, "F")} (${time(startTime, "R")})` },
+                    { name: "Shutted down at", value: `${time(currentTime, "F")} (${time(currentTime, "R")})` },
                 ])
                 .setErrorColor();
 
@@ -111,7 +113,7 @@ export const Event: MeteoriumEvent<"ready"> = {
         const embed = new MeteoriumEmbedBuilder()
             .setTitle("Bot is online")
             .setDescription("The bot is now online")
-            .addFields([{ name: "Started at", value: moment(startTime).format("DD-MM-YYYY hh:mm:ss:SSS A Z") }])
+            .addFields([{ name: "Started at", value: `${time(startTime, "F")} (${time(startTime, "R")})` }])
             .setNormalColor();
 
         client.config.RuntimeLogChannelIds.forEach(async (channelId) => {
