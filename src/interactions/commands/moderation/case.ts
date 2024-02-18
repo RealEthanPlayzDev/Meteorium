@@ -33,51 +33,14 @@ export const Command: MeteoriumChatCommand = {
         await interaction.deferReply({ ephemeral: ephemeral });
 
         // Get case data
-        const caseDb = await client.dbUtils.getCaseData(interaction.guildId, caseId, historyLevel);
-        if (!caseDb) return await interaction.editReply("The case you specified doesn't exist.");
-
-        // Get user datas
-        const modUser = await client.users.fetch(caseDb.ModeratorUserId).catch(() => null);
-        const targetUser = await client.users.fetch(caseDb.TargetUserId).catch(() => null);
-
-        // Create embed
-        const embed = new MeteoriumEmbedBuilder(interaction.user)
-            .setAuthor({
-                name: `Case: #${caseId} | ${caseDb.Action.toLowerCase()} | ${targetUser != null ? `${targetUser.username} (${targetUser.id})` : caseDb.TargetUserId}`,
-                iconURL: targetUser != null ? targetUser.displayAvatarURL({ extension: "png", size: 256 }) : undefined,
-            })
-            .addFields([
-                {
-                    name: "Moderator",
-                    value: `${userMention(caseDb.ModeratorUserId)} (${modUser != null ? `${modUser.username} - ${modUser.id}` : caseDb.ModeratorUserId})`,
-                },
-                {
-                    name: "Target",
-                    value: `${userMention(caseDb.TargetUserId)} (${targetUser != null ? `${targetUser.username} - ${targetUser.id}` : caseDb.TargetUserId})`,
-                },
-                { name: "Reason", value: caseDb.Reason },
-            ])
-            .setImage(caseDb.AttachmentProof != "" ? caseDb.AttachmentProof : null)
-            .setThumbnail(caseDb.ModeratorAttachment != "" ? caseDb.ModeratorAttachment : null)
-            .setColor("Yellow");
-
-        // Action specific fields
-        if (caseDb.Action == ModerationAction.Mute || caseDb.Action == ModerationAction.TempBan)
-            embed.addFields([{ name: "Duration", value: caseDb.Duration }]);
-        if (caseDb.Action == ModerationAction.Ban)
-            embed.addFields([{ name: "Appealable", value: caseDb.NotAppealable ? "No" : "Yes" }]);
-
-        // Remaining fields
-        embed.addFields([
-            { name: "Moderator note", value: caseDb.ModeratorNote != "" ? caseDb.ModeratorNote : "N/A" },
-            { name: "Attachment proof", value: caseDb.AttachmentProof != "" ? caseDb.AttachmentProof : "N/A" },
-            {
-                name: "Moderator attachment",
-                value: caseDb.ModeratorAttachment != "" ? caseDb.ModeratorAttachment : "N/A",
-            },
-            { name: "Removed", value: caseDb.Removed ? "Yes" : "No" },
-            { name: "Created at", value: `${time(caseDb.CreatedAt, "F")} (${time(caseDb.CreatedAt, "R")})` },
-        ]);
+        const embed = await client.dbUtils.generateCaseEmbedFromCaseId(
+            interaction.guildId,
+            caseId,
+            interaction.user,
+            true,
+            historyLevel,
+        );
+        if (!embed) return await interaction.editReply("The case you specified doesn't exist.");
 
         return await interaction.editReply({ embeds: [embed] });
     },
