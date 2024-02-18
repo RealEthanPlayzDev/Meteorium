@@ -52,4 +52,10 @@ export default class MeteoriumClient extends Client<true> {
         loginNS.info("Logging in to Discord");
         return super.login(this.config.BotToken);
     }
+
+    public async destroy() {
+        await super.destroy();
+        await this.db.$disconnect();
+        return;
+    }
 }
