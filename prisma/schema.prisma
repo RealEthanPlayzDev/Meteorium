@@ -57,7 +57,7 @@ model ModerationCaseHistory {
     ModerationCase          ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
     GlobalCaseId            Int
     EditedAt                DateTime       @default(now())
-    Editor                  String
+    EditorUserId            String
     Reason                  String?
     AttachmentProof         String?
     Duration                String?
@@ -69,7 +69,7 @@ model ModerationCaseHistory {
 
 model ActiveTempBans {
     ActiveTempBanId Int            @id @default(autoincrement())
-    GlobalCaseId    Int
+    GlobalCaseId    Int            @unique
     Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
 }
 
