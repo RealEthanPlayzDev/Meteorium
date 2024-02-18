@@ -7,3 +7,4 @@ export * as TestDefferedError from "./tests/deferredError.js";
 export * as Case from "./moderation/case.js";
 export * as Cases from "./moderation/cases.js";
 export * as RemoveCase from "./moderation/removeCase.js";
+export * as EditCase from "./moderation/editCase.js";

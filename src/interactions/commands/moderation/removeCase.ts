@@ -1,7 +1,6 @@
 import { PermissionFlagsBits, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { ModerationAction } from "@prisma/client";
 import type { MeteoriumChatCommand } from "../../index.js";
-import MeteoriumEmbedBuilder from "../../../classes/embedBuilder.js";
 
 export const Command: MeteoriumChatCommand = {
     interactionData: new SlashCommandBuilder()
