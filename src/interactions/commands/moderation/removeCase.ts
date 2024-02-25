@@ -112,6 +112,14 @@ export const Command: MeteoriumChatCommand = {
                     // Edit interaction reply
                     await interaction.editReply({ content: replyContent, embeds: [], components: [] });
 
+                    // Logging
+                    await client.dbUtils.sendGuildLog(interaction.guildId, {
+                        content: `Case #${caseId} removed.`,
+                        embeds: [
+                            await client.dbUtils.generateCaseEmbedFromData(caseData, interaction.user, true, true),
+                        ],
+                    });
+
                     break;
                 }
                 case "no": {

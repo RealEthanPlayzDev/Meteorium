@@ -141,11 +141,22 @@ export const Command: MeteoriumChatCommand = {
                     });
 
                     // Edit the reply
+                    const editCount = await client.db.moderationCaseHistory.count({ where: { GlobalCaseId: caseId } });
                     await interaction.editReply({
-                        content: `Case #${caseId} edited. (Edit #${await client.db.moderationCaseHistory.count({ where: { GlobalCaseId: caseId } })})`,
+                        content: `Case #${caseId} edited. (Edit #${editCount})`,
                         embeds: [newDataEmbed],
                         components: [],
                     });
+
+                    // Logging
+                    await client.dbUtils.sendGuildLog(interaction.guildId, {
+                        content: `Case #${caseId} edited. (Edit #${editCount}) (new top, previous bottom)`,
+                        embeds: [
+                            await client.dbUtils.generateCaseEmbedFromData(newCaseData, interaction.user, true, true),
+                            await client.dbUtils.generateCaseEmbedFromData(caseData, interaction.user, true, true),
+                        ],
+                    });
+
                     break;
                 }
                 case "no": {

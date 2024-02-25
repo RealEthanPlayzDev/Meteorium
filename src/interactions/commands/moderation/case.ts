@@ -42,6 +42,12 @@ export const Command: MeteoriumChatCommand = {
         );
         if (!embed) return await interaction.editReply("The case you specified doesn't exist.");
 
+        // Logging
+        await client.dbUtils.sendGuildLog(interaction.guildId, {
+            content: `Case #${caseId} viewed.`,
+            embeds: [embed],
+        });
+
         return await interaction.editReply({ embeds: [embed] });
     },
 };
