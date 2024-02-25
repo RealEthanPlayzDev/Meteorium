@@ -1,4 +1,4 @@
-import { User, time, userMention } from "discord.js";
+import { MessageCreateOptions, MessagePayload, User, time, userMention } from "discord.js";
 import { ModerationAction } from "@prisma/client";
 import MeteoriumClient from "./client.js";
 import MeteoriumEmbedBuilder from "./embedBuilder.js";
@@ -172,5 +172,16 @@ export default class MeteoriumDatabaseUtilities {
         const caseData = await this.getCaseData(guildId, caseId, historyTake);
         if (!caseData) return false;
         return await this.generateCaseEmbedFromData(caseData, requester, full, inclRequester);
+    }
+
+    public async sendGuildLog(guildId: string, reply: string | MessagePayload | MessageCreateOptions) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        if (!guildSettings) return;
+        if (guildSettings.LoggingChannelId == "") return;
+
+        const channel = await this.client.channels.fetch(guildSettings.LoggingChannelId).catch(() => null);
+        if (!channel || !channel.isTextBased()) return;
+
+        return await channel.send(reply);
     }
 }
