@@ -7,6 +7,7 @@ import Logging from "./logging.js";
 import MeteoriumInteractionManager from "../interactions/index.js";
 import MeteoriumEventManager from "../events/index.js";
 import MeteoriumDatabaseUtilities from "./dbUtils.js";
+import MeteoriumGuildFeatureManager from "./guildFeatureManager.js";
 
 function parseDotEnvConfig() {
     if (!process.env.METEORIUM_BOT_TOKEN) config();
@@ -26,6 +27,7 @@ export default class MeteoriumClient extends Client<true> {
     public config = parseDotEnvConfig();
     public db = new PrismaClient();
     public dbUtils = new MeteoriumDatabaseUtilities(this);
+    public guildFeatures = new MeteoriumGuildFeatureManager(this);
     public interactions = new MeteoriumInteractionManager(this);
     public events = new MeteoriumEventManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
