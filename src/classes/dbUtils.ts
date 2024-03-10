@@ -9,6 +9,8 @@ export type CaseData = {
     Action: ModerationAction;
     TargetUserId: string;
     ModeratorUserId: string;
+    Active: boolean;
+    RelatedCaseId: number;
     PublicLogMsgId: string;
     CreatedAt: Date;
 
@@ -37,12 +39,14 @@ export default class MeteoriumDatabaseUtilities {
         if (!caseDb) return false;
 
         // Build a final data dictionary
-        const finalData = {
+        const finalData: CaseData = {
             GlobalCaseId: caseDb.GlobalCaseId,
             CaseId: caseDb.CaseId,
             Action: caseDb.Action,
             TargetUserId: caseDb.TargetUserId,
             ModeratorUserId: caseDb.ModeratorUserId,
+            Active: caseDb.Active,
+            RelatedCaseId: caseDb.RelatedCaseId,
             PublicLogMsgId: caseDb.PublicModLogMsgId,
             CreatedAt: caseDb.CreatedAt,
 
