@@ -148,6 +148,16 @@ export default class MeteoriumDatabaseUtilities {
         if (caseData.Action == ModerationAction.Ban)
             embed.addFields([{ name: "Appealable", value: caseData.NotAppealable ? "No" : "Yes" }]);
 
+        // Active ban and related appeal case id
+        if (caseData.Action == ModerationAction.Ban && full)
+            embed.addFields([
+                { name: "Active ban", value: caseData.Active ? "Yes" : "No" },
+                {
+                    name: "Appeal case id",
+                    value: caseData.RelatedCaseId != -1 ? caseData.RelatedCaseId.toString() : "N/A",
+                },
+            ]);
+
         // Full data
         if (full) {
             embed.addFields([
