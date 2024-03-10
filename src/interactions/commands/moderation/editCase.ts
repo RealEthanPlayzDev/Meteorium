@@ -83,6 +83,8 @@ export const Command: MeteoriumChatCommand = {
             Action: caseData.Action,
             TargetUserId: caseData.TargetUserId,
             ModeratorUserId: caseData.ModeratorUserId,
+            Active: caseData.Active,
+            RelatedCaseId: caseData.RelatedCaseId,
             PublicLogMsgId: caseData.PublicLogMsgId,
             CreatedAt: caseData.CreatedAt,
 
