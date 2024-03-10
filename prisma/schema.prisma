@@ -44,6 +44,8 @@ model ModerationCase {
     ModeratorNote         String                  @default("")
     ModeratorAttachment   String                  @default("")
     NotAppealable         Boolean                 @default(false)
+    Active                Boolean                 @default(false) // Used in ban
+    RelatedCaseId         Int                     @default(-1) // Used in ban
     PublicModLogMsgId     String                  @default("")
     CreatedAt             DateTime                @default(now())
     ActiveTempBans        ActiveTempBans[]
