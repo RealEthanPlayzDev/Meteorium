@@ -1,7 +1,7 @@
 import { PermissionFlagsBits, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import type { MeteoriumChatCommand } from "../../index.js";
 import { CaseData } from "../../../classes/dbUtils.js";
-import { ModerationAction } from "@prisma/client";
+import { ModerationAction, GuildFeatures } from "@prisma/client";
 
 export const Command: MeteoriumChatCommand = {
     interactionData: new SlashCommandBuilder()
@@ -59,6 +59,7 @@ export const Command: MeteoriumChatCommand = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
+    requiredFeature: GuildFeatures.Moderation,
     async callback(interaction, client) {
         const actionStr = interaction.options.getString("action", true);
         const user = interaction.options.getUser("user", true);

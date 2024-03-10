@@ -17,6 +17,7 @@ import {
     userMention,
     User,
 } from "discord.js";
+import { GuildFeatures } from "@prisma/client";
 import type MeteoriumClient from "../classes/client.js";
 import type { LoggingNamespace } from "../classes/logging.js";
 
@@ -27,6 +28,7 @@ import MeteoriumEmbedBuilder from "../classes/embedBuilder.js";
 
 export type MeteoriumChatCommand = {
     interactionData: Pick<SlashCommandBuilder, "toJSON"> & Pick<SlashCommandBuilder, "name">;
+    requiredFeature?: GuildFeatures;
     callback(interaction: ChatInputCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     autocomplete?(interaction: AutocompleteInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     initialize?(client: MeteoriumClient): Awaitable<any>;
@@ -34,12 +36,14 @@ export type MeteoriumChatCommand = {
 
 export type MeteoriumUserContextMenuAction = {
     interactionData: ContextMenuCommandBuilder;
+    requiredFeature?: GuildFeatures;
     callback(interaction: UserContextMenuCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     initialize?(client: MeteoriumClient): Awaitable<any>;
 };
 
 export type MeteoriumMessageContextMenuAction = {
     interactionData: ContextMenuCommandBuilder;
+    requiredFeature?: GuildFeatures;
     callback(interaction: MessageContextMenuCommandInteraction<"cached">, client: MeteoriumClient): Awaitable<any>;
     initialize?(client: MeteoriumClient): Awaitable<any>;
 };
@@ -201,6 +205,19 @@ export default class MeteoriumInteractionManager {
             return dispatchNS.error(
                 `could not find interaction data for ${interactionName}? ignoring this interaction (${interaction.id})`,
             );
+
+        // Required feature check
+        if (
+            data.requiredFeature &&
+            !(await this.client.guildFeatures.hasFeatureEnabled(interaction.guildId, data.requiredFeature))
+        ) {
+            if (interaction.isRepliable())
+                await interaction.reply({
+                    content: `This command requires the guild feature ${data.requiredFeature} to be enabled.`,
+                    ephemeral: true,
+                });
+            return;
+        }
 
         // Logging to guild internal logs
         if (!isAutocomplete)
