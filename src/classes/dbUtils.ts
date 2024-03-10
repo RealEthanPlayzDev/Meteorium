@@ -198,4 +198,15 @@ export default class MeteoriumDatabaseUtilities {
 
         return await channel.send(reply);
     }
+
+    public async sendGuildPubLog(guildId: string, reply: string | MessagePayload | MessageCreateOptions) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        if (!guildSettings) return;
+        if (guildSettings.LoggingChannelId == "") return;
+
+        const channel = await this.client.channels.fetch(guildSettings.PublicModLogChannelId).catch(() => null);
+        if (!channel || !channel.isTextBased()) return;
+
+        return await channel.send(reply);
+    }
 }
