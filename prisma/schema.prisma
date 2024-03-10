@@ -10,17 +10,6 @@ datasource db {
     url      = env("METEORIUM_POSTGRES_URL")
 }
 
-model Guild {
-    GuildId               String           @unique
-    EnforceSayInExecutor  Boolean          @default(false)
-    JoinLeaveLogChannelId String           @default("")
-    PublicModLogChannelId String           @default("")
-    LoggingChannelId      String           @default("")
-    BanAppealLink         String           @default("")
-    ModerationCase        ModerationCase[]
-    Tag                   Tag[]
-}
-
 enum ModerationAction {
     Ban
     TempBan
@@ -28,6 +17,29 @@ enum ModerationAction {
     Mute
     Warn
     Unban
+}
+
+enum GuildFeatures {
+    Moderation
+    UserVerification
+    Tags
+    Music
+    DiscordInfo
+    HolodexAPI
+    MojangAPI
+    RobloxAPI
+}
+
+model Guild {
+    GuildId               String           @unique
+    EnforceSayInExecutor  Boolean          @default(false)
+    JoinLeaveLogChannelId String           @default("")
+    PublicModLogChannelId String           @default("")
+    LoggingChannelId      String           @default("")
+    BanAppealLink         String           @default("")
+    EnabledGuildFeatures  GuildFeatures[]
+    ModerationCase        ModerationCase[]
+    Tag                   Tag[]
 }
 
 model ModerationCase {
