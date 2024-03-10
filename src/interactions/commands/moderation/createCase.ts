@@ -241,11 +241,8 @@ export const Command: MeteoriumChatCommand = {
                     });
 
                     // Post in public moderation log
-                    const publogChannel = await interaction.guild.channels
-                        .fetch(guildSettings.PublicModLogChannelId)
-                        .catch(() => null);
-                    if (publogChannel && publogChannel.isTextBased() && dbDataEmbedPublic)
-                        publogChannel.send({ embeds: [dbDataEmbedPublic] });
+                    if (dbDataEmbedPublic)
+                        await client.dbUtils.sendGuildPubLog(interaction.guildId, { embeds: [dbDataEmbedPublic] });
 
                     // Post in internal server log
                     await client.dbUtils.sendGuildLog(interaction.guildId, {
