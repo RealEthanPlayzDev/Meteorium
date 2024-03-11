@@ -143,6 +143,23 @@ export const Command: MeteoriumChatCommand = {
                 content: "The user id does not match between the data specified here and the related case data.",
             });
 
+        // Active ban case check
+        const prevBanCase = await client.db.moderationCase.findFirst({
+            where: {
+                OR: [
+                    { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.Ban },
+                    { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.TempBan },
+                ],
+            },
+            orderBy: {
+                GlobalCaseId: "desc",
+            },
+        });
+        if (prevBanCase && prevBanCase.Active)
+            return await interaction.editReply({
+                content: "This user currently has a active ban/tempban case.",
+            });
+
         // Generate embed
         const embed = await client.dbUtils.generateCaseEmbedFromData(
             {
