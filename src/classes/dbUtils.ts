@@ -1,5 +1,5 @@
-import { MessageCreateOptions, MessagePayload, User, time, userMention } from "discord.js";
-import { ModerationAction } from "@prisma/client";
+import { EmbedBuilder, MessageCreateOptions, MessagePayload, User, time, userMention } from "discord.js";
+import { ModerationAction, ModerationCase } from "@prisma/client";
 import MeteoriumClient from "./client.js";
 import MeteoriumEmbedBuilder from "./embedBuilder.js";
 
@@ -21,6 +21,20 @@ export type CaseData = {
     ModeratorAttachment: string;
     NotAppealable: boolean;
     Removed: boolean;
+};
+
+export type NewCaseData = {
+    Action: ModerationAction;
+    GuildId: string;
+    TargetUserId: string;
+    ModeratorUserId: string;
+    RelatedCaseId?: number;
+    Reason: string;
+    AttachmentProof?: string;
+    Duration?: string;
+    ModeratorNote?: string;
+    ModeratorAttachment?: string;
+    NotAppealable?: boolean;
 };
 
 export default class MeteoriumDatabaseUtilities {
@@ -208,5 +222,73 @@ export default class MeteoriumDatabaseUtilities {
         if (!channel || !channel.isTextBased()) return;
 
         return await channel.send(reply);
+    }
+
+    public async createModerationCase(
+        data: NewCaseData,
+        afterDbCreateCallback?: (caseDb: ModerationCase) => Promise<void>,
+    ) {
+        // Create case
+        const caseDb = await this.client.db.moderationCase.create({
+            data: {
+                GuildId: data.GuildId,
+                CaseId: (await this.client.db.moderationCase.count({ where: { GuildId: data.GuildId } })) + 1,
+                Action: data.Action,
+                TargetUserId: data.TargetUserId,
+                ModeratorUserId: data.ModeratorUserId,
+                Reason: data.Reason,
+                AttachmentProof: data.AttachmentProof,
+                Duration: data.Duration,
+                ModeratorNote: data.ModeratorNote,
+                ModeratorAttachment: data.ModeratorAttachment,
+                NotAppealable: data.NotAppealable,
+                RelatedCaseId: data.RelatedCaseId,
+            },
+        });
+
+        // Do callback
+        if (afterDbCreateCallback) await afterDbCreateCallback(caseDb);
+
+        // Generate embed
+        const embed = await this.generateCaseEmbedFromData(
+            {
+                ...caseDb,
+                Removed: false,
+                PublicLogMsgId: "",
+            },
+            undefined,
+            false,
+            false,
+        );
+
+        // Send in public log
+        const pubLog = await this.sendGuildPubLog(data.GuildId, { embeds: [embed] });
+        if (pubLog)
+            await this.client.db.moderationCase.update({
+                where: { GlobalCaseId: caseDb.GlobalCaseId },
+                data: { PublicModLogMsgId: pubLog.id },
+            });
+
+        // Generate full embed
+        const fullEmbed = await this.generateCaseEmbedFromData(
+            {
+                ...caseDb,
+                Removed: false,
+                PublicLogMsgId: pubLog ? pubLog.id : "",
+            },
+            await this.client.users.fetch(data.ModeratorUserId).catch(() => undefined),
+            true,
+            true,
+        );
+
+        // Send in private log
+        await this.sendGuildLog(data.GuildId, { embeds: [fullEmbed] });
+
+        return {
+            globalCaseId: caseDb.GlobalCaseId,
+            caseId: caseDb.CaseId,
+            embed: embed,
+            fullEmbed: fullEmbed,
+        };
     }
 }

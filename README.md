@@ -33,3 +33,7 @@ yarn start
 ## Configuration file
 
 See the `.env.example`
+
+## Special thanks
+
+-   [@Abdelrahmanwalidhassan's `ms` fork](https://github.com/Abdelrahmanwalidhassan/ms)
