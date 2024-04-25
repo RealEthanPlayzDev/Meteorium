@@ -106,7 +106,7 @@ export const Command: MeteoriumChatCommand = {
                 // Ban
                 const delMsgSeconds = delMsgHistoryTime ? ms(delMsgHistoryTime) * 1000 : undefined;
                 await member.ban({
-                    reason: `Case #${caseId} from ${moderator.username} (${moderator.id}): ${reason}`,
+                    reason: `Case #${caseDb.CaseId} from ${moderator.username} (${moderator.id}): ${reason}`,
                     deleteMessageSeconds: delMsgSeconds
                         ? delMsgSeconds >= 604800
                             ? 604800
@@ -138,20 +138,41 @@ export const Command: MeteoriumChatCommand = {
         return await interaction.respond([]);
     },
     async initialize(client) {
+        const logNS = client.logging.getNamespace("Moderation").getNamespace("TempBan");
         setInterval(async () => {
             await client.db.$transaction(async (tx) => {
                 const active = await tx.activeTempBans.findMany({ include: { Case: true } });
                 const promises = active.map(async (active) => {
-                    const createdAt = active.Case.CreatedAt;
+                    const current = new Date();
                     const expiresAt = new Date(Number(active.Case.CreatedAt) + ms(active.Case.Duration));
-                    if (expiresAt <= createdAt) {
+                    if (expiresAt <= current) {
+                        logNS.verbose(`Processing unban for ${active.Case.TargetUserId} in ${active.Case.GuildId}`);
+
+                        // Unban
                         const guild = await client.guilds.fetch(active.Case.GuildId);
-                        await guild.members.unban(active.Case.TargetUserId);
+                        await guild.members.unban(
+                            active.Case.TargetUserId,
+                            `Case #${active.Case.CaseId}: Automatic unban from temporary ban.`,
+                        );
                         await tx.activeTempBans.delete({ where: { ActiveTempBanId: active.ActiveTempBanId } });
                         await tx.moderationCase.update({
                             where: { GlobalCaseId: active.GlobalCaseId },
                             data: { Active: false },
                         });
+
+                        // Log
+                        const logEmbed = await client.dbUtils.generateCaseEmbedFromCaseId(
+                            active.Case.GuildId,
+                            active.Case.CaseId,
+                            undefined,
+                            true,
+                        );
+                        if (!logEmbed)
+                            throw new Error(
+                                `could not generate embed for case #${active.Case.CaseId}@${active.Case.GuildId} (${active.Case.GlobalCaseId})`,
+                            );
+                        logEmbed.setTitle("Automatic unban");
+                        await client.dbUtils.sendGuildLog(active.Case.GuildId, { embeds: [logEmbed] });
                     }
                     return;
                 });
