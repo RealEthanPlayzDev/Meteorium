@@ -120,7 +120,7 @@ export const Command: MeteoriumChatCommand = {
                 // Ban
                 const delMsgSeconds = delMsgHistoryTime ? ms(delMsgHistoryTime) * 1000 : undefined;
                 await member.ban({
-                    reason: `Case #${caseId} from ${moderator.username} (${moderator.id}): ${reason}`,
+                    reason: `Case #${caseDb.CaseId} from ${moderator.username} (${moderator.id}): ${reason}`,
                     deleteMessageSeconds: delMsgSeconds
                         ? delMsgSeconds >= 604800
                             ? 604800
