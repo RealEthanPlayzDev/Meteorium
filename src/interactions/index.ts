@@ -73,6 +73,10 @@ export default class MeteoriumInteractionManager {
             if (this.client.config.DontRegisterTestInteractions && Name.toLowerCase().startsWith("test")) continue;
             regChatInputNS.verbose(`Registering -> ${Name} (${Command.interactionData.name})`);
             this.chatInputInteractions.set(Name, Command);
+            if (Command.initialize) {
+                regChatInputNS.verbose(`Init -> ${Name} (${Command.interactionData.name})`);
+                Command.initialize(this.client);
+            }
         }
 
         return;
@@ -94,6 +98,10 @@ export default class MeteoriumInteractionManager {
                     `invalid context menu action type for ${Name} (expected User, got ${UserContextMenuAction.interactionData.type})`,
                 );
             this.userContextMenuActionInteractions.set(Name, UserContextMenuAction);
+            if (UserContextMenuAction.initialize) {
+                regUserContextMenuActionNS.verbose(`Init -> ${Name} (${UserContextMenuAction.interactionData.name})`);
+                UserContextMenuAction.initialize(this.client);
+            }
         }
 
         return;
@@ -115,6 +123,12 @@ export default class MeteoriumInteractionManager {
                     `invalid context menu action type for ${Name} (expected Message, got ${MessageContextMenuAction.interactionData.type})`,
                 );
             this.messageContextMenuActionInteractions.set(Name, MessageContextMenuAction);
+            if (MessageContextMenuAction.initialize) {
+                regMessageContextMenuActionNS.verbose(
+                    `Init -> ${Name} (${MessageContextMenuAction.interactionData.name})`,
+                );
+                MessageContextMenuAction.initialize(this.client);
+            }
         }
 
         return;
