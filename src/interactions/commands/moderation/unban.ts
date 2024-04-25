@@ -7,15 +7,15 @@ export const Command: MeteoriumChatCommand = {
         .setName("unban")
         .setDescription("Deactivate a ban punishment")
         .addNumberOption((option) =>
-            option.setName("relcid").setDescription("The ban case id that will be deactivated"),
+            option.setName("relcid").setDescription("The ban case id that will be deactivated").setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName("reason").setDescription("The reason why this user was pardoned").setRequired(true),
+            option.setName("reason").setDescription("The reason why this user was unbanned").setRequired(true),
         )
         .addAttachmentOption((option) =>
             option
                 .setName("proof")
-                .setDescription("The attachment proof on why this user received the pardon")
+                .setDescription("The attachment proof on why this user got unbanned")
                 .setRequired(false),
         )
         .addStringOption((option) =>
@@ -28,7 +28,7 @@ export const Command: MeteoriumChatCommand = {
         .setDMPermission(false),
     requiredFeature: GuildFeatures.Moderation,
     async callback(interaction, client) {
-        const relatedCaseId = interaction.options.getInteger("relcid", true);
+        const relatedCaseId = interaction.options.getNumber("relcid", true);
         const reason = interaction.options.getString("reason", true);
         const proof = interaction.options.getAttachment("proof", false);
         const moderationNote = interaction.options.getString("modnote", false);
@@ -89,6 +89,9 @@ export const Command: MeteoriumChatCommand = {
                             RelatedCaseId: caseId,
                         },
                     });
+
+                    // Unban
+                    await interaction.guild.members.unban(banCase.TargetUserId, `Case #${caseId}: ${reason}`);
 
                     // Edit reply
                     await interaction.editReply({
