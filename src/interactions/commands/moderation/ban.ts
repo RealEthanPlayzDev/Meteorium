@@ -69,6 +69,7 @@ export const Command: MeteoriumChatCommand = {
                 AttachmentProof: proof?.url,
                 ModeratorNote: moderationNote || undefined,
                 ModeratorAttachment: moderationAttach?.url,
+                NotAppealable: notAppealable || undefined,
             },
             async function (caseDb) {
                 // Get guild settings
