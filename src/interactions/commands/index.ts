@@ -12,4 +12,6 @@ export * as CreateCase from "./moderation/createCase.js";
 export * as Warn from "./moderation/warn.js";
 export * as Mute from "./moderation/mute.js";
 export * as Kick from "./moderation/kick.js";
+export * as TempBan from "./moderation/tempBan.js";
 export * as Ban from "./moderation/ban.js";
+export * as UnBan from "./moderation/unban.js";
