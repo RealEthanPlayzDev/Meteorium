@@ -131,7 +131,7 @@ export default class MeteoriumDatabaseUtilities {
         });
 
         // Set the attachment proof if any exist
-        embed.setThumbnail(caseData.AttachmentProof == "" ? null : caseData.AttachmentProof);
+        embed.setImage(caseData.AttachmentProof == "" ? null : caseData.AttachmentProof);
 
         // Include requester?
         if (inclRequester && requester)
@@ -178,7 +178,10 @@ export default class MeteoriumDatabaseUtilities {
                 { name: "Moderator note", value: caseData.ModeratorNote == "" ? "N/A" : caseData.ModeratorNote },
                 { name: "Removed", value: caseData.Removed ? "Yes" : "No" },
             ]);
-            embed.setImage(caseData.ModeratorAttachment == "" ? null : caseData.ModeratorAttachment);
+            if (caseData.ModeratorAttachment != "") {
+                embed.setImage(caseData.ModeratorAttachment == "" ? null : caseData.ModeratorAttachment);
+                embed.setThumbnail(caseData.AttachmentProof == "" ? null : caseData.AttachmentProof);
+            }
         }
 
         // Created at
