@@ -1,16 +1,28 @@
 # Meteorium
 
-A Discord bot developed by RadiatedExodus (RealEthanPlayzDev) as a side (and personal) project, written in Javascript using Node.js and Discord.js, also being used as a way for me to learn JavaScript and TypeScript.
+This is a hobby Discord bot I've written, the bot is only used for a few servers.
+Feel free to look around, make suggestion, and report bugs.
 
-Since the ts rewrite, some of the source might ressemble [PojavBot](https://github.com/PojavLauncherTeam/PojavBot) as I took several references from there.
-
-## UNSTABLE - THIS IS A FULL REWRITE
+## FULL REWRITE (v3)
 
 This branch is a full rewrite, not all features have been implemented!
 
+## Feature parity with v2
+
+-   [*] Moderation
+-   [ ] Music
+-   [ ] Info
+-   [ ] HolodexAPI
+-   [ ] MojangAPI
+-   [ ] RbxAPI
+-   [ ] ServerInfo
+-   [ ] UserInfo
+-   [ ] Tag
+-   [ ] Ping
+
 ## Installing required dependencies
 
-Ensure `yarn` is installed (`npm install --global yarn`), then just run it at the root of the repository
+Meteorium uses `yarn` to manage Node packages. Ensure `yarn` is installed (`npm install --global yarn`), then just run it at the root of the repository
 
 ```
 yarn
@@ -33,34 +45,8 @@ yarn start
 
 ## Configuration file
 
-The configuration file uses `dotenv`, create a file named ".ENV" on the project root and use the following example:
+See the `.env.example`
 
-```
-METEORIUMBOTTOKEN=bot_token_here
-METEORIUMPOSTGRESURL=postgres_url_here
-METEORIUMHOLODEXTOKEN=holodex_token_here_optional
-METEORIUMAPPLICATIONID=bot_app_id_here
-RATELIMITMAXLIMIT=rate_limit_maximum_limit_before_nodejs_terminates_PUT_A_NUMBER_HERE
-RATELIMITMAXLIMITTIME=after_when_should_ratelimit_reset_PUT_A_NUMBER_HERE
-DEPLOYGUILDIDS=guildids_for_deployment_seperated_by,commas,and_so_on
-GENIUSAPIKEY=genius_api_key_here
-```
+## Special thanks
 
-## Credits
-
--   [discord.js](https://github.com/discordjs/discord.js)
--   [holodex.js](https://github.com/HolodexNet/holodex.js)
--   [noblox.js](https://github.com/noblox/noblox.js)
--   [Prisma](https://www.prisma.io)
--   [dotenv](https://github.com/motdotla/dotenv)
-
-## Acknowledgements
-
--   All discord.js contributors and authors
--   All holodex.js contributors and authors
--   All noblox.js contributors and authors
--   All mongodb contributors and authors
--   All dotenv contributors and authors
--   All Prisma contributors and authors
--   All PostgreSQL contributors and authors
--   Syjalo
+-   [@Abdelrahmanwalidhassan's `ms` fork](https://github.com/Abdelrahmanwalidhassan/ms)

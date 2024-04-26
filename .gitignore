@@ -1,4 +1,6 @@
-config.json
+# Compile deps and results
 node_modules
-.ENV
 dist
+
+# Configuration files
+.env

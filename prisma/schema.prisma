@@ -7,19 +7,7 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("METEORIUMPOSTGRESURL")
-}
-
-model Guild {
-    GuildId                   String   @unique
-    EnforceSayInExecutor      Boolean  @default(false)
-    DisabledCommands          String[] @default([])
-    DisabledCommandCategories String[] @default([])
-    PublicModLogChannelId     String   @default("")
-    LoggingChannelId          String   @default("")
-    JoinLeaveLogChannelId     String   @default("")
-    CurrentCaseId             Int      @default(0)
-    BanAppealLink             String   @default("")
+    url      = env("METEORIUM_POSTGRES_URL")
 }
 
 enum ModerationAction {
@@ -31,37 +19,51 @@ enum ModerationAction {
     Unban
 }
 
+enum GuildFeatures {
+    Moderation
+    UserVerification
+    Tags
+    Music
+    DiscordInfo
+    HolodexAPI
+    MojangAPI
+    RobloxAPI
+}
+
+model Guild {
+    GuildId               String           @unique
+    EnforceSayInExecutor  Boolean          @default(false)
+    JoinLeaveLogChannelId String           @default("")
+    PublicModLogChannelId String           @default("")
+    LoggingChannelId      String           @default("")
+    BanAppealLink         String           @default("")
+    EnabledGuildFeatures  GuildFeatures[]
+    ModerationCase        ModerationCase[]
+    Tag                   Tag[]
+}
+
 model ModerationCase {
     GlobalCaseId          Int                     @id @default(autoincrement())
+    Guild                 Guild                   @relation(fields: [GuildId], references: [GuildId], onDelete: Cascade)
+    GuildId               String
     CaseId                Int
     Action                ModerationAction
     TargetUserId          String
     ModeratorUserId       String
-    GuildId               String
     Reason                String
-    AttachmentProof       String
+    AttachmentProof       String                  @default("")
     Duration              String                  @default("0")
-    CreatedAt             DateTime                @default(now())
     ModeratorNote         String                  @default("")
     ModeratorAttachment   String                  @default("")
     NotAppealable         Boolean                 @default(false)
+    Active                Boolean                 @default(true) // Used in ban
+    RelatedCaseId         Int                     @default(-1) // Used in ban, does NOT use GlobalCaseId
     PublicModLogMsgId     String                  @default("")
+    CreatedAt             DateTime                @default(now())
     ActiveTempBans        ActiveTempBans[]
     ModerationCaseHistory ModerationCaseHistory[]
-}
 
-model Tag {
-    GlobalTagId Int    @id @default(autoincrement())
-    TagName     String
-    GuildId     String
-    Content     String
-    Image       String
-}
-
-model ActiveTempBans {
-    ActiveTempBanId Int            @id @default(autoincrement())
-    GlobalCaseId    Int
-    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
+    @@unique(name: "UniqueCaseIdPerGuild", fields: [GuildId, CaseId])
 }
 
 model ModerationCaseHistory {
@@ -69,11 +71,27 @@ model ModerationCaseHistory {
     ModerationCase          ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
     GlobalCaseId            Int
     EditedAt                DateTime       @default(now())
-    Editor                  String
+    EditorUserId            String
     Reason                  String?
     AttachmentProof         String?
     Duration                String?
     ModeratorNote           String?
     ModeratorAttachment     String?
     NotAppealable           Boolean?
+    Removed                 Boolean?
+}
+
+model ActiveTempBans {
+    ActiveTempBanId Int            @id @default(autoincrement())
+    GlobalCaseId    Int            @unique
+    Case            ModerationCase @relation(fields: [GlobalCaseId], references: [GlobalCaseId], onDelete: Cascade)
+}
+
+model Tag {
+    GlobalTagId Int    @id @default(autoincrement())
+    Guild       Guild  @relation(fields: [GuildId], references: [GuildId], onDelete: Cascade)
+    GuildId     String
+    TagName     String
+    Content     String
+    Attachment  String @default("")
 }
