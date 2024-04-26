@@ -7,6 +7,19 @@ Feel free to look around, make suggestion, and report bugs.
 
 This branch is a full rewrite, not all features have been implemented!
 
+## Feature parity with v2
+
+-   [*] Moderation
+-   [ ] Music
+-   [ ] Info
+-   [ ] HolodexAPI
+-   [ ] MojangAPI
+-   [ ] RbxAPI
+-   [ ] ServerInfo
+-   [ ] UserInfo
+-   [ ] Tag
+-   [ ] Ping
+
 ## Installing required dependencies
 
 Meteorium uses `yarn` to manage Node packages. Ensure `yarn` is installed (`npm install --global yarn`), then just run it at the root of the repository
