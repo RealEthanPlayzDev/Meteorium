@@ -81,7 +81,10 @@ export const Event: MeteoriumEvent<"ready"> = {
 
         // Exit handling
         const exitNS = runtimeNS.getNamespace("Exit");
+        let exitAlreadyHandled = false;
         async function exitHandler() {
+            if (exitAlreadyHandled) return;
+            exitAlreadyHandled = true;
             exitNS.info("Bot shutting down!");
             const runtimeLogPromises: Promise<any>[] = [];
             const currentTime = new Date();
