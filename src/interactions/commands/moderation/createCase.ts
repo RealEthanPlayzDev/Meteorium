@@ -144,20 +144,25 @@ export const Command: MeteoriumChatCommand = {
             });
 
         // Active ban case check
-        const prevBanCase = await client.db.moderationCase.findFirst({
-            where: {
-                OR: [
-                    { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.Ban },
-                    { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.TempBan },
-                ],
-            },
-            orderBy: {
-                GlobalCaseId: "desc",
-            },
-        });
-        if (prevBanCase && prevBanCase.Active)
+        // TODO: god dammit make this look better
+        const prevBanCase = await client.dbUtils.getCaseData(
+            interaction.guildId,
+            (await client.db.moderationCase.findFirst({
+                where: {
+                    OR: [
+                        { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.Ban },
+                        { GuildId: interaction.guildId, TargetUserId: user.id, Action: ModerationAction.TempBan },
+                    ],
+                },
+                orderBy: {
+                    GlobalCaseId: "desc",
+                },
+                select: { CaseId: true },
+            }))!.CaseId,
+        );
+        if (prevBanCase && prevBanCase.Active && !prevBanCase.Removed)
             return await interaction.editReply({
-                content: "This user currently has a active ban/tempban case.",
+                content: "This user currently has an active ban/tempban case.",
             });
 
         // Generate embed
