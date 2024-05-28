@@ -144,6 +144,29 @@ export const Command: MeteoriumChatCommand = {
                         },
                     });
 
+                    // Edit public moderation log message if exists
+                    const guildSettings = await client.db.guild.findUnique({ where: { GuildId: interaction.guildId } });
+                    if (caseData.PublicLogMsgId != "" && guildSettings?.PublicModLogChannelId != "") {
+                        const channel = await client.channels
+                            .fetch(guildSettings!.PublicModLogChannelId)
+                            .catch(() => null);
+                        const message =
+                            channel && channel.isTextBased()
+                                ? await channel.messages.fetch(caseData.PublicLogMsgId).catch(() => null)
+                                : null;
+                        if (message)
+                            await message.edit({
+                                embeds: [
+                                    await client.dbUtils.generateCaseEmbedFromData(
+                                        newCaseData,
+                                        undefined,
+                                        false,
+                                        false,
+                                    ),
+                                ],
+                            });
+                    }
+
                     // Edit the reply
                     const editCount = await client.db.moderationCaseHistory.count({ where: { GlobalCaseId: caseId } });
                     await interaction.editReply({
