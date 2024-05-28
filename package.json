@@ -8,7 +8,8 @@
         "compile": "tsc",
         "start": "node dist",
         "installUtils:fillMissingGuildData": "node ./dist/installUtils/fillMissingGuildData.js",
-        "installUtils:enableGuildFeature": "node ./dist/installUtils/enableGuildFeature.js"
+        "installUtils:enableGuildFeature": "node ./dist/installUtils/enableGuildFeature.js",
+        "installUtils:clearInteractions": "node ./dist/installUtils/clearInteractions.js"
     },
     "repository": {
         "type": "git",
