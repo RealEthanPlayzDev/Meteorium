@@ -57,6 +57,12 @@ export const Command: MeteoriumChatCommand = {
         .addBooleanOption((option) =>
             option.setName("notappealable").setDescription("Is this ban appealable?").setRequired(false),
         )
+        .addBooleanOption((option) =>
+            option
+                .setName("publish")
+                .setDescription("Publishes the case info to the public mod log")
+                .setRequired(false),
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
     requiredFeature: GuildFeatures.Moderation,
@@ -71,6 +77,7 @@ export const Command: MeteoriumChatCommand = {
         const moderationNote = interaction.options.getString("modnote", false);
         const moderationAttach = interaction.options.getAttachment("modattach", false);
         const notAppealable = interaction.options.getBoolean("notappealable", false);
+        const publish = interaction.options.getBoolean("publish", false);
 
         // Determine action
         let action: ModerationAction;
@@ -264,7 +271,7 @@ export const Command: MeteoriumChatCommand = {
                     });
 
                     // Post in public moderation log
-                    if (dbDataEmbedPublic)
+                    if (dbDataEmbedPublic && publish)
                         await client.dbUtils.sendGuildPubLog(interaction.guildId, { embeds: [dbDataEmbedPublic] });
 
                     // Post in internal server log
