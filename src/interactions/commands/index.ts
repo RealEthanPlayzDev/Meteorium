@@ -16,3 +16,6 @@ export * as TempBan from "./moderation/tempBan.js";
 export * as Ban from "./moderation/ban.js";
 export * as UnBan from "./moderation/unban.js";
 export * as Purge from "./moderation/purge.js";
+
+// Management
+export * as Settings from "./management/settings.js";
