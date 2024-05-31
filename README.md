@@ -9,7 +9,8 @@ This branch is a full rewrite, not all features have been implemented!
 
 ## Feature parity with v2
 
--   [*] Moderation
+-   [x] Moderation
+-   [x] Settings
 -   [ ] Music
 -   [ ] Info
 -   [ ] HolodexAPI
