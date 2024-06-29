@@ -19,3 +19,6 @@ export * as Purge from "./moderation/purge.js";
 
 // Management
 export * as Settings from "./management/settings.js";
+
+// Fun
+export * as Music from "./fun/music.js";

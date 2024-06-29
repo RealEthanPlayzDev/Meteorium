@@ -2,6 +2,8 @@ import { Client, ClientOptions } from "discord.js";
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { HolodexApiClient } from "holodex.js";
+import { Player } from "discord-player";
+import { lyricsExtractor } from "@discord-player/extractor";
 
 import Logging from "./logging.js";
 import MeteoriumInteractionManager from "../interactions/index.js";
@@ -31,6 +33,8 @@ export default class MeteoriumClient extends Client<true> {
     public interactions = new MeteoriumInteractionManager(this);
     public events = new MeteoriumEventManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
+    public player = new Player(this);
+    public playerLyricsExtractor = lyricsExtractor(this.config.GeniusApiKey);
 
     public constructor(options: ClientOptions) {
         super(options);
@@ -49,6 +53,9 @@ export default class MeteoriumClient extends Client<true> {
 
         // Hook events
         this.events.hook();
+
+        // Load discord-player default extractors
+        this.player.extractors.loadDefault();
 
         // Login
         loginNS.info("Logging in to Discord");
