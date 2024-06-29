@@ -58,7 +58,7 @@ export const Command: MeteoriumChatCommand = {
                 const query = interaction.options.getString("query", true);
                 const channel = interaction.member.voice.channel;
                 if (!channel)
-                    return await interaction.reply({
+                    return await interaction.editReply({
                         content: "You are not in a voice channel.",
                     });
 
@@ -66,7 +66,7 @@ export const Command: MeteoriumChatCommand = {
                     interaction.guild.members.me?.voice.channelId &&
                     interaction.member.voice.channelId !== interaction.guild.members.me?.voice.channelId
                 )
-                    return await interaction.reply({
+                    return await interaction.editReply({
                         content: "You are not in the same voice channel.",
                     });
 
@@ -74,7 +74,7 @@ export const Command: MeteoriumChatCommand = {
                     requestedBy: interaction.user,
                 });
                 if (!search.hasTracks())
-                    return await interaction.reply({
+                    return await interaction.editReply({
                         content: "No tracks found.",
                     });
 
