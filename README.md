@@ -11,8 +11,7 @@ This branch is a full rewrite, not all features have been implemented!
 
 -   [x] Moderation
 -   [x] Settings
--   [ ] Music
--   [ ] Info
+-   [x] Music
 -   [ ] HolodexAPI
 -   [ ] MojangAPI
 -   [ ] RbxAPI
@@ -20,6 +19,7 @@ This branch is a full rewrite, not all features have been implemented!
 -   [ ] UserInfo
 -   [ ] Tag
 -   [ ] Ping
+-   [x] Welcome & left member logging
 
 ## Installing required dependencies
 
