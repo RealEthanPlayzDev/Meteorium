@@ -33,7 +33,7 @@ export default class MeteoriumClient extends Client<true> {
     public interactions = new MeteoriumInteractionManager(this);
     public events = new MeteoriumEventManager(this);
     public holodex = new HolodexApiClient({ apiKey: this.config.HolodexApiKey });
-    public player = new Player(this);
+    public player = new Player(this as any);
     public playerLyricsExtractor = lyricsExtractor(this.config.GeniusApiKey);
 
     public constructor(options: ClientOptions) {

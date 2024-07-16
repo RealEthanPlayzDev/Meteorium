@@ -62,6 +62,11 @@ export const Command: MeteoriumChatCommand = {
                         content: "You are not in a voice channel.",
                     });
 
+                if (!channel.isVoiceBased())
+                    return await interaction.editReply({
+                        content: "This is not a voice channel.",
+                    });
+
                 if (
                     interaction.guild.members.me?.voice.channelId &&
                     interaction.member.voice.channelId !== interaction.guild.members.me?.voice.channelId
@@ -71,14 +76,14 @@ export const Command: MeteoriumChatCommand = {
                     });
 
                 const search = await client.player.search(query, {
-                    requestedBy: interaction.user,
+                    requestedBy: interaction.user.id,
                 });
                 if (!search.hasTracks())
                     return await interaction.editReply({
                         content: "No tracks found.",
                     });
 
-                await client.player.play(channel, search, {
+                await client.player.play(channel as any, search, {
                     nodeOptions: {
                         metadata: interaction,
                         selfDeaf: true,
