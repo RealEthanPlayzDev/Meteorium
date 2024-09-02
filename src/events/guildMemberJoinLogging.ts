@@ -33,6 +33,15 @@ export const Event: MeteoriumEvent<"guildMemberAdd"> = {
             if (channel && channel.isTextBased()) sendPromises.push(channel.send({ embeds: [embed] }));
         }
 
+        sendPromises.push(
+            client.db.userVerificationData.upsert({
+                where: { UniqueUserPerGuild: { GuildId: member.guild.id, UserId: member.id } },
+                update: {},
+                create: { GuildId: member.guild.id, UserId: member.id },
+            }),
+        );
+        sendPromises.push(client.dbUtils.updateMemberVerificationRole(member));
+
         await Promise.all(sendPromises);
         return;
     },

@@ -19,6 +19,8 @@ export * as Purge from "./moderation/purge.js";
 
 // Management
 export * as Settings from "./management/settings.js";
+export * as Verify from "./management/verify.js";
+export * as Verification from "./management/verification.js";
 
 // Fun
 export * as Music from "./fun/music.js";

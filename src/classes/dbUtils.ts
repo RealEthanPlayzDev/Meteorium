@@ -1,5 +1,20 @@
-import { EmbedBuilder, MessageCreateOptions, MessagePayload, User, time, userMention } from "discord.js";
-import { ModerationAction, ModerationCase } from "@prisma/client";
+import {
+    Interaction,
+    MessageCreateOptions,
+    MessagePayload,
+    User,
+    ModalBuilder,
+    ActionRowBuilder,
+    TextInputBuilder,
+    time,
+    userMention,
+    TextInputStyle,
+    GuildMember,
+    ButtonBuilder,
+    ComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
+import { GuildFeatures, ModerationAction, ModerationCase, VerificationStatus } from "@prisma/client";
 import MeteoriumClient from "./client.js";
 import MeteoriumEmbedBuilder from "./embedBuilder.js";
 
@@ -293,5 +308,402 @@ export default class MeteoriumDatabaseUtilities {
             embed: embed,
             fullEmbed: fullEmbed,
         };
+    }
+
+    public async generateUserVerificationDataEmbed(guildId: string, userId: string, requester?: User) {
+        const mainDataDb = await this.client.db.userVerificationData.findUnique({
+            where: { UniqueUserPerGuild: { UserId: userId, GuildId: guildId } },
+        });
+        const dataDb = await this.client.db.userVerificationHistory.findFirst({
+            where: { UserId: userId, GuildId: guildId },
+            orderBy: { VerificationHistoryId: "desc" },
+        });
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        const embed = new MeteoriumEmbedBuilder(requester);
+        const user = await this.client.users.fetch(userId).catch(() => null);
+        const updateDate = dataDb?.UpdatedAt || new Date();
+        const createdDate = dataDb?.CreatedAt || new Date();
+
+        // Set author field
+        embed.setAuthor({
+            name: `User Verification Details | ${user != null ? `${user.username} (${user.id})` : userId}`,
+            iconURL: user != null ? user.displayAvatarURL({ extension: "png", size: 256 }) : undefined,
+        });
+
+        embed.addFields([
+            { name: "Status", value: dataDb?.Status.toString() || "Never sent a request" },
+            { name: "Banned from verification", value: mainDataDb?.Banned ? "Yes" : "No" },
+            { name: "Last request updated at", value: `${time(updateDate, "F")} (${time(updateDate, "R")})` },
+            { name: "Last request created at", value: `${time(createdDate, "F")} (${time(createdDate, "R")})` },
+        ]);
+
+        if (guildSettings?.VerifyDetailEnabled) {
+            embed.addFields([{ name: "Details", value: dataDb?.Detail || "N/A" }]);
+        }
+
+        if (guildSettings?.VerifyAttachEnabled) {
+            embed.addFields([{ name: "Attachment", value: dataDb?.Attachment || "N/A" }]);
+            embed.setImage(dataDb?.Attachment || null);
+        }
+
+        if (dataDb?.Status == VerificationStatus.Rejected) {
+            embed.addFields([{ name: "Rejection reason", value: dataDb.RejectReason }]);
+        }
+
+        return embed;
+    }
+
+    public async processVerification(interaction: Interaction<"cached">, fromEvent: boolean) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: interaction.guildId } });
+        if (!guildSettings) throw new Error("could not get settings from database");
+
+        let verificationData = await this.client.db.userVerificationData.findUnique({
+            where: { UniqueUserPerGuild: { GuildId: interaction.guildId, UserId: interaction.user.id } },
+            select: { History: true, Banned: true },
+        });
+        if (!verificationData)
+            verificationData = await this.client.db.userVerificationData.create({
+                data: { GuildId: interaction.guildId, UserId: interaction.user.id },
+                select: { History: true, Banned: true },
+            });
+
+        if (!verificationData)
+            throw new Error(`could not get/create verification data for ${interaction.user.id}@${interaction.guildId}`);
+
+        // Request submission modal
+        if (
+            (interaction.isChatInputCommand() && interaction.commandName == "verify" && !fromEvent) ||
+            (interaction.isButton() && interaction.customId == "MeteoriumUserVerificationButtonRequest")
+        ) {
+            if (guildSettings.VerifyTempPaused)
+                return await interaction.reply({
+                    content:
+                        "Verification for this server is currently paused. Contact a server admin for more details.",
+                    ephemeral: true,
+                });
+            if (verificationData.Banned)
+                return await interaction.reply({
+                    content: "You have been banned from verifying. Contact a server admin for more details.",
+                    ephemeral: true,
+                });
+
+            const histData = verificationData.History[verificationData.History.length - 1];
+            if (histData) {
+                if (histData.Status == VerificationStatus.Waiting)
+                    return await interaction.reply({
+                        content:
+                            "You already have a existing verification request. Wait for a server admin to check it.",
+                        ephemeral: true,
+                    });
+                if (histData.Status == VerificationStatus.Approved)
+                    return await interaction.reply({
+                        content: "You are already verified in this server.",
+                        ephemeral: true,
+                    });
+            }
+
+            if (guildSettings.VerifyDetailEnabled) {
+                const modal = new ModalBuilder();
+                modal.setCustomId("MeteoriumUserVerificationModal");
+                modal.setTitle("Verification request submission");
+
+                const ti = new TextInputBuilder();
+                ti.setLabel("Details");
+                ti.setCustomId("MeteoriumUserVerificationModalDetails");
+                ti.setRequired(true);
+                ti.setPlaceholder("Put the details required for verification here");
+                ti.setStyle(TextInputStyle.Paragraph);
+
+                const ar = new ActionRowBuilder<TextInputBuilder>();
+                ar.addComponents(ti);
+
+                modal.addComponents(ar);
+
+                return await interaction.showModal(modal);
+            }
+
+            const attachment = guildSettings.VerifyAttachEnabled
+                ? await this.client.db.userVerificationAttachment.findUnique({
+                      where: {
+                          UniqueAttachmentPerUserPerGuild: {
+                              GuildId: interaction.guildId,
+                              UserId: interaction.user.id,
+                          },
+                      },
+                  })
+                : undefined;
+
+            if (guildSettings.VerifyAttachEnabled && !attachment) {
+                return await interaction.reply({
+                    ephemeral: true,
+                    content: "You have not uploaded a attachment to include with the verification request.",
+                });
+            }
+
+            await this.client.db.userVerificationHistory.create({
+                data: {
+                    GuildId: interaction.guildId,
+                    UserId: interaction.user.id,
+                    Attachment: attachment?.Attachment || "",
+                },
+            });
+
+            if (guildSettings.VerifyAttachEnabled)
+                await this.client.db.userVerificationAttachment.delete({
+                    where: {
+                        UniqueAttachmentPerUserPerGuild: {
+                            GuildId: interaction.guildId,
+                            UserId: interaction.user.id,
+                        },
+                    },
+                });
+
+            return await interaction.reply({ ephemeral: true, content: "Verification request submitted." });
+        }
+
+        // Modal submission
+        if (interaction.isModalSubmit() && interaction.customId == "MeteoriumUserVerificationModal") {
+            const details = guildSettings.VerifyDetailEnabled
+                ? interaction.fields.getTextInputValue("MeteoriumUserVerificationModalDetails")
+                : undefined;
+            const attachment = guildSettings.VerifyAttachEnabled
+                ? await this.client.db.userVerificationAttachment.findUnique({
+                      where: {
+                          UniqueAttachmentPerUserPerGuild: {
+                              GuildId: interaction.guildId,
+                              UserId: interaction.user.id,
+                          },
+                      },
+                  })
+                : undefined;
+
+            const histData = verificationData.History[verificationData.History.length - 1];
+            if (histData && histData.Status == VerificationStatus.Waiting)
+                return await interaction.reply({
+                    content: "You already have a existing verification request. Wait for a server admin to check it.",
+                    ephemeral: true,
+                });
+
+            await interaction.deferReply({ ephemeral: true });
+
+            if (guildSettings.VerifyAttachEnabled && !attachment) {
+                return await interaction.editReply(
+                    "You have not uploaded a attachment to include with the verification request.",
+                );
+            }
+
+            await this.client.db.userVerificationHistory.create({
+                data: {
+                    GuildId: interaction.guildId,
+                    UserId: interaction.user.id,
+                    Detail: details,
+                    Attachment: attachment?.Attachment || "",
+                },
+            });
+
+            if (guildSettings.VerifyAttachEnabled)
+                await this.client.db.userVerificationAttachment.delete({
+                    where: {
+                        UniqueAttachmentPerUserPerGuild: {
+                            GuildId: interaction.guildId,
+                            UserId: interaction.user.id,
+                        },
+                    },
+                });
+
+            return await interaction.editReply("Verification request submitted.");
+        }
+
+        // Approve request action
+        if (interaction.isButton() && interaction.customId.startsWith("MeteoriumUserVerificationApprove-")) {
+            const targetUserId = interaction.customId.replaceAll("MeteoriumUserVerificationApprove-", "");
+            await interaction.deferUpdate();
+
+            const data = await this.client.db.userVerificationHistory.findFirst({
+                where: { GuildId: interaction.guildId, UserId: targetUserId },
+                orderBy: { VerificationHistoryId: "desc" },
+            });
+            if (!data)
+                return await interaction.editReply({
+                    content: "internal error: data doesn't exist?",
+                    embeds: [],
+                    components: [],
+                });
+
+            await this.client.db.userVerificationHistory.update({
+                where: { VerificationHistoryId: data.VerificationHistoryId },
+                data: {
+                    Status: VerificationStatus.Approved,
+                    CheckerUserId: interaction.user.id,
+                    UpdatedAt: new Date(),
+                },
+            });
+
+            const promises: Promise<any>[] = [];
+            const updateRolePromise = new Promise<void>(async (resolve) => {
+                const member = await interaction.guild.members.fetch(targetUserId).catch(() => null);
+                if (member) await this.updateMemberVerificationRole(member);
+                return resolve();
+            });
+            try {
+                const user = await this.client.users.fetch(targetUserId).catch(() => null);
+                if (user) {
+                    const embed = new MeteoriumEmbedBuilder();
+                    embed.setTitle("Verification status");
+                    embed.setDescription("Congratulations, your verification request was approved!");
+                    embed.addFields([{ name: "Server", value: `${interaction.guild.name} (${interaction.guild.id})` }]);
+                    embed.setColor("Green");
+                    promises.push(user.send({ embeds: [embed] }));
+                }
+            } catch (e) {}
+            promises.push(updateRolePromise);
+            await Promise.all(promises);
+
+            return await interaction.editReply({
+                content: "Processing completed - user verification request approved.",
+                embeds: [],
+                components: [],
+            });
+        }
+
+        // Reject request action
+        if (interaction.isButton() && interaction.customId.startsWith("MeteoriumUserVerificationReject-")) {
+            const targetUserId = interaction.customId.replaceAll("MeteoriumUserVerificationReject-", "");
+            await interaction.deferUpdate();
+
+            const openReasonButton = new ButtonBuilder();
+            openReasonButton.setLabel("Open modal");
+            openReasonButton.setCustomId(`MeteoriumUserVerificationRejectReasonButton-${targetUserId}`);
+            openReasonButton.setStyle(ButtonStyle.Primary);
+
+            const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents([openReasonButton]);
+            await interaction.followUp({
+                content: "Click the button below to open a modal to fill the rejection reason.",
+                ephemeral: true,
+                components: [actionRow],
+            });
+
+            return await interaction.editReply({
+                content: "See follow-up message for the next step.",
+                embeds: [],
+                components: [],
+            });
+        }
+
+        // Button for handling rejection open modal
+        if (interaction.isButton() && interaction.customId.startsWith("MeteoriumUserVerificationRejectReasonButton-")) {
+            const targetUserId = interaction.customId.replaceAll("MeteoriumUserVerificationRejectReasonButton-", "");
+
+            const modal = new ModalBuilder();
+            modal.setCustomId(`MeteoriumUserVerificationRejectFinal-${targetUserId}`);
+            modal.setTitle(`Verification rejection reason`);
+
+            const ti = new TextInputBuilder();
+            ti.setLabel("Details");
+            ti.setCustomId("MeteoriumUserVerificationRejectFinalReason");
+            ti.setRequired(true);
+            ti.setPlaceholder("Why was this user's verification rejected?");
+            ti.setStyle(TextInputStyle.Short);
+
+            const ar = new ActionRowBuilder<TextInputBuilder>();
+            ar.addComponents(ti);
+            modal.addComponents(ar);
+
+            return await interaction.showModal(modal);
+        }
+
+        // Reject final modal (reason modal)
+        if (interaction.isModalSubmit() && interaction.customId.startsWith("MeteoriumUserVerificationRejectFinal-")) {
+            const targetUserId = interaction.customId.replaceAll("MeteoriumUserVerificationRejectFinal-", "");
+            const rejectReason = interaction.fields.getTextInputValue("MeteoriumUserVerificationRejectFinalReason");
+            await interaction.deferUpdate();
+
+            const data = await this.client.db.userVerificationHistory.findFirst({
+                where: { GuildId: interaction.guildId, UserId: targetUserId },
+                orderBy: { VerificationHistoryId: "desc" },
+            });
+            if (!data)
+                return await interaction.editReply({
+                    content: "internal error: data doesn't exist?",
+                    embeds: [],
+                    components: [],
+                });
+
+            await this.client.db.userVerificationHistory.update({
+                where: { VerificationHistoryId: data.VerificationHistoryId },
+                data: {
+                    Status: VerificationStatus.Rejected,
+                    CheckerUserId: interaction.user.id,
+                    RejectReason: rejectReason,
+                    UpdatedAt: new Date(),
+                },
+            });
+
+            const promises: Promise<any>[] = [];
+            const updateRolePromise = new Promise<void>(async (resolve) => {
+                const member = await interaction.guild.members.fetch(targetUserId).catch(() => null);
+                if (member) await this.updateMemberVerificationRole(member);
+                return resolve();
+            });
+            try {
+                const user = await this.client.users.fetch(targetUserId).catch(() => null);
+                if (user) {
+                    const embed = new MeteoriumEmbedBuilder();
+                    embed.setTitle("Verification status");
+                    embed.setDescription("Unfortunately, your verification request was rejected.");
+                    embed.addFields([
+                        { name: "Server", value: `${interaction.guild.name} (${interaction.guild.id})` },
+                        { name: "Reason", value: rejectReason },
+                    ]);
+                    embed.setColor("Red");
+                    promises.push(user.send({ embeds: [embed] }));
+                }
+            } catch (e) {}
+            promises.push(updateRolePromise);
+            await Promise.all(promises);
+
+            return await interaction.editReply({
+                content: "Processing completed - user verification request rejected.",
+                embeds: [],
+                components: [],
+            });
+        }
+
+        return;
+    }
+
+    public async updateMemberVerificationRole(member: GuildMember) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: member.guild.id } });
+        if (!guildSettings) throw new Error("could not get settings from database");
+        if (guildSettings.EnabledGuildFeatures.indexOf(GuildFeatures.UserVerification) == -1) return;
+
+        const verRole =
+            guildSettings.VerifyVerifiedRoleId != ""
+                ? await member.guild.roles.fetch(guildSettings.VerifyVerifiedRoleId).catch(() => null)
+                : null;
+        const unVerRole =
+            guildSettings.VerifyUnverifiedRoleId != ""
+                ? await member.guild.roles.fetch(guildSettings.VerifyUnverifiedRoleId).catch(() => null)
+                : null;
+
+        const verHistData = await this.client.db.userVerificationHistory.findFirst({
+            where: { GuildId: member.guild.id, UserId: member.id },
+            orderBy: { VerificationHistoryId: "desc" },
+            include: { MainData: true },
+        });
+
+        if (verHistData?.Status == VerificationStatus.Approved) {
+            if (unVerRole && member.roles.cache.has(unVerRole.id)) {
+                await member.roles.remove(unVerRole);
+            }
+            if (verRole) await member.roles.add(verRole);
+        } else {
+            if (verRole && member.roles.cache.has(verRole.id)) {
+                await member.roles.remove(verRole);
+            }
+            if (unVerRole) await member.roles.add(unVerRole);
+        }
+
+        return;
     }
 }

@@ -1,4 +1,4 @@
-import { PermissionFlagsBits, SlashCommandBuilder, channelMention, codeBlock } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder, channelMention, codeBlock, roleMention } from "discord.js";
 import MeteoriumEmbedBuilder from "../../../classes/embedBuilder.js";
 import type { MeteoriumChatCommand } from "../../index.js";
 import type { Guild } from "@prisma/client";
@@ -7,6 +7,7 @@ enum SettingType {
     Boolean,
     String,
     Channel,
+    Role,
 }
 
 // A mapping of guild settings between interaction and database
@@ -16,7 +17,12 @@ type DbSettingNames =
     | "PublicModLogChannelId"
     | "LoggingChannelId"
     | "BanAppealLink"
-    | "EnabledGuildFeatures";
+    | "EnabledGuildFeatures"
+    | "VerifyDetailEnabled"
+    | "VerifyAttachEnabled"
+    | "VerifyTempPaused"
+    | "VerifyVerifiedRoleId"
+    | "VerifyUnverifiedRoleId";
 type SettingData = { type: SettingType; inName: string; dbName: DbSettingNames; description: string };
 const settingsMapping: Array<SettingData> = [
     {
@@ -49,6 +55,36 @@ const settingsMapping: Array<SettingData> = [
         dbName: "BanAppealLink",
         description: "Ban appeals link, this link will be sent when someone gets banned",
     },
+    {
+        type: SettingType.Boolean,
+        inName: "verdetailenabled",
+        dbName: "VerifyDetailEnabled",
+        description: "Is the detail section during request submission enabled for verification?",
+    },
+    {
+        type: SettingType.Boolean,
+        inName: "verattachenabled",
+        dbName: "VerifyAttachEnabled",
+        description: "Is the attachment section during request submission enabled for verification?",
+    },
+    {
+        type: SettingType.Boolean,
+        inName: "verpaused",
+        dbName: "VerifyTempPaused",
+        description: "Verification paused for the whole server",
+    },
+    {
+        type: SettingType.Role,
+        inName: "verifiedrole",
+        dbName: "VerifyVerifiedRoleId",
+        description: "The role to be given for those who got approved",
+    },
+    {
+        type: SettingType.Role,
+        inName: "unverifiedrole",
+        dbName: "VerifyUnverifiedRoleId",
+        description: "The role to be given for those who failed verification",
+    },
 ];
 
 const interactionData = new SlashCommandBuilder()
@@ -77,6 +113,11 @@ for (const setting of settingsMapping)
             case SettingType.Channel:
                 option.addChannelOption((option) =>
                     option.setName("value").setDescription("The channel value").setRequired(false),
+                );
+                break;
+            case SettingType.Role:
+                option.addRoleOption((option) =>
+                    option.setName("value").setDescription("The role value").setRequired(false),
                 );
                 break;
             default:
@@ -151,6 +192,23 @@ export const Command: MeteoriumChatCommand = {
                 embed.addFields([
                     { name: "New value", value: channelMention(newValue.id) },
                     { name: "Old value", value: channelMention(oldValue.toString()) },
+                ]);
+                break;
+            }
+            case SettingType.Role: {
+                const oldValue = guildSettings[data.dbName];
+                const newValue = interaction.options.getRole("value", false);
+                if (newValue == null) {
+                    embed.addFields([{ name: "Value", value: roleMention(oldValue.toString()) }]);
+                    return await interaction.editReply({ embeds: [embed] });
+                }
+
+                // @ts-ignore
+                guildSettings[data.dbName] = newValue!.id.toString();
+                await client.db.guild.update({ where: { GuildId: interaction.guildId }, data: guildSettings });
+                embed.addFields([
+                    { name: "New value", value: roleMention(newValue.id) },
+                    { name: "Old value", value: roleMention(oldValue.toString()) },
                 ]);
                 break;
             }

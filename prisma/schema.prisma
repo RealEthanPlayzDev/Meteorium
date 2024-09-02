@@ -30,16 +30,29 @@ enum GuildFeatures {
     RobloxAPI
 }
 
+enum VerificationStatus {
+    Waiting
+    Approved
+    Rejected
+    Revoked
+}
+
 model Guild {
-    GuildId               String           @unique
-    EnforceSayInExecutor  Boolean          @default(false)
-    JoinLeaveLogChannelId String           @default("")
-    PublicModLogChannelId String           @default("")
-    LoggingChannelId      String           @default("")
-    BanAppealLink         String           @default("")
-    EnabledGuildFeatures  GuildFeatures[]
-    ModerationCase        ModerationCase[]
-    Tag                   Tag[]
+    GuildId                String                 @unique
+    EnforceSayInExecutor   Boolean                @default(false)
+    JoinLeaveLogChannelId  String                 @default("")
+    PublicModLogChannelId  String                 @default("")
+    LoggingChannelId       String                 @default("")
+    BanAppealLink          String                 @default("")
+    VerifyDetailEnabled    Boolean                @default(false)
+    VerifyAttachEnabled    Boolean                @default(false)
+    VerifyTempPaused       Boolean                @default(false)
+    VerifyVerifiedRoleId   String                 @default("")
+    VerifyUnverifiedRoleId String                 @default("")
+    EnabledGuildFeatures   GuildFeatures[]
+    ModerationCase         ModerationCase[]
+    Tag                    Tag[]
+    UserVerificationData   UserVerificationData[]
 }
 
 model ModerationCase {
@@ -94,4 +107,37 @@ model Tag {
     TagName     String
     Content     String
     Attachment  String @default("")
+}
+
+model UserVerificationData {
+    Guild   Guild                     @relation(fields: [GuildId], references: [GuildId], onDelete: Cascade)
+    GuildId String
+    UserId  String
+    Banned  Boolean                   @default(false)
+    History UserVerificationHistory[]
+
+    @@unique(name: "UniqueUserPerGuild", fields: [GuildId, UserId])
+}
+
+model UserVerificationHistory {
+    VerificationHistoryId Int                  @id @default(autoincrement())
+    MainData              UserVerificationData @relation(fields: [GuildId, UserId], references: [GuildId, UserId], onDelete: Cascade)
+    GuildId               String
+    UserId                String
+    Status                VerificationStatus   @default(Waiting)
+    CheckerUserId         String               @default("")
+    CheckerNote           String               @default("")
+    Detail                String               @default("")
+    Attachment            String               @default("")
+    RejectReason          String               @default("")
+    CreatedAt             DateTime             @default(now())
+    UpdatedAt             DateTime             @default(now())
+}
+
+model UserVerificationAttachment {
+    GuildId    String
+    UserId     String
+    Attachment String
+
+    @@unique(name: "UniqueAttachmentPerUserPerGuild", fields: [GuildId, UserId])
 }
