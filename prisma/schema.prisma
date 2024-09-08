@@ -44,6 +44,7 @@ model Guild {
     PublicModLogChannelId  String                 @default("")
     LoggingChannelId       String                 @default("")
     BanAppealLink          String                 @default("")
+    ModPingRoleId          String                 @default("")
     VerifyDetailEnabled    Boolean                @default(false)
     VerifyAttachEnabled    Boolean                @default(false)
     VerifyTempPaused       Boolean                @default(false)

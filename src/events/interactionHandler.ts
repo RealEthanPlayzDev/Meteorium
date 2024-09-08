@@ -6,6 +6,12 @@ export const Event: MeteoriumEvent<"interactionCreate"> = {
     async callback(client, interaction) {
         await client.interactions.dispatchInteraction(interaction);
         await client.dbUtils.processVerification(interaction as Interaction<"cached">, true);
+        if (!interaction.isChatInputCommand())
+            await client.dbUtils.processModPing(
+                interaction.guildId!,
+                interaction.user.id,
+                interaction as Interaction<"cached">,
+            );
         return;
     },
     once: false,

@@ -8,6 +8,7 @@ const client = new MeteoriumClient({
         IntentsBitField.Flags.GuildMessages,
         IntentsBitField.Flags.GuildModeration,
         IntentsBitField.Flags.GuildVoiceStates,
+        IntentsBitField.Flags.GuildPresences,
     ],
 });
 

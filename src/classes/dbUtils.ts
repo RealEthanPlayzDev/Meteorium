@@ -13,6 +13,7 @@ import {
     ButtonBuilder,
     ComponentBuilder,
     ButtonStyle,
+    Collection,
 } from "discord.js";
 import { GuildFeatures, ModerationAction, ModerationCase, VerificationStatus } from "@prisma/client";
 import MeteoriumClient from "./client.js";
@@ -54,9 +55,19 @@ export type NewCaseData = {
 
 export default class MeteoriumDatabaseUtilities {
     public client: MeteoriumClient;
+    public modPingData: Collection<
+        string,
+        {
+            amount: number;
+            repeated: number;
+            channelId: string;
+            callMessageIds: Array<string>;
+        }
+    >;
 
     public constructor(client: MeteoriumClient) {
         this.client = client;
+        this.modPingData = new Collection();
     }
 
     public async getCaseData(guildId: string, caseId: number, historyTake?: number): Promise<CaseData | false> {
@@ -705,5 +716,202 @@ export default class MeteoriumDatabaseUtilities {
         }
 
         return;
+    }
+
+    public async generateModPingMentions(guildId: string, amount: number, pingRole: boolean) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        if (!guildSettings) throw new Error("could not get settings from database");
+        if (guildSettings.ModPingRoleId == "") return false;
+
+        if (!pingRole) {
+            const guild = await this.client.guilds.fetch(guildId).catch(() => null);
+            if (!guild) throw new Error(`failed to fetch guild ${guildId}`);
+
+            const role = await guild.roles.fetch(guildSettings.ModPingRoleId).catch(() => null);
+            if (!role) throw new Error(`failed to fetch role ${guildSettings.ModPingRoleId} from ${guildId}`);
+
+            const onlineUsers = role.members.map((v) => v);
+            //const onlineUsers = role.members
+            //    .map((v) => {
+            //        if (v.presence?.status != "offline") return v;
+            //        return;
+            //    })
+            //    .filter((v) => v != undefined);
+
+            const picked: GuildMember[] = [];
+            while (picked.length <= amount && picked.length != onlineUsers.length) {
+                const selected = onlineUsers[this.getRandomInt(0, onlineUsers.length - 1)];
+                if (picked.indexOf(selected) == -1) picked.push(selected);
+            }
+
+            //return picked.map((v) => `<@!${v.user.id}>`).join(" ");
+            return picked.map((v) => `${v.user.username}<${v.user.id}>`).join(" ");
+        }
+
+        return `<@!${guildSettings.ModPingRoleId}>`;
+    }
+
+    public async generateModPingEmbedActionRow(
+        requester: User,
+        guildId: string,
+        repeated: number,
+        finished: boolean,
+        concludor?: User,
+    ) {
+        const embed = new MeteoriumEmbedBuilder(requester);
+        embed.setTitle("Mod ping");
+        embed.setDescription(
+            finished
+                ? "This mod ping call has been concluded."
+                : "A mod ping was initiated. Once attended by a moderator press the button below to end the mod ping call.",
+        );
+        embed.addFields([
+            { name: "Requested by", value: userMention(requester.id) },
+            { name: "Repeated", value: repeated.toString() },
+        ]);
+
+        if (concludor) embed.addFields([{ name: "Concluded by", value: userMention(concludor.id) }]);
+
+        const btn = new ButtonBuilder();
+        btn.setCustomId(`MeteoriumModPingConclude-${requester.id}-${guildId}`);
+        btn.setLabel("Conclude");
+        btn.setStyle(ButtonStyle.Success);
+        btn.setDisabled(finished);
+
+        const ar = new ActionRowBuilder<ButtonBuilder>();
+        ar.addComponents(btn);
+
+        return { embed: embed, actionRow: ar };
+    }
+
+    public async processModPing(guildId: string, userId: string, interaction?: Interaction<"cached">) {
+        const guildSettings = await this.client.db.guild.findUnique({ where: { GuildId: guildId } });
+        if (!guildSettings) throw new Error("could not get settings from database");
+
+        if (guildSettings.ModPingRoleId == "") {
+            if (interaction && interaction.isChatInputCommand())
+                return await interaction.reply({
+                    ephemeral: true,
+                    content:
+                        "This server's configuration is incomplete to have mod ping functionality. Contact a server admin about this.",
+                });
+            return;
+        }
+        const data = this.modPingData.get(`${userId}-${guildId}`);
+
+        if (interaction) {
+            if (interaction.isButton() && interaction.customId.startsWith("MeteoriumModPingConclude-")) {
+                if (!interaction.member.roles.cache.has(guildSettings.ModPingRoleId))
+                    return await interaction.reply({
+                        ephemeral: true,
+                        content: "Only moderators may press this button.",
+                    });
+
+                const modPingId = interaction.customId.replaceAll("MeteoriumModPingConclude-", "");
+                const [userId, guildId] = modPingId.split("-");
+
+                const data = this.modPingData.get(modPingId);
+                let requesterUser = interaction.user;
+
+                if (data) {
+                    this.modPingData.delete(modPingId);
+                    const channel = await this.client.channels.fetch(data.channelId).catch(() => null);
+                    requesterUser = (await this.client.users.fetch(userId).catch(() => null)) || requesterUser;
+                    if (channel && channel.isTextBased())
+                        data.callMessageIds.forEach(async (v) => {
+                            const msg = await channel.messages.fetch(v).catch(() => null);
+                            if (msg) {
+                                const { embed, actionRow } = await this.generateModPingEmbedActionRow(
+                                    requesterUser,
+                                    guildId,
+                                    0,
+                                    true,
+                                    interaction.user,
+                                );
+                                await msg.edit({ embeds: [embed], components: [actionRow] });
+                            }
+                        });
+                }
+
+                return await interaction.reply({ ephemeral: true, content: "Mod ping concluded." });
+            }
+            if (interaction.isChatInputCommand()) {
+                if (data) {
+                    return await interaction.reply({
+                        ephemeral: true,
+                        content: "You have already initiated a mod ping and it is still on-going.",
+                    });
+                }
+
+                const mentions = await this.generateModPingMentions(guildId, 3, false);
+                const msgData = await this.generateModPingEmbedActionRow(
+                    interaction.user,
+                    interaction.guildId,
+                    0,
+                    false,
+                );
+                if (!mentions) return;
+
+                const msg = await interaction.channel?.send({
+                    content: mentions,
+                    embeds: [msgData.embed],
+                    components: [msgData.actionRow],
+                });
+                if (!msg) return;
+
+                this.modPingData.set(`${userId}-${guildId}`, {
+                    amount: 3,
+                    repeated: 0,
+                    channelId: interaction.channelId,
+                    callMessageIds: [msg.id],
+                });
+
+                return await interaction.reply({ ephemeral: true, content: "Mod ping initiated." });
+            }
+            return;
+        }
+
+        if (!data) return;
+        data.repeated += 1;
+        data.amount += 1;
+
+        const user = await this.client.users.fetch(userId).catch(() => null);
+        if (!user) throw new Error(`could not fetch user ${user}`);
+
+        const channel = await this.client.channels.fetch(data.channelId).catch(() => null);
+        if (!channel) throw new Error(`could not fetch chanel ${data.channelId}`);
+        if (!channel.isTextBased()) return this.modPingData.delete(`${userId}-${guildId}`);
+
+        if (data.repeated > 4) {
+            const mentions = await this.generateModPingMentions(guildId, data.amount, true);
+            const msgData = await this.generateModPingEmbedActionRow(user, guildId, data.repeated, false);
+            if (!mentions) return;
+
+            const msg = await channel.send({
+                content: mentions,
+                embeds: [msgData.embed],
+                components: [msgData.actionRow],
+            });
+            data.callMessageIds.push(msg.id);
+            return;
+        }
+
+        const mentions = await this.generateModPingMentions(guildId, data.amount, false);
+        const msgData = await this.generateModPingEmbedActionRow(user, guildId, data.repeated, false);
+        if (!mentions) return;
+
+        const msg = await channel.send({
+            content: mentions,
+            embeds: [msgData.embed],
+            components: [msgData.actionRow],
+        });
+        data.callMessageIds.push(msg.id);
+        return;
+    }
+
+    public getRandomInt(min: number, max: number) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 }
