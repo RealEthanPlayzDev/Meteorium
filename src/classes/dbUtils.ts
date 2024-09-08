@@ -744,8 +744,8 @@ export default class MeteoriumDatabaseUtilities {
                 if (picked.indexOf(selected) == -1) picked.push(selected);
             }
 
-            //return picked.map((v) => `<@!${v.user.id}>`).join(" ");
-            return picked.map((v) => `${v.user.username}<${v.user.id}>`).join(" ");
+            return picked.map((v) => `<@!${v.user.id}>`).join(" ");
+            //return picked.map((v) => `${v.user.username}<${v.user.id}>`).join(" ");
         }
 
         return `<@!${guildSettings.ModPingRoleId}>`;
