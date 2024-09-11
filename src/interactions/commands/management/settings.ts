@@ -22,7 +22,8 @@ type DbSettingNames =
     | "VerifyAttachEnabled"
     | "VerifyTempPaused"
     | "VerifyVerifiedRoleId"
-    | "VerifyUnverifiedRoleId";
+    | "VerifyUnverifiedRoleId"
+    | "CreateCaseFromAutoMod";
 type SettingData = { type: SettingType; inName: string; dbName: DbSettingNames; description: string };
 const settingsMapping: Array<SettingData> = [
     {
@@ -84,6 +85,12 @@ const settingsMapping: Array<SettingData> = [
         inName: "unverifiedrole",
         dbName: "VerifyUnverifiedRoleId",
         description: "The role to be given for those who failed verification",
+    },
+    {
+        type: SettingType.Boolean,
+        inName: "casefromautomod",
+        dbName: "CreateCaseFromAutoMod",
+        description: "Detect automod events and automatically create a case from it",
     },
 ];
 

@@ -7,6 +7,7 @@ export * as PresenceResumption from "./presenceResumption.js";
 export * as GuildDataSetup from "./guildDataSetup.js";
 export * as GuildMemberJoinLogging from "./guildMemberJoinLogging.js";
 export * as GuildMemberLeaveLogging from "./guildMemberLeaveLogging.js";
+export * as AutoModDetect from "./autoModDetect.js";
 
 export type MeteoriumEvent<EventName extends keyof ClientEvents> = {
     event: EventName;

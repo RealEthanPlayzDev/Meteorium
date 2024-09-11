@@ -50,6 +50,7 @@ model Guild {
     VerifyTempPaused       Boolean                @default(false)
     VerifyVerifiedRoleId   String                 @default("")
     VerifyUnverifiedRoleId String                 @default("")
+    CreateCaseFromAutoMod  Boolean                @default(true)
     EnabledGuildFeatures   GuildFeatures[]
     ModerationCase         ModerationCase[]
     Tag                    Tag[]
