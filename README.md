@@ -1,3 +1,6 @@
+# Retired
+As of September 15 2024, Meteorium has officially released EoL and has been retired. No new updates will come anymore.
+
 # Meteorium
 
 This is a hobby Discord bot I've written, the bot is only used for a few servers.
